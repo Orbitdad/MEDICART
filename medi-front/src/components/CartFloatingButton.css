@@ -1,0 +1,37 @@
+  .cart-float-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    background: #2563eb;
+    color: white;
+
+    border: none;
+    border-radius: 999px;
+    padding: 0.65rem 1.2rem;
+
+    font-size: 0.9rem;
+    font-weight: 500;
+
+    cursor: pointer;
+    box-shadow: 0 18px 40px rgba(37, 99, 235, 0.45);
+    z-index: 100;
+  }
+
+  .cart-float-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .cart-count {
+    background: white;
+    color: #2563eb;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+  }

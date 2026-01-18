@@ -1,0 +1,142 @@
+/* =========================
+   NAVBAR (REAL GLASS)
+========================= */
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  z-index: 1000;
+
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.navbar-inner {
+  height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.navbar-logo {
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+
+.logo-main {
+  color: #0f172a;
+}
+
+.logo-accent {
+  color: #2563eb;
+}
+
+/* Links */
+.nav-links {
+  display: flex;
+  gap: 1.6rem;
+}
+
+.nav-links a {
+  position: relative;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #475569;
+  padding-bottom: 0.25rem;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0%;
+  height: 2px;
+  background: #2563eb;
+  transition: width 200ms ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  width: 100%;
+}
+
+.nav-links a:hover {
+  color: #2563eb;
+}
+
+/* Right group */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  background: rgba(255, 255, 255, 0.6);
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.nav-user {
+  font-size: 0.85rem;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nav-role {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.65rem;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Logout */
+.nav-logout {
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  background: transparent;
+  color: #0f172a;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.nav-logout:hover {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: #2563eb;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .navbar-inner {
+    padding: 0 1rem;
+  }
+}

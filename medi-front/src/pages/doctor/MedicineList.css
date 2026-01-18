@@ -1,0 +1,90 @@
+.medicine-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.medicine-header h1 {
+  font-size: 1.6rem;
+  margin-bottom: 0.25rem;
+}
+
+.medicine-header p {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.medicine-search {
+  margin: 1.2rem 0;
+}
+
+.medicine-search input {
+  width: 100%;
+  max-width: 420px;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+}
+
+.medicine-search input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.medicine-categories {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.cat {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cat.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.medicine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.2rem;
+}
+
+.medicine-loading,
+.medicine-empty {
+  padding: 2rem;
+  color: #64748b;
+}
+
+
+.sticky-search {
+  position: sticky;
+  top: 64px;
+  z-index: 20;
+  background: #f8fafc;
+  padding-top: 0.5rem;
+}
+
+.skeleton-card {
+  height: 140px;
+  border-radius: 16px;
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 25%,
+    #e5e7eb 37%,
+    #f1f5f9 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
