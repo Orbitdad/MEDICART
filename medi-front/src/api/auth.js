@@ -4,32 +4,57 @@ import * as client from "./client";
    DOCTOR AUTH
 ========================= */
 export const doctorLogin = async (email, password) => {
-  const data = await client.post("/auth/doctor/login", {
+  const res = await client.post("/auth/doctor/login", {
     email,
     password,
   });
 
-  return data;
+  // 🔒 normalize response
+  if (!res || !res.token) {
+    throw new Error("Invalid login response");
+  }
+
+  return {
+    token: res.token,
+    role: res.role,
+    user: res.user,
+  };
 };
 
 export const doctorSignup = async (name, email, password) => {
-  const data = await client.post("/auth/doctor/register", {
+  const res = await client.post("/auth/doctor/register", {
     name,
     email,
     password,
   });
 
-  return data;
+  if (!res || !res.token) {
+    throw new Error("Invalid signup response");
+  }
+
+  return {
+    token: res.token,
+    role: res.role,
+    user: res.user,
+  };
 };
 
 /* =========================
    ADMIN AUTH
 ========================= */
 export const adminLogin = async (email, password) => {
-  const data = await client.post("/auth/admin/login", {
+  const res = await client.post("/auth/admin/login", {
     email,
     password,
   });
 
-  return data;
+  if (!res || !res.token) {
+    throw new Error("Invalid admin login response");
+  }
+
+  return {
+    token: res.token,
+    role: res.role,
+    user: res.user,
+  };
 };

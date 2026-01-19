@@ -1,5 +1,8 @@
 const base = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "");
 
+/* =========================
+   HEADERS
+========================= */
 function buildHeaders() {
   const token = localStorage.getItem("medicart_token");
 
@@ -9,13 +12,45 @@ function buildHeaders() {
   };
 }
 
-async function handleResponse(res) {
-  // 204 No Content (OPTIONS, DELETE sometimes)
-  if (res.status === 204) {
-    return null;
-  }
+/* =========================
+   SAFE FETCH (MOBILE FIX)
+========================= */
+async function safeFetch(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000); // ⏱️ 15s
 
-  const text = await res.text();
+  try {
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+
+    return res;
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw new Error("Server timeout. Please try again.");
+    }
+
+    throw new Error(
+      "Network error. Check internet or backend connection."
+    );
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/* =========================
+   RESPONSE HANDLER
+========================= */
+async function handleResponse(res) {
+  if (res.status === 204) return null;
+
+  let text = "";
+  try {
+    text = await res.text();
+  } catch {
+    throw new Error("Server response error");
+  }
 
   let data = null;
   try {
@@ -31,15 +66,19 @@ async function handleResponse(res) {
   return data;
 }
 
+/* =========================
+   URL BUILDER
+========================= */
 function buildUrl(path) {
-  if (!path.startsWith("/")) {
-    path = "/" + path;
-  }
+  if (!path.startsWith("/")) path = "/" + path;
   return base + path;
 }
 
+/* =========================
+   METHODS
+========================= */
 export async function get(path) {
-  const res = await fetch(buildUrl(path), {
+  const res = await safeFetch(buildUrl(path), {
     method: "GET",
     headers: buildHeaders(),
   });
@@ -48,7 +87,7 @@ export async function get(path) {
 }
 
 export async function post(path, body) {
-  const res = await fetch(buildUrl(path), {
+  const res = await safeFetch(buildUrl(path), {
     method: "POST",
     headers: buildHeaders(),
     body: JSON.stringify(body),
@@ -58,7 +97,7 @@ export async function post(path, body) {
 }
 
 export async function put(path, body) {
-  const res = await fetch(buildUrl(path), {
+  const res = await safeFetch(buildUrl(path), {
     method: "PUT",
     headers: buildHeaders(),
     body: JSON.stringify(body),
@@ -68,7 +107,7 @@ export async function put(path, body) {
 }
 
 export async function del(path) {
-  const res = await fetch(buildUrl(path), {
+  const res = await safeFetch(buildUrl(path), {
     method: "DELETE",
     headers: buildHeaders(),
   });
