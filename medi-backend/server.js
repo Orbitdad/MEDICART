@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-import cors from "cors";
 import morgan from "morgan";
 import path from "path";
 
@@ -27,22 +26,32 @@ connectDB();
 const app = express();
 
 // =========================
-// MIDDLEWARE
+// BODY PARSERS
 // =========================
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 // =========================
-// CORS — FINAL & CORRECT
+// ✅ FINAL CORS (MOBILE SAFE)
 // =========================
-app.use(
-  cors({
-    origin: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 
 // =========================
 // ROUTES
@@ -67,11 +76,10 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use(errorHandler);
 
 // =========================
-// SERVER
+// SERVER — 🔥 VERY IMPORTANT
 // =========================
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 MediCart backend running on port ${PORT}`);
 });
-  
