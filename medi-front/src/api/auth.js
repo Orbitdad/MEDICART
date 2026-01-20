@@ -4,12 +4,11 @@ import * as client from "./client";
    DOCTOR AUTH
 ========================= */
 export const doctorLogin = async (email, password) => {
-  const res = await client.post("/auth/doctor/login", {
+  const res = await client.post("/api/auth/doctor/login", {
     email,
     password,
   });
 
-  // 🔒 normalize response
   if (!res || !res.token) {
     throw new Error("Invalid login response");
   }
@@ -22,7 +21,7 @@ export const doctorLogin = async (email, password) => {
 };
 
 export const doctorSignup = async (name, email, password) => {
-  const res = await client.post("/auth/doctor/register", {
+  const res = await client.post("/api/auth/doctor/register", {
     name,
     email,
     password,
@@ -43,7 +42,7 @@ export const doctorSignup = async (name, email, password) => {
    ADMIN AUTH
 ========================= */
 export const adminLogin = async (email, password) => {
-  const res = await client.post("/auth/admin/login", {
+  const res = await client.post("/api/auth/admin/login", {
     email,
     password,
   });
