@@ -9,14 +9,14 @@ import heroImage from "../../../assets/hero.png";
 
 export default function DoctorHome() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { items } = useCart();
+
+  const { user } = useAuth() || {};
+  const { items = [] } = useCart() || {};
 
   const hasCartItems = items.length > 0;
 
   return (
     <div className="space-y-6">
-
       {/* =========================
           HERO IMAGE BANNER
       ========================== */}
@@ -104,6 +104,7 @@ export default function DoctorHome() {
             <h3 className="text-sm font-medium">Cart</h3>
             <ChevronRight size={16} className="text-muted" />
           </div>
+
           <p className="text-muted mt-1 text-sm">
             {hasCartItems ? `${items.length} items` : "Empty"}
           </p>
@@ -111,9 +112,7 @@ export default function DoctorHome() {
 
         <div className="card">
           <h3 className="text-sm font-medium">Payment</h3>
-          <p className="text-muted mt-1 text-sm">
-            Hospital Credit
-          </p>
+          <p className="text-muted mt-1 text-sm">Hospital Credit</p>
         </div>
 
         <div
@@ -124,16 +123,13 @@ export default function DoctorHome() {
             <h3 className="text-sm font-medium">Medicines</h3>
             <ChevronRight size={16} className="text-muted" />
           </div>
-          <p className="text-muted mt-1 text-sm">
-            Browse inventory
-          </p>
+
+          <p className="text-muted mt-1 text-sm">Browse inventory</p>
         </div>
 
         <div className="card">
           <h3 className="text-sm font-medium">Orders</h3>
-          <p className="text-muted mt-1 text-sm">
-            Recent activity
-          </p>
+          <p className="text-muted mt-1 text-sm">Recent activity</p>
         </div>
       </section>
 
@@ -145,6 +141,7 @@ export default function DoctorHome() {
           <p className="text-muted text-sm">
             You haven’t added any medicines yet.
           </p>
+
           <button
             className="button button-primary mt-3 w-full md:w-auto"
             onClick={() => navigate("/doctor/medicines")}
@@ -156,5 +153,3 @@ export default function DoctorHome() {
     </div>
   );
 }
-
-
