@@ -14,6 +14,8 @@ import adminMedicineRoutes from "./routes/adminMedicineRoutes.js";
 import doctorAuthRoutes from "./routes/doctorAuthRoutes.js";
 import medicineRoutes from "./routes/medicineRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+
 
 // Middleware
 import { errorHandler } from "./middleware/errorMiddleware.js";
@@ -64,6 +66,8 @@ app.use("/api/orders", orderRoutes);
 
 app.use("/api/admin/medicines", adminMedicineRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
+app.use("/api/payment", paymentRoutes);
+
 
 // =========================
 // STATIC FILES
