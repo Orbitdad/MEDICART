@@ -10,12 +10,17 @@ export const getMedicines = async (req, res, next) => {
       ? { name: { $regex: req.query.search, $options: "i" } }
       : {};
 
-    const medicines = await Medicine.find(q).sort({ name: 1 });
+    const medicines = await Medicine.find({
+      ...q,
+      isActive: true,
+    }).sort({ name: 1 });
+
     res.json(medicines);
   } catch (err) {
     next(err);
   }
 };
+
 
 /* ----------------------------------
    ADMIN: GET ALL MEDICINES
