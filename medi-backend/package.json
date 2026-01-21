@@ -1,6 +1,10 @@
 {
     "homepage": "https://Orbitdad.github.io/MEDICART",
     "type": "module",
+    "engines": {
+        "node": "18.x"
+    },
+
     "name": "medi-backend",
     "version": "1.0.0",
     "main": "server.js",
