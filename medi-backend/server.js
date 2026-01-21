@@ -39,16 +39,28 @@ app.use(morgan("dev"));
 // =========================
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://orbitdad.github.io",
-    ],
+    origin: (origin, callback) => {
+      const allowed = [
+        "http://localhost:5173",
+        "https://orbitdad.github.io",
+      ];
+
+      // allow Postman / mobile / server-side
+      if (!origin) return callback(null, true);
+
+      if (allowed.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS blocked"));
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: false,
   })
 );
 
-// ✅ IMPORTANT — preflight support
+// ✅ VERY IMPORTANT
 app.options("*", cors());
 
 // =========================
