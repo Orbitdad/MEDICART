@@ -11,7 +11,7 @@ export async function adminFetchOrders() {
 /* ✅ NEW */
 export async function updateOrderStatus(orderId, status) {
   const res = await fetch(
-    `${import.meta.env.VITE_API_BASE_URL}/admin/orders/${orderId}/status`,
+    `${import.meta.env.VITE_API_URL}/admin/orders/${orderId}/status`,
     {
       method: "PUT",
       headers: {
