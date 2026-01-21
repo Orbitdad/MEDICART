@@ -1,4 +1,6 @@
-const base = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+const base =
+  (import.meta.env.VITE_API_URL || "https://medicart-backend.onrender.com/api")
+    .replace(/\/$/, "");
 
 /* =========================
    HEADERS
