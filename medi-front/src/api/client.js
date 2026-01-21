@@ -19,7 +19,7 @@ function buildHeaders() {
 ========================= */
 async function safeFetch(url, options = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000); // ⏱️ 15s
+  const timeout = setTimeout(() => controller.abort(), 60000); // ⏱️ 15s
 
   try {
     const res = await fetch(url, {
