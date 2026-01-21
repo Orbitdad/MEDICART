@@ -4,7 +4,7 @@ dotenv.config();
 import express from "express";
 import morgan from "morgan";
 import path from "path";
-import cors from "cors"; // ✅ ADD
+import cors from "cors";
 
 import connectDB from "./config/db.js";
 
@@ -27,6 +27,27 @@ connectDB();
 
 const app = express();
 
+/* ======================================================
+   🔥 GLOBAL PREFLIGHT HANDLER — MUST BE FIRST
+====================================================== */
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://orbitdad.github.io");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
 // =========================
 // BODY PARSERS
 // =========================
@@ -35,33 +56,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 // =========================
-// ✅ UPDATED CORS (RENDER + GITHUB SAFE)
+// ✅ STANDARD CORS (SAFE)
 // =========================
 app.use(
   cors({
-    origin: (origin, callback) => {
-      const allowed = [
-        "http://localhost:5173",
-        "https://orbitdad.github.io",
-      ];
-
-      // allow Postman / mobile / server-side
-      if (!origin) return callback(null, true);
-
-      if (allowed.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("CORS blocked"));
-    },
+    origin: [
+      "http://localhost:5173",
+      "https://orbitdad.github.io",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: false,
   })
 );
-
-// ✅ VERY IMPORTANT
-app.options("*", cors());
 
 // =========================
 // ROUTES
