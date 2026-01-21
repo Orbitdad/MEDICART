@@ -1,6 +1,5 @@
-const BASE =
-  import.meta.env.VITE_API_URL ||
-  "https://medicart-backend.onrender.com/api";
+const BASE = import.meta.env.VITE_API_URL;
+
 
 /* =========================
    DOCTOR
