@@ -1,11 +1,13 @@
-const base = import.meta.env.VITE_API_URL;
+const BASE =
+  import.meta.env.VITE_API_URL ||
+  "https://medicart-backend.onrender.com/api";
 
 /* =========================
    DOCTOR
 ========================= */
 export const getMedicines = async (search = "") => {
   const res = await fetch(
-    `${base}/medicines?search=${encodeURIComponent(search)}`
+    `${BASE}/medicines?search=${encodeURIComponent(search)}`
   );
 
   if (!res.ok) {
