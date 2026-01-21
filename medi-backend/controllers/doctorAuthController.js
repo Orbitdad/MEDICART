@@ -33,7 +33,7 @@ export const registerDoctor = async (req, res) => {
 
     const token = generateToken(doctor._id, "doctor");
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       token,
       role: "doctor",
@@ -44,7 +44,9 @@ export const registerDoctor = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Doctor register error:", error);
+
+    return res.status(500).json({
       success: false,
       message: "Doctor registration failed",
     });
@@ -74,7 +76,6 @@ export const loginDoctor = async (req, res) => {
       });
     }
 
-    // VERY IMPORTANT
     if (doctor.role !== "doctor") {
       return res.status(403).json({
         success: false,
@@ -82,7 +83,17 @@ export const loginDoctor = async (req, res) => {
       });
     }
 
-    const isMatch = await doctor.matchPassword(password);
+    let isMatch = false;
+
+    try {
+      isMatch = await doctor.matchPassword(password);
+    } catch (err) {
+      console.error("Password compare failed:", err);
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
 
     if (!isMatch) {
       return res.status(401).json({
@@ -93,7 +104,7 @@ export const loginDoctor = async (req, res) => {
 
     const token = generateToken(doctor._id, "doctor");
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       token,
       role: "doctor",
@@ -104,7 +115,9 @@ export const loginDoctor = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Doctor login error:", error);
+
+    return res.status(500).json({
       success: false,
       message: "Doctor login failed",
     });
