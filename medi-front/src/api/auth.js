@@ -4,7 +4,7 @@ import * as client from "./client";
    DOCTOR AUTH
 ========================= */
 export const doctorLogin = async (email, password) => {
-  const res = await client.post("/auth/doctor/login", {
+  const res = await client.post("/api/auth/doctor/login", {
     email,
     password,
   });
@@ -21,7 +21,7 @@ export const doctorLogin = async (email, password) => {
 };
 
 export const doctorSignup = async (name, email, password) => {
-  const res = await client.post("/auth/doctor/register", {
+  const res = await client.post("/api/auth/doctor/register", {
     name,
     email,
     password,
