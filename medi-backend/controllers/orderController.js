@@ -6,13 +6,19 @@ import Medicine from "../models/Medicine.js";
 ----------------------------------- */
 export const placeOrder = async (req, res, next) => {
   try {
-    const { items, notes, paymentMode } = req.body;
+    const {
+      items,
+      notes,
+      paymentMode,
+      paymentInfo,
+    } = req.body;
 
     if (!items || items.length === 0) {
       return res.status(400).json({ message: "No items in order" });
     }
 
     let total = 0;
+    const orderItems = [];
 
     for (const item of items) {
       const medicine = await Medicine.findOneAndUpdate(
@@ -31,23 +37,37 @@ export const placeOrder = async (req, res, next) => {
       }
 
       total += medicine.price * item.quantity;
+
+      orderItems.push({
+        medicineId: medicine._id,
+        quantity: item.quantity,
+      });
     }
 
     const order = await Order.create({
       doctor: req.user._id,
-      items,
+      items: orderItems,
       notes,
       totalAmount: total,
-      paymentMode,
+
+      paymentMode, // "credit" | "online"
+
       paymentStatus:
-        paymentMode === "now" ? "paid" : "pending",
+        paymentMode === "online" ? "paid" : "pending",
+
+      paymentInfo:
+        paymentMode === "online" ? paymentInfo : null,
+
+      orderStatus: "placed",
     });
 
     res.status(201).json({
       message: "Order placed successfully",
       order,
     });
+
   } catch (err) {
+    console.error("ORDER ERROR:", err);
     next(err);
   }
 };
@@ -73,6 +93,8 @@ export const adminGetOrders = async (req, res, next) => {
 ----------------------------------- */
 export const adminUpdateOrderStatus = async (req, res, next) => {
   try {
+    const { orderStatus } = req.body;
+
     const order = await Order.findById(req.params.id);
 
     if (!order) {
@@ -81,11 +103,11 @@ export const adminUpdateOrderStatus = async (req, res, next) => {
         .json({ message: "Order not found" });
     }
 
-    order.status = req.body.status || order.status;
+    order.orderStatus = orderStatus || order.orderStatus;
     await order.save();
 
     res.json({
-      message: "Order updated",
+      message: "Order updated successfully",
       order,
     });
   } catch (err) {

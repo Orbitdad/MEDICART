@@ -8,8 +8,8 @@ export async function adminFetchOrders() {
   return client.get("/admin/orders");
 }
 
-/* ✅ NEW */
-export async function updateOrderStatus(orderId, status) {
+/* ✅ ADMIN: UPDATE ORDER STATUS */
+export async function updateOrderStatus(orderId, orderStatus) {
   const res = await fetch(
     `${import.meta.env.VITE_API_URL}/admin/orders/${orderId}/status`,
     {
@@ -18,7 +18,7 @@ export async function updateOrderStatus(orderId, status) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("medicart_token")}`,
       },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ orderStatus }),
     }
   );
 
