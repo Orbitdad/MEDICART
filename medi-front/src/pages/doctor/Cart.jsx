@@ -62,7 +62,7 @@ export default function Cart() {
       setLoading(true);
       setError("");
 
-      const BASE = import.meta.env.VITE_API_BASE_URL;
+      const BASE = import.meta.env.VITE_API_URL;
 
       const res = await fetch(`${BASE}/payment/create-order`, {
         method: "POST",
