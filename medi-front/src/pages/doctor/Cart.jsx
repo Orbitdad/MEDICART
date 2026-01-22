@@ -62,16 +62,12 @@ export default function Cart() {
       setError("");
 
       // 1️⃣ Create Razorpay order from backend
-      const res = await fetch(
-        `${BASE}/payment/create-order`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: totalAmount,
-          }),
-        }
-      );
+      const res = await fetch(`${BASE}/payment/create-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: totalAmount }),
+      });
+
 
       const order = await res.json();
 
@@ -86,14 +82,12 @@ export default function Cart() {
 
         handler: async function (response) {
           // 3️⃣ Verify payment on backend
-          const verify = await fetch(
-            `${BASE}/payment/verify`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(response),
-            }
-          );
+          const verify = await fetch(`${BASE}/payment/verify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(response),
+          });
+
 
           const data = await verify.json();
 
