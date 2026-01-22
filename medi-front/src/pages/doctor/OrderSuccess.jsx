@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
+const BASE = import.meta.env.VITE_API_URL;
 
 export default function OrderSuccess() {
   const navigate = useNavigate();

@@ -30,23 +30,17 @@ const app = express();
 /* ======================================================
    🔥 GLOBAL PREFLIGHT HANDLER — MUST BE FIRST
 ====================================================== */
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://orbitdad.github.io");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://orbitdad.github.io",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-
-  next();
-});
 
 // =========================
 // BODY PARSERS
