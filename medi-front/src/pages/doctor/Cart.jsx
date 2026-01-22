@@ -14,7 +14,7 @@ export default function Cart() {
     setNotes,
   } = useCart();
 
-  const [paymentMode, setPaymentMode] = useState("later");
+  const [paymentMode, setPaymentMode] = useState("credit");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [confirming, setConfirming] = useState(false);
@@ -26,13 +26,13 @@ export default function Cart() {
     0
   );
 
-  /* =====================================================
-     PLACE ORDER (USED AFTER PAYMENT OR PAY LATER)
-  ====================================================== */
-  const confirmPlaceOrder = async () => {
+  /* =============================
+     PLACE ORDER
+  ============================== */
+  const confirmPlaceOrder = async (paymentInfo = null) => {
     setConfirming(false);
-    setLoading(true);
     setError("");
+    setLoading(true);
 
     try {
       await placeOrder({
@@ -41,25 +41,29 @@ export default function Cart() {
           quantity: it.quantity,
         })),
         notes,
-        paymentMode,
+        paymentMode: paymentInfo ? "online" : "credit",
+        paymentInfo,
       });
 
       clearCart();
       navigate("/doctor/order-success");
-    } catch {
+    } catch (err) {
       setError("Order failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  /* =====================================================
+  /* =============================
      RAZORPAY PAYMENT
-  ====================================================== */
+  ============================== */
   const handleOnlinePayment = async () => {
     try {
       setLoading(true);
       setError("");
+
+      const BASE = import.meta.env.VITE_API_BASE_URL;
+
       const res = await fetch(`${BASE}/payment/create-order`, {
         method: "POST",
         headers: {
@@ -71,17 +75,11 @@ export default function Cart() {
       });
 
       if (!res.ok) {
-        const errText = await res.text();
-        console.error("Create order API failed:", errText);
         throw new Error("Create order failed");
       }
 
       const order = await res.json();
 
-
-
-
-      // 2️⃣ Razorpay checkout options
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
@@ -91,21 +89,30 @@ export default function Cart() {
         description: "Medicine Order Payment",
 
         handler: async function (response) {
-          // 3️⃣ Verify payment on backend
-          const verify = await fetch(`${BASE}/payment/verify`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response),
-          });
+          try {
+            const verify = await fetch(`${BASE}/payment/verify`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(response),
+            });
 
+            const data = await verify.json();
 
-          const data = await verify.json();
-
-          if (data.success) {
-            await confirmPlaceOrder();
-          } else {
-            setError("Payment verification failed.");
+            if (data.success) {
+              await confirmPlaceOrder({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+              });
+            } else {
+              setError("Payment verification failed.");
+            }
+          } catch {
+            setError("Payment verification error.");
           }
+        },
+
+        modal: {
+          ondismiss: () => setLoading(false),
         },
 
         theme: {
@@ -115,16 +122,17 @@ export default function Cart() {
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-    } catch {
+
+    } catch (err) {
+      console.error(err);
       setError("Payment failed. Please try again.");
-    } finally {
       setLoading(false);
     }
   };
 
-  /* =====================================================
+  /* =============================
      EMPTY CART
-  ====================================================== */
+  ============================== */
   if (!items.length) {
     return (
       <div className="card text-center max-w-md mx-auto">
@@ -139,13 +147,12 @@ export default function Cart() {
     );
   }
 
-  /* =====================================================
+  /* =============================
      UI
-  ====================================================== */
+  ============================== */
   return (
     <div className="max-w-2xl mx-auto space-y-6">
 
-      {/* HEADER */}
       <div className="text-center">
         <h2 className="text-2xl font-semibold">Review Order</h2>
         <p className="text-muted text-sm mt-1">
@@ -158,39 +165,27 @@ export default function Cart() {
         {items.map((it) => (
           <div
             key={it._id}
-            className="flex items-center justify-between border-b border-gray-100 pb-3 last:border-none"
+            className="flex items-center justify-between border-b pb-3 last:border-none"
           >
             <div>
               <p className="font-medium">{it.name}</p>
               <p className="text-xs text-muted">
                 ₹{it.price} × {it.quantity}
               </p>
-
-              {it.quantity >= it.stock && (
-                <p className="text-xs text-red-400 mt-1">
-                  Max stock reached
-                </p>
-              )}
             </div>
 
             <div className="flex items-center gap-3">
               <div className="flex items-center border rounded-lg">
                 <button
                   className="px-2"
-                  onClick={() =>
-                    updateQty(it._id, it.quantity - 1)
-                  }
+                  onClick={() => updateQty(it._id, it.quantity - 1)}
                 >
                   –
                 </button>
-                <span className="px-3 text-sm">
-                  {it.quantity}
-                </span>
+                <span className="px-3 text-sm">{it.quantity}</span>
                 <button
                   className="px-2"
-                  onClick={() =>
-                    updateQty(it._id, it.quantity + 1)
-                  }
+                  onClick={() => updateQty(it._id, it.quantity + 1)}
                 >
                   +
                 </button>
@@ -213,7 +208,6 @@ export default function Cart() {
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Any special instructions?"
           className="input min-h-[80px]"
         />
       </div>
@@ -233,15 +227,15 @@ export default function Cart() {
         </div>
       </div>
 
-      {/* PAYMENT MODE */}
+      {/* PAYMENT */}
       <div className="card space-y-2">
         <p className="font-medium">Payment Option</p>
 
         <label className="flex items-center gap-2 text-sm">
           <input
             type="radio"
-            checked={paymentMode === "later"}
-            onChange={() => setPaymentMode("later")}
+            checked={paymentMode === "credit"}
+            onChange={() => setPaymentMode("credit")}
           />
           Pay Later (Hospital Credit)
         </label>
@@ -249,73 +243,28 @@ export default function Cart() {
         <label className="flex items-center gap-2 text-sm">
           <input
             type="radio"
-            checked={paymentMode === "now"}
-            onChange={() => setPaymentMode("now")}
+            checked={paymentMode === "online"}
+            onChange={() => setPaymentMode("online")}
           />
           Pay Now
         </label>
       </div>
 
-      {error && (
-        <p className="text-red-400 text-sm">{error}</p>
-      )}
+      {error && <p className="text-red-400 text-sm">{error}</p>}
 
-      {/* PLACE ORDER BUTTON */}
       <button
         disabled={loading}
         className="button button-primary w-full py-3 text-base"
         onClick={() => {
-          if (paymentMode === "now") {
+          if (paymentMode === "online") {
             handleOnlinePayment();
           } else {
-            setConfirming("order");
+            confirmPlaceOrder();
           }
         }}
       >
         {loading ? "Processing..." : "Place Order"}
       </button>
-
-      {/* CONFIRM MODAL */}
-      {confirming && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="card max-w-sm w-full text-center">
-            <h3 className="font-semibold">
-              {confirming === "order"
-                ? "Place this order?"
-                : "Remove item?"}
-            </h3>
-
-            <p className="text-muted text-sm mt-2">
-              {confirming === "order"
-                ? "This action cannot be undone."
-                : "This item will be removed from your cart."}
-            </p>
-
-            <div className="flex gap-3 mt-5">
-              <button
-                className="button button-outline w-full"
-                onClick={() => setConfirming(false)}
-              >
-                Cancel
-              </button>
-
-              <button
-                className="button button-primary w-full"
-                onClick={() => {
-                  if (confirming === "order") {
-                    confirmPlaceOrder();
-                  } else {
-                    removeFromCart(confirming);
-                    setConfirming(false);
-                  }
-                }}
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
