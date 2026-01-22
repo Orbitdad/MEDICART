@@ -7,6 +7,7 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     items: [
       {
         medicineId: {
@@ -20,25 +21,35 @@ const orderSchema = new mongoose.Schema(
         },
       },
     ],
+
     notes: String,
+
     totalAmount: {
       type: Number,
       required: true,
     },
+
     paymentMode: {
       type: String,
-      enum: ["now", "later"],
-      default: "later",
+      enum: ["credit", "online"],
+      required: true,
     },
+
     paymentStatus: {
       type: String,
       enum: ["pending", "paid"],
       default: "pending",
     },
+
+    paymentInfo: {
+      razorpay_payment_id: String,
+      razorpay_order_id: String,
+    },
+
     status: {
       type: String,
-      enum: ["pending", "completed"],
-      default: "pending",
+      enum: ["placed", "completed"],
+      default: "placed",
     },
   },
   { timestamps: true }
