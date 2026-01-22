@@ -1,6 +1,5 @@
 const BASE = import.meta.env.VITE_API_URL;
 
-
 /* =========================
    DOCTOR
 ========================= */
@@ -25,7 +24,7 @@ const authHeader = () => ({
 
 /* READ */
 export const adminGetMedicines = async () => {
-  const res = await fetch(`${base}/admin/medicines`, {
+  const res = await fetch(`${BASE}/admin/medicines`, {
     headers: authHeader(),
   });
 
@@ -38,7 +37,7 @@ export const adminGetMedicines = async () => {
 
 /* CREATE */
 export const adminAddMedicine = async (formData) => {
-  const res = await fetch(`${base}/admin/medicines`, {
+  const res = await fetch(`${BASE}/admin/medicines`, {
     method: "POST",
     headers: authHeader(),
     body: formData,
@@ -53,7 +52,7 @@ export const adminAddMedicine = async (formData) => {
 
 /* UPDATE */
 export const adminUpdateMedicine = async (id, payload) => {
-  const res = await fetch(`${base}/admin/medicines/${id}`, {
+  const res = await fetch(`${BASE}/admin/medicines/${id}`, {
     method: "PUT",
     headers: {
       ...authHeader(),
@@ -71,7 +70,7 @@ export const adminUpdateMedicine = async (id, payload) => {
 
 /* DELETE */
 export const adminDeleteMedicine = async (id) => {
-  const res = await fetch(`${base}/admin/medicines/${id}`, {
+  const res = await fetch(`${BASE}/admin/medicines/${id}`, {
     method: "DELETE",
     headers: authHeader(),
   });
