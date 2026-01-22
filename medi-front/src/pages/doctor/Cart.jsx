@@ -60,16 +60,26 @@ export default function Cart() {
     try {
       setLoading(true);
       setError("");
-
-      // 1️⃣ Create Razorpay order from backend
       const res = await fetch(`${BASE}/payment/create-order`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: totalAmount }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: Number(totalAmount),
+        }),
       });
 
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("Create order API failed:", errText);
+        throw new Error("Create order failed");
+      }
 
       const order = await res.json();
+
+
+
 
       // 2️⃣ Razorpay checkout options
       const options = {
