@@ -50,7 +50,7 @@ export const placeOrder = async (req, res, next) => {
       notes,
       totalAmount: total,
 
-      paymentMode, // "credit" | "online"
+      paymentMode,
 
       paymentStatus:
         paymentMode === "online" ? "paid" : "pending",
@@ -59,6 +59,9 @@ export const placeOrder = async (req, res, next) => {
         paymentMode === "online" ? paymentInfo : null,
 
       orderStatus: "placed",
+
+      // ✅ NEW
+      adminStatus: "pending",
     });
 
     res.status(201).json({
@@ -89,7 +92,33 @@ export const adminGetOrders = async (req, res, next) => {
 };
 
 /* ----------------------------------
-   ADMIN: UPDATE ORDER STATUS
+   ADMIN: MARK ORDER COMPLETED
+----------------------------------- */
+export const adminMarkOrderCompleted = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ message: "Order not found" });
+    }
+
+    order.adminStatus = "completed";
+
+    await order.save();
+
+    res.json({
+      message: "Order marked as completed",
+      order,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/* ----------------------------------
+   ADMIN: UPDATE DELIVERY STATUS
 ----------------------------------- */
 export const adminUpdateOrderStatus = async (req, res, next) => {
   try {
@@ -104,6 +133,7 @@ export const adminUpdateOrderStatus = async (req, res, next) => {
     }
 
     order.orderStatus = orderStatus || order.orderStatus;
+
     await order.save();
 
     res.json({

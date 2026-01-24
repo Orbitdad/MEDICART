@@ -29,6 +29,9 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+    /* ======================
+       PAYMENT
+    ====================== */
     paymentMode: {
       type: String,
       enum: ["credit", "online"],
@@ -46,6 +49,18 @@ const orderSchema = new mongoose.Schema(
       razorpay_order_id: String,
     },
 
+    /* ======================
+       ADMIN DECISION STATUS
+    ====================== */
+    adminStatus: {
+      type: String,
+      enum: ["pending", "completed"],
+      default: "pending",
+    },
+
+    /* ======================
+       ORDER FLOW
+    ====================== */
     orderStatus: {
       type: String,
       enum: [
