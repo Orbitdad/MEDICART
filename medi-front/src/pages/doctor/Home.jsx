@@ -16,18 +16,24 @@ export default function DoctorHome() {
   const hasCartItems = items.length > 0;
 
   return (
-<div className="w-full px-4 md:px-6 lg:px-8 space-y-6">
+    <>
       {/* =========================
           HERO IMAGE BANNER
+          Edge-to-edge on mobile, contained on desktop
       ========================== */}
-{/* HERO IMAGE */}
-<div className="overflow-hidden md:rounded-xl -mx-4 md:mx-0">
-  <img
-    src={heroImage}
-    alt="MediCart banner"
-    className="w-screen max-w-none h-[240px] sm:h-[280px] md:h-[320px] object-cover"
-  />
-</div>
+      <div className="w-full -mx-8 overflow-hidden md:rounded-xl md:mx-0 md:px-4 md:px-6 lg:px-8">
+        <div className="relative w-full h-[240px] sm:h-[280px] md:h-[320px]">
+          <img
+            src={heroImage}
+            alt="MediCart banner"
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
+      </div>
+
+      {/* Content wrapper with padding */}
+      <div className="w-full px-4 md:px-6 lg:px-8 space-y-6">
 
 
       {/* =========================
@@ -39,7 +45,6 @@ export default function DoctorHome() {
     md:-mt-16
     relative z-10
     md:max-w-6xl md:mx-auto
-    mx-4
   "
 >
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -149,7 +154,7 @@ export default function DoctorHome() {
       {!hasCartItems && (
         <section className="card text-center">
           <p className="text-muted text-sm">
-            You haven’t added any medicines yet.
+            You haven't added any medicines yet.
           </p>
 
           <button
@@ -160,6 +165,7 @@ export default function DoctorHome() {
           </button>
         </section>
       )}
-    </div>
+      </div>
+    </>
   );
 }
