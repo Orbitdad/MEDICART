@@ -5,31 +5,34 @@ import {
   adminMarkOrderCompleted,
   inventorySummary,
 } from "../controllers/orderController.js";
-import { protect, adminOnly } from "../middleware/authMiddleware.js";
+
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", protect, adminOnly, adminGetOrders);
+/* ADMIN ONLY */
+router.get(
+  "/",
+  protect(["admin"]),
+  adminGetOrders
+);
 
 router.put(
   "/:id/status",
-  protect,
-  adminOnly,
+  protect(["admin"]),
   adminUpdateOrderStatus
 );
 
-/* ✅ ADD THIS */
+/* ✅ MARK COMPLETED */
 router.put(
   "/:id/complete",
-  protect,
-  adminOnly,
+  protect(["admin"]),
   adminMarkOrderCompleted
 );
 
 router.get(
   "/inventory",
-  protect,
-  adminOnly,
+  protect(["admin"]),
   inventorySummary
 );
 
