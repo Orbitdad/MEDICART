@@ -21,7 +21,7 @@ export default function DoctorHome() {
           HERO IMAGE BANNER
           Edge-to-edge on mobile, contained on desktop
       ========================== */}
-      <div className="hero-breakout overflow-hidden md:rounded-xl md:px-4 md:px-6 lg:px-8">
+      <div className="w-full -mx-8 overflow-hidden md:rounded-xl md:mx-0 md:px-4 md:px-6 lg:px-8">
         <div className="relative w-full h-[240px] sm:h-[280px] md:h-[320px]">
           <img
             src={heroImage}
