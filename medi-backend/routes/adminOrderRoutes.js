@@ -1,17 +1,36 @@
 import express from "express";
 import {
   adminGetOrders,
-  inventorySummary,
   adminUpdateOrderStatus,
+  adminMarkOrderCompleted,
+  inventorySummary,
 } from "../controllers/orderController.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect, adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", protect(["admin"]), adminGetOrders);
-router.get("/inventory", protect(["admin"]), inventorySummary);
+router.get("/", protect, adminOnly, adminGetOrders);
 
-/* ✅ NEW */
-router.put("/:id/status", protect(["admin"]), adminUpdateOrderStatus);
+router.put(
+  "/:id/status",
+  protect,
+  adminOnly,
+  adminUpdateOrderStatus
+);
+
+/* ✅ ADD THIS */
+router.put(
+  "/:id/complete",
+  protect,
+  adminOnly,
+  adminMarkOrderCompleted
+);
+
+router.get(
+  "/inventory",
+  protect,
+  adminOnly,
+  inventorySummary
+);
 
 export default router;
