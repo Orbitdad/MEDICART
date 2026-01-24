@@ -16,7 +16,7 @@ export default function DoctorHome() {
   const hasCartItems = items.length > 0;
 
   return (
-    <div className="space-y-6">
+<div className="w-full px-4 md:px-6 lg:px-8 space-y-6">
       {/* =========================
           HERO IMAGE BANNER
       ========================== */}
@@ -103,7 +103,7 @@ className="w-full h-[200px] sm:h-[240px] md:h-[300px] object-cover"
       {/* =========================
           QUICK STATS
       ========================== */}
-      <section className="stats-grid">
+<section className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div
           className="card cursor-pointer transition hover:shadow-md"
           onClick={() => navigate("/doctor/cart")}
