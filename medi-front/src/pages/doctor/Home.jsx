@@ -24,14 +24,22 @@ export default function DoctorHome() {
         <img
           src={heroImage}
           alt="MediCart banner"
-          className="w-full h-[220px] md:h-[260px] object-cover object-center"
+className="w-full h-[200px] sm:h-[240px] md:h-[300px] object-cover"
         />
       </div>
 
       {/* =========================
           HERO CONTENT
       ========================== */}
-      <div className="bg-white rounded-xl p-6 md:p-10 shadow-sm -mt-10 relative z-10 max-w-6xl mx-auto">
+<div
+  className="
+    bg-white rounded-xl p-6 md:p-10 shadow-sm
+    md:-mt-16
+    relative z-10
+    md:max-w-6xl md:mx-auto
+    mx-4
+  "
+>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
           MediCart Medical Store
         </h1>
