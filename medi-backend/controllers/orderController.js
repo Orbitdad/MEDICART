@@ -91,6 +91,18 @@ export const adminGetOrders = async (req, res, next) => {
   }
 };
 
+
+export const getRecentOrders = async (req, res) => {
+  const orders = await Order.find({
+    doctor: req.user._id,
+  })
+    .sort({ createdAt: -1 })
+    .limit(3)
+    .populate("items.medicineId", "name");
+
+  res.json(orders);
+};
+
 /* ----------------------------------
    ADMIN: MARK ORDER COMPLETED
 ----------------------------------- */

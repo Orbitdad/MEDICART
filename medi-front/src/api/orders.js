@@ -6,6 +6,25 @@ import client from "./client.js";
 export async function placeOrder(payload) {
   return client.post("/orders", payload);
 }
+/* ----------------------------------
+   DOCTOR: RECENT ORDERS
+----------------------------------- */
+export const getRecentOrders = async () => {
+  const res = await fetch(
+    `${import.meta.env.VITE_API_URL}/orders/recent`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch recent orders");
+  }
+
+  return res.json();
+};
 
 /* =========================
    ADMIN
