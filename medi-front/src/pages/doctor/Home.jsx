@@ -20,13 +20,15 @@ export default function DoctorHome() {
       {/* =========================
           HERO IMAGE BANNER
       ========================== */}
-      <div className="rounded-xl overflow-hidden">
-        <img
-          src={heroImage}
-          alt="MediCart banner"
-className="w-full h-[200px] sm:h-[240px] md:h-[300px] object-cover"
-        />
-      </div>
+{/* HERO IMAGE */}
+<div className="overflow-hidden md:rounded-xl -mx-4 md:mx-0">
+  <img
+    src={heroImage}
+    alt="MediCart banner"
+    className="w-screen max-w-none h-[240px] sm:h-[280px] md:h-[320px] object-cover"
+  />
+</div>
+
 
       {/* =========================
           HERO CONTENT
