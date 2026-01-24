@@ -33,17 +33,26 @@ export default function Orders() {
     filter === "all"
       ? orders
       : orders.filter(
-          (o) => o.adminStatus === filter
-        );
+        (o) => o.adminStatus === filter
+      );
 
   /* =========================
      ADMIN ACTION
   ========================== */
   async function markCompleted(orderId) {
     setUpdatingId(orderId);
+
     try {
-      await markOrderCompleted(orderId);
-      await loadOrders();
+      const res = await markOrderCompleted(orderId);
+
+      setOrders((prev) =>
+        prev.map((o) =>
+          o._id === orderId
+            ? { ...o, adminStatus: "completed" }
+            : o
+        )
+      );
+
     } catch (err) {
       console.error("Failed to update order", err);
     } finally {
@@ -122,11 +131,10 @@ export default function Orders() {
                   </p>
 
                   <span
-                    className={`flex items-center justify-end gap-1 text-xs font-medium ${
-                      o.adminStatus === "pending"
+                    className={`flex items-center justify-end gap-1 text-xs font-medium ${o.adminStatus === "pending"
                         ? "text-orange-600"
                         : "text-green-600"
-                    }`}
+                      }`}
                   >
                     {o.adminStatus === "pending" ? (
                       <Clock size={14} />
