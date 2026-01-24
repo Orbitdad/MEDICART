@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   adminFetchOrders,
-  updateOrderStatus,
+  markOrderCompleted,
 } from "../../api/orders.js";
 import { CheckCircle, Clock, Filter } from "lucide-react";
 
@@ -26,15 +26,23 @@ export default function Orders() {
     }
   }
 
+  /* =========================
+     FILTER LOGIC
+  ========================== */
   const filteredOrders =
     filter === "all"
       ? orders
-      : orders.filter((o) => o.status === filter);
+      : orders.filter(
+          (o) => o.adminStatus === filter
+        );
 
+  /* =========================
+     ADMIN ACTION
+  ========================== */
   async function markCompleted(orderId) {
     setUpdatingId(orderId);
     try {
-      await updateOrderStatus(orderId, "completed");
+      await markOrderCompleted(orderId);
       await loadOrders();
     } catch (err) {
       console.error("Failed to update order", err);
@@ -115,20 +123,20 @@ export default function Orders() {
 
                   <span
                     className={`flex items-center justify-end gap-1 text-xs font-medium ${
-                      o.status === "pending"
+                      o.adminStatus === "pending"
                         ? "text-orange-600"
                         : "text-green-600"
                     }`}
                   >
-                    {o.status === "pending" ? (
+                    {o.adminStatus === "pending" ? (
                       <Clock size={14} />
                     ) : (
                       <CheckCircle size={14} />
                     )}
-                    {o.status}
+                    {o.adminStatus}
                   </span>
 
-                  {o.status === "pending" && (
+                  {o.adminStatus === "pending" && (
                     <>
                       <button
                         type="button"
@@ -144,7 +152,7 @@ export default function Orders() {
                         Mark as completed
                       </button>
 
-                      {/* INLINE CONFIRM */}
+                      {/* CONFIRM */}
                       {confirmingId === o._id && (
                         <div className="absolute right-0 mt-2 w-52 bg-white border rounded-lg shadow-lg p-3 z-20">
                           <p className="text-xs text-muted mb-2">
@@ -182,7 +190,7 @@ export default function Orders() {
                 </div>
               </div>
 
-              {/* MEDICINE DETAILS (NEW – IMPORTANT) */}
+              {/* MEDICINES */}
               <div className="pt-2 border-t text-xs text-muted space-y-1">
                 {o.items.map((it, idx) => (
                   <div key={idx}>
