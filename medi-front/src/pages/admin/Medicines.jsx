@@ -10,8 +10,12 @@ function Medicines() {
   const [form, setForm] = useState({
     name: "",
     brand: "",
+    description: "",
+    packaging: "",
+    mrp: "",
     price: "",
     stock: "",
+    expiryDate: "",
     category: "",
   });
 
@@ -38,6 +42,7 @@ function Medicines() {
   };
 
   /* ================= CREATE ================= */
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -56,10 +61,15 @@ function Medicines() {
       setForm({
         name: "",
         brand: "",
+        description: "",
+        packaging: "",
+        mrp: "",
         price: "",
         stock: "",
+        expiryDate: "",
         category: "",
       });
+
       setImages([]);
       loadMedicines();
     } catch {
@@ -70,14 +80,21 @@ function Medicines() {
   };
 
   /* ================= EDIT ================= */
+
   const startEdit = (m) => {
     setEditingId(m._id);
     setEditForm({
-      name: m.name,
-      brand: m.brand,
-      price: m.price,
-      stock: m.stock,
-      category: m.category,
+      name: m.name || "",
+      brand: m.brand || "",
+      description: m.description || "",
+      packaging: m.packaging || "",
+      mrp: m.mrp || "",
+      price: m.price || "",
+      stock: m.stock || "",
+      expiryDate: m.expiryDate
+        ? m.expiryDate.slice(0, 10)
+        : "",
+      category: m.category || "",
     });
   };
 
@@ -100,6 +117,7 @@ function Medicines() {
   };
 
   /* ================= DELETE ================= */
+
   const confirmDelete = async (id) => {
     setLoadingId(id);
     try {
@@ -115,63 +133,34 @@ function Medicines() {
 
   return (
     <div className="admin-medicines">
-      {/* HEADER */}
       <div className="admin-header">
         <h1>Medicine Management</h1>
-        <p className="text-muted">
-          Add, edit and manage live inventory.
-        </p>
+        <p className="text-muted">Add, edit and manage live inventory.</p>
       </div>
 
-      {/* ADD MEDICINE */}
+      {/* ================= ADD MEDICINE ================= */}
+
       <div className="card">
         <h3 className="card-title">Add Medicine</h3>
 
         <form onSubmit={handleSubmit} className="add-form-grid">
-          <input
-            className="input"
-            name="name"
-            placeholder="Name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
+          <input className="input" name="name" placeholder="Medicine Name" value={form.name} onChange={handleChange} required />
 
-          <input
-            className="input"
-            name="brand"
-            placeholder="Brand"
-            value={form.brand}
-            onChange={handleChange}
-          />
+          <input className="input" name="brand" placeholder="Company / Brand" value={form.brand} onChange={handleChange} />
 
-          <input
-            className="input"
-            name="price"
-            type="number"
-            placeholder="Price"
-            value={form.price}
-            onChange={handleChange}
-            required
-          />
+          <input className="input" name="description" placeholder="Description" value={form.description} onChange={handleChange} />
 
-          <input
-            className="input"
-            name="stock"
-            type="number"
-            placeholder="Stock"
-            value={form.stock}
-            onChange={handleChange}
-            required
-          />
+          <input className="input" name="packaging" placeholder="Packaging (Strip of 10 tablets)" value={form.packaging} onChange={handleChange} />
 
-          <select
-            name="category"
-            className="input"
-            value={form.category}
-            onChange={handleChange}
-            required
-          >
+          <input className="input" name="mrp" type="number" placeholder="MRP" value={form.mrp} onChange={handleChange} required />
+
+          <input className="input" name="price" type="number" placeholder="Selling Price" value={form.price} onChange={handleChange} required />
+
+          <input className="input" name="stock" type="number" placeholder="Stock" value={form.stock} onChange={handleChange} required />
+
+          <input className="input" name="expiryDate" type="date" value={form.expiryDate} onChange={handleChange} required />
+
+          <select name="category" className="input" value={form.category} onChange={handleChange} required>
             <option value="">Select category</option>
             <option value="TAB">Tablet</option>
             <option value="CAP">Capsule</option>
@@ -181,27 +170,18 @@ function Medicines() {
             <option value="INSTR">Instrument</option>
           </select>
 
-
-          {/* ✅ FIXED FILE INPUT */}
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            className="input"
-            onChange={(e) => setImages([...e.target.files])}
-          />
+          <input type="file" multiple accept="image/*" className="input" onChange={(e) => setImages([...e.target.files])} />
 
           <button className="button button-primary" disabled={loading}>
             {loading ? "Adding…" : "Add Medicine"}
           </button>
         </form>
 
-        {error && (
-          <p className="text-red-500 text-sm mt-2">{error}</p>
-        )}
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </div>
 
-      {/* INVENTORY */}
+      {/* ================= INVENTORY ================= */}
+
       <div className="card">
         <h3 className="card-title">Inventory</h3>
 
@@ -211,8 +191,10 @@ function Medicines() {
               <tr>
                 <th>Name</th>
                 <th>Brand</th>
+                <th>MRP</th>
                 <th>Price</th>
                 <th>Stock</th>
+                <th>Expiry</th>
                 <th>Category</th>
                 <th className="text-right">Actions</th>
               </tr>
@@ -223,71 +205,14 @@ function Medicines() {
                 <tr key={m._id}>
                   {editingId === m._id ? (
                     <>
+                      <td><input className="input" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} /></td>
+                      <td><input className="input" value={editForm.brand} onChange={(e) => setEditForm({ ...editForm, brand: e.target.value })} /></td>
+                      <td><input className="input" type="number" value={editForm.mrp} onChange={(e) => setEditForm({ ...editForm, mrp: e.target.value })} /></td>
+                      <td><input className="input" type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} /></td>
+                      <td><input className="input" type="number" value={editForm.stock} onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })} /></td>
+                      <td><input className="input" type="date" value={editForm.expiryDate} onChange={(e) => setEditForm({ ...editForm, expiryDate: e.target.value })} /></td>
                       <td>
-                        <input
-                          className="input"
-                          value={editForm.name}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              name: e.target.value,
-                            })
-                          }
-                        />
-                      </td>
-
-                      <td>
-                        <input
-                          className="input"
-                          value={editForm.brand}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              brand: e.target.value,
-                            })
-                          }
-                        />
-                      </td>
-
-                      <td>
-                        <input
-                          className="input"
-                          type="number"
-                          value={editForm.price}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              price: e.target.value,
-                            })
-                          }
-                        />
-                      </td>
-
-                      <td>
-                        <input
-                          className="input"
-                          type="number"
-                          value={editForm.stock}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              stock: e.target.value,
-                            })
-                          }
-                        />
-                      </td>
-
-                      <td>
-                        <select
-                          className="input"
-                          value={editForm.category}
-                          onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              category: e.target.value,
-                            })
-                          }
-                        >
+                        <select className="input" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}>
                           <option value="TAB">TAB</option>
                           <option value="CAP">CAP</option>
                           <option value="SYP">SYP</option>
@@ -296,89 +221,23 @@ function Medicines() {
                           <option value="INSTR">INSTR</option>
                         </select>
                       </td>
-
                       <td className="actions">
-                        <button
-                          className="button button-primary"
-                          disabled={loadingId === m._id}
-                          onClick={() => saveEdit(m._id)}
-                        >
-                          {loadingId === m._id
-                            ? "Saving…"
-                            : "Save"}
-                        </button>
-
-                        <button
-                          className="button button-outline"
-                          onClick={cancelEdit}
-                        >
-                          Cancel
-                        </button>
+                        <button className="button button-primary" onClick={() => saveEdit(m._id)}>Save</button>
+                        <button className="button button-outline" onClick={cancelEdit}>Cancel</button>
                       </td>
                     </>
                   ) : (
                     <>
                       <td>{m.name}</td>
                       <td>{m.brand || "-"}</td>
+                      <td>₹{m.mrp}</td>
                       <td>₹{m.price}</td>
-                      <td
-                        className={
-                          m.stock <= 5
-                            ? "text-red-600 font-medium"
-                            : ""
-                        }
-                      >
-                        {m.stock}
-                      </td>
+                      <td className={m.stock <= 5 ? "text-red-600 font-medium" : ""}>{m.stock}</td>
+                      <td>{m.expiryDate ? new Date(m.expiryDate).toLocaleDateString() : "-"}</td>
                       <td>{m.category}</td>
-
                       <td className="actions">
-                        {deletingId === m._id ? (
-                          <>
-                            <button
-                              className="button button-outline"
-                              onClick={() =>
-                                setDeletingId(null)
-                              }
-                            >
-                              Cancel
-                            </button>
-
-                            <button
-                              className="button button-danger"
-                              disabled={
-                                loadingId === m._id
-                              }
-                              onClick={() =>
-                                confirmDelete(m._id)
-                              }
-                            >
-                              {loadingId === m._id
-                                ? "Deleting…"
-                                : "Confirm"}
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              className="button button-outline"
-                              onClick={() =>
-                                startEdit(m)
-                              }
-                            >
-                              Edit
-                            </button>
-
-                            <button
-                              className="button button-danger"
-                              onClick={() =>
-                                setDeletingId(m._id)
-                              }
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
+                        <button className="button button-outline" onClick={() => startEdit(m)}>Edit</button>
+                        <button className="button button-danger" onClick={() => setDeletingId(m._id)}>Delete</button>
                       </td>
                     </>
                   )}
@@ -388,48 +247,6 @@ function Medicines() {
           </table>
         </div>
       </div>
-
-      {/* ✅ RESPONSIVE FIXES */}
-      <style>{`
-        .admin-medicines {
-          max-width: 1400px;
-          margin: auto;
-        }
-
-        .add-form-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 1rem;
-          margin-top: 1rem;
-        }
-
-        @media (max-width: 1024px) {
-          .add-form-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (max-width: 640px) {
-          .add-form-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .table-wrapper {
-          overflow-x: auto;
-          width: 100%;
-        }
-
-        .table {
-          min-width: 700px;
-        }
-
-        .actions {
-          display: flex;
-          gap: 0.4rem;
-          justify-content: flex-end;
-        }
-      `}</style>
     </div>
   );
 }

@@ -34,25 +34,40 @@ export const adminGetMedicines = async (req, res, next) => {
 };
 
 /* ----------------------------------
-   ADMIN: CREATE MEDICINE (WITH IMAGES)
+   ADMIN: CREATE MEDICINE
 ----------------------------------- */
 export const adminCreateMedicine = async (req, res, next) => {
   try {
     const {
       name,
       brand,
+      description,
+      packaging,
+      mrp,
       price,
       stock,
+      expiryDate,
       category,
     } = req.body;
 
     /* ✅ HARD VALIDATION */
-    if (!name || !price || !stock || !category) {
+    if (
+      !name ||
+      !price ||
+      !stock ||
+      !category ||
+      !mrp ||
+      !expiryDate
+    ) {
       return res.status(400).json({
-        message: "Name, price, stock and category are required",
+        message:
+          "Name, MRP, price, stock, expiry date and category are required",
       });
     }
 
+    /* --------------------------
+       UPLOAD IMAGES
+    -------------------------- */
     const imageUrls = [];
 
     if (req.files?.length) {
@@ -68,8 +83,12 @@ export const adminCreateMedicine = async (req, res, next) => {
     const medicine = await Medicine.create({
       name: name.trim(),
       brand: brand?.trim(),
+      description: description?.trim(),
+      packaging: packaging?.trim(),
+      mrp: Number(mrp),
       price: Number(price),
       stock: Number(stock),
+      expiryDate: new Date(expiryDate),
       category,
       images: imageUrls,
     });
@@ -88,8 +107,12 @@ export const adminUpdateMedicine = async (req, res, next) => {
     const allowedFields = [
       "name",
       "brand",
+      "description",
+      "packaging",
+      "mrp",
       "price",
       "stock",
+      "expiryDate",
       "category",
       "isActive",
     ];
@@ -98,7 +121,10 @@ export const adminUpdateMedicine = async (req, res, next) => {
 
     for (const key of allowedFields) {
       if (req.body[key] !== undefined) {
-        updates[key] = req.body[key];
+        updates[key] =
+          key === "expiryDate"
+            ? new Date(req.body[key])
+            : req.body[key];
       }
     }
 

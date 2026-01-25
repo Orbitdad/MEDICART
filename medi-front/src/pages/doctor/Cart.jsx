@@ -237,7 +237,7 @@ export default function Cart() {
             checked={paymentMode === "credit"}
             onChange={() => setPaymentMode("credit")}
           />
-          Pay Later (Hospital Credit)
+         Cash on Delivery
         </label>
 
         <label className="flex items-center gap-2 text-sm">
