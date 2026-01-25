@@ -12,24 +12,12 @@ const router = express.Router();
 
 /* ADMIN MEDICINE ROUTES */
 
-router.get("/medicines", protect(["admin"]), adminGetMedicines);
+router.get("/", protect(["admin"]), adminGetMedicines);
 
-router.post(
-  "/medicines",
-  protect(["admin"]),
-  adminCreateMedicine
-);
+router.post("/", protect(["admin"]), adminCreateMedicine);
 
-router.put(
-  "/medicines/:id",
-  protect(["admin"]),
-  adminUpdateMedicine
-);
+router.put("/:id", protect(["admin"]), adminUpdateMedicine);
 
-router.delete(
-  "/medicines/:id",
-  protect(["admin"]),
-  adminDeleteMedicine
-);
+router.delete("/:id", protect(["admin"]), adminDeleteMedicine);
 
 export default router;
