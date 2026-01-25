@@ -35,3 +35,10 @@
     padding: 0.2rem 0.5rem;
     border-radius: 999px;
   }
+
+
+  @media (max-width: 480px) {
+  .cart-float-btn {
+    bottom: 90px;
+  }
+}
