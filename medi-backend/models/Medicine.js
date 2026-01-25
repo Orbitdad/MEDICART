@@ -9,7 +9,7 @@ const medicineSchema = new mongoose.Schema(
 
     category: {
       type: String,
-      enum: ["SYP", "TAB", "CAP", "E/E", "INJ", "INSTR"],
+      enum: ["SYP", "TAB", "CAP", "EE", "INJ", "INSTR"],
       required: true,
       default: "TAB",
     },

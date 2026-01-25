@@ -174,7 +174,7 @@ function Medicines() {
             <option value="TAB">Tablet</option>
             <option value="CAP">Capsule</option>
             <option value="SYP">Syrup</option>
-            <option value="E/E">Eye / Ear</option>
+            <option value="EE">Eye / Ear</option>
             <option value="INJ">Injection</option>
             <option value="INSTR">Instrument</option>
           </select>
@@ -288,7 +288,7 @@ function Medicines() {
                           <option value="TAB">TAB</option>
                           <option value="CAP">CAP</option>
                           <option value="SYP">SYP</option>
-                          <option value="E/E">E/E</option>
+                          <option value="EE">EE</option>
                           <option value="INJ">INJ</option>
                           <option value="INSTR">INSTR</option>
                         </select>

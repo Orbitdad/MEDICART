@@ -9,38 +9,57 @@ const CATEGORY_MAP = [
   { code: "SYP", label: "Syrups" },
   { code: "TAB", label: "Tablets" },
   { code: "CAP", label: "Capsules" },
-  { code: "E/E", label: "Eye / Ear" },
+  { code: "EE", label: "Eye / Ear" },
   { code: "INJ", label: "Injections" },
   { code: "INSTR", label: "Instruments" },
 ];
 
 export default function MedicineList() {
+  const [allMedicines, setAllMedicines] = useState([]);
   const [medicines, setMedicines] = useState([]);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [loading, setLoading] = useState(false);
 
-  /* -----------------------------
-     FETCH
-  ------------------------------ */
-  const fetchMedicines = async () => {
-    setLoading(true);
-    try {
-      const data = await getMedicines(search.trim());
-      const filtered =
-        activeCategory === "ALL"
-          ? data
-          : data.filter((m) => m.category === activeCategory);
-
-      setMedicines(Array.isArray(filtered) ? filtered : []);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  /* =========================
+     FETCH ONCE
+  ========================== */
   useEffect(() => {
+    const fetchMedicines = async () => {
+      setLoading(true);
+      try {
+        const data = await getMedicines();
+        setAllMedicines(Array.isArray(data) ? data : []);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMedicines();
-  }, [search, activeCategory]);
+  }, []);
+
+  /* =========================
+     FILTER LOCALLY
+  ========================== */
+  useEffect(() => {
+    let filtered = [...allMedicines];
+
+    // search filter
+    if (search.trim()) {
+      filtered = filtered.filter((m) =>
+        m.name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    // category filter
+    if (activeCategory !== "ALL") {
+      filtered = filtered.filter(
+        (m) => m.category === activeCategory
+      );
+    }
+
+    setMedicines(filtered);
+  }, [search, activeCategory, allMedicines]);
 
   return (
     <>
@@ -88,9 +107,6 @@ export default function MedicineList() {
         ) : medicines.length === 0 ? (
           <div className="medicine-empty">
             <p>No medicines found.</p>
-            <p className="text-muted text-sm mt-1">
-              Try adjusting search or category.
-            </p>
           </div>
         ) : (
           <div className="medicine-grid">
@@ -101,7 +117,6 @@ export default function MedicineList() {
         )}
       </div>
 
-      {/* FLOATING CART CTA */}
       <CartFloatingButton />
     </>
   );

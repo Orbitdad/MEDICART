@@ -56,6 +56,7 @@ export const adminCreateMedicine = async (req, res, next) => {
       brand: req.body.brand,
       price: Number(req.body.price),
       stock: Number(req.body.stock),
+      category: req.body.category,   // ✅ ADD THIS
       images: imageUrls,
     });
 
