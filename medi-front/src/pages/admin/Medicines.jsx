@@ -23,7 +23,6 @@ function Medicines() {
   const [medicines, setMedicines] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
-  const [deletingId, setDeletingId] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -91,9 +90,7 @@ function Medicines() {
       mrp: m.mrp || "",
       price: m.price || "",
       stock: m.stock || "",
-      expiryDate: m.expiryDate
-        ? m.expiryDate.slice(0, 10)
-        : "",
+      expiryDate: m.expiryDate?.slice(0, 10) || "",
       category: m.category || "",
     });
   };
@@ -118,15 +115,16 @@ function Medicines() {
 
   /* ================= DELETE ================= */
 
-  const confirmDelete = async (id) => {
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this medicine permanently?")) return;
+
     setLoadingId(id);
     try {
       await adminDeleteMedicine(id);
       setMedicines((prev) => prev.filter((m) => m._id !== id));
     } catch {
-      setError("Failed to delete medicine");
+      alert("Delete failed");
     } finally {
-      setDeletingId(null);
       setLoadingId(null);
     }
   };
@@ -135,7 +133,9 @@ function Medicines() {
     <div className="admin-medicines">
       <div className="admin-header">
         <h1>Medicine Management</h1>
-        <p className="text-muted">Add, edit and manage live inventory.</p>
+        <p className="text-muted">
+          Add, edit and manage live inventory.
+        </p>
       </div>
 
       {/* ================= ADD MEDICINE ================= */}
@@ -232,12 +232,14 @@ function Medicines() {
                       <td>{m.brand || "-"}</td>
                       <td>₹{m.mrp}</td>
                       <td>₹{m.price}</td>
-                      <td className={m.stock <= 5 ? "text-red-600 font-medium" : ""}>{m.stock}</td>
+                      <td>{m.stock}</td>
                       <td>{m.expiryDate ? new Date(m.expiryDate).toLocaleDateString() : "-"}</td>
                       <td>{m.category}</td>
                       <td className="actions">
                         <button className="button button-outline" onClick={() => startEdit(m)}>Edit</button>
-                        <button className="button button-danger" onClick={() => setDeletingId(m._id)}>Delete</button>
+                        <button className="button button-danger" disabled={loadingId === m._id} onClick={() => handleDelete(m._id)}>
+                          {loadingId === m._id ? "Deleting…" : "Delete"}
+                        </button>
                       </td>
                     </>
                   )}
