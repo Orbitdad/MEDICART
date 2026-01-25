@@ -41,25 +41,35 @@ export default function MedicineList() {
   /* =========================
      FILTER LOCALLY
   ========================== */
-  useEffect(() => {
-    let filtered = [...allMedicines];
+useEffect(() => {
+  let filtered = [...allMedicines];
 
-    // search filter
-    if (search.trim()) {
-      filtered = filtered.filter((m) =>
-        m.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
+  // SEARCH FILTER
+  if (search.trim()) {
+    const keyword = search.toLowerCase();
 
-    // category filter
-    if (activeCategory !== "ALL") {
-      filtered = filtered.filter(
-        (m) => m.category === activeCategory
-      );
-    }
+    filtered = filtered.filter((m) => {
+      const searchableText = `
+        ${m.name || ""}
+        ${m.brand || ""}
+        ${m.description || ""}
+        ${m.packaging || ""}
+      `.toLowerCase();
 
-    setMedicines(filtered);
-  }, [search, activeCategory, allMedicines]);
+      return searchableText.includes(keyword);
+    });
+  }
+
+  // CATEGORY FILTER
+  if (activeCategory !== "ALL") {
+    filtered = filtered.filter(
+      (m) => m.category === activeCategory
+    );
+  }
+
+  setMedicines(filtered);
+}, [search, activeCategory, allMedicines]);
+
 
   return (
     <>
