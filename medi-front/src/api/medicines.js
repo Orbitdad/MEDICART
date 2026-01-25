@@ -4,7 +4,7 @@ const BASE = import.meta.env.VITE_API_URL;
    DOCTOR
 ========================= */
 export const getMedicines = async () => {
-  const res = await fetch(`${BASE}/medicines`);
+  const res = await fetch(`${BASE}/api/medicines`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch medicines");
