@@ -48,7 +48,7 @@ export default function DoctorHome() {
         <div className="welcome-row">
           <div>
             <h2>
-              Welcome {user?.name ? `, Dr. ${user.name}` : ""}
+              Welcome {user?.name ? `, ${user.name}` : ""}
             </h2>
 
             <p className="muted">
