@@ -3,8 +3,10 @@ const BASE = import.meta.env.VITE_API_URL;
 /* =========================
    DOCTOR
 ========================= */
-export const getMedicines = async () => {
-  const res = await fetch(`${BASE}/api/medicines`);
+export const getMedicines = async (search = "") => {
+  const res = await fetch(
+    `${BASE}/medicines?search=${encodeURIComponent(search)}`
+  );
 
   if (!res.ok) {
     throw new Error("Failed to fetch medicines");
