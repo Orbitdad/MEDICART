@@ -2,11 +2,58 @@ import mongoose from "mongoose";
 
 const medicineSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    brand: { type: String },
-    price: { type: Number, required: true },
-    stock: { type: Number, required: true },
+    /* --------------------
+       BASIC INFO
+    -------------------- */
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
+    brand: {
+      type: String, // company / manufacturer
+      required: true,
+    },
+
+    description: {
+      type: String,
+    },
+
+    packaging: {
+      type: String, // Strip of 10 tablets
+    },
+
+    /* --------------------
+       PRICING
+    -------------------- */
+    mrp: {
+      type: Number,
+      required: true,
+    },
+
+    price: {
+      type: Number, // selling price
+      required: true,
+    },
+
+    /* --------------------
+       STOCK
+    -------------------- */
+    stock: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+
+    expiryDate: {
+      type: Date,
+      required: true,
+    },
+
+    /* --------------------
+       CATEGORY
+    -------------------- */
     category: {
       type: String,
       enum: ["SYP", "TAB", "CAP", "EE", "INJ", "INSTR"],
@@ -14,8 +61,22 @@ const medicineSchema = new mongoose.Schema(
       default: "TAB",
     },
 
-    images: [{ type: String }],
-    isActive: { type: Boolean, default: true },
+    /* --------------------
+       IMAGES
+    -------------------- */
+    images: [
+      {
+        type: String, // filename
+      },
+    ],
+
+    /* --------------------
+       STATUS
+    -------------------- */
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );
