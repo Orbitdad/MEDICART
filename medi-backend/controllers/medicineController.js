@@ -21,7 +21,6 @@ export const getMedicines = async (req, res, next) => {
   }
 };
 
-
 /* ----------------------------------
    ADMIN: GET ALL MEDICINES
 ----------------------------------- */
@@ -39,6 +38,21 @@ export const adminGetMedicines = async (req, res, next) => {
 ----------------------------------- */
 export const adminCreateMedicine = async (req, res, next) => {
   try {
+    const {
+      name,
+      brand,
+      price,
+      stock,
+      category,
+    } = req.body;
+
+    /* ✅ HARD VALIDATION */
+    if (!name || !price || !stock || !category) {
+      return res.status(400).json({
+        message: "Name, price, stock and category are required",
+      });
+    }
+
     const imageUrls = [];
 
     if (req.files?.length) {
@@ -52,11 +66,11 @@ export const adminCreateMedicine = async (req, res, next) => {
     }
 
     const medicine = await Medicine.create({
-      name: req.body.name,
-      brand: req.body.brand,
-      price: Number(req.body.price),
-      stock: Number(req.body.stock),
-      category: req.body.category,   // ✅ ADD THIS
+      name: name.trim(),
+      brand: brand?.trim(),
+      price: Number(price),
+      stock: Number(stock),
+      category,
       images: imageUrls,
     });
 
@@ -71,14 +85,33 @@ export const adminCreateMedicine = async (req, res, next) => {
 ----------------------------------- */
 export const adminUpdateMedicine = async (req, res, next) => {
   try {
+    const allowedFields = [
+      "name",
+      "brand",
+      "price",
+      "stock",
+      "category",
+      "isActive",
+    ];
+
+    const updates = {};
+
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        updates[key] = req.body[key];
+      }
+    }
+
     const updated = await Medicine.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true }
+      updates,
+      { new: true, runValidators: true }
     );
 
     if (!updated) {
-      return res.status(404).json({ message: "Medicine not found" });
+      return res.status(404).json({
+        message: "Medicine not found",
+      });
     }
 
     res.json(updated);
@@ -88,15 +121,16 @@ export const adminUpdateMedicine = async (req, res, next) => {
 };
 
 /* ----------------------------------
-   ADMIN: DELETE MEDICINE (HARD DELETE)
-   🔴 ONLY CHANGE IN THIS FILE
+   ADMIN: DELETE MEDICINE
 ----------------------------------- */
 export const adminDeleteMedicine = async (req, res, next) => {
   try {
     const medicine = await Medicine.findByIdAndDelete(req.params.id);
 
     if (!medicine) {
-      return res.status(404).json({ message: "Medicine not found" });
+      return res.status(404).json({
+        message: "Medicine not found",
+      });
     }
 
     res.json({ success: true });
