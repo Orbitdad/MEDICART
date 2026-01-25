@@ -12,7 +12,7 @@ function Medicines() {
     brand: "",
     price: "",
     stock: "",
-    category: "TAB",
+    category: "",
   });
 
   const [images, setImages] = useState([]);
@@ -58,7 +58,7 @@ function Medicines() {
         brand: "",
         price: "",
         stock: "",
-        category: "TAB",
+        category: "",
       });
       setImages([]);
       loadMedicines();
@@ -170,7 +170,9 @@ function Medicines() {
             className="input"
             value={form.category}
             onChange={handleChange}
+            required
           >
+            <option value="">Select category</option>
             <option value="TAB">Tablet</option>
             <option value="CAP">Capsule</option>
             <option value="SYP">Syrup</option>
@@ -178,6 +180,7 @@ function Medicines() {
             <option value="INJ">Injection</option>
             <option value="INSTR">Instrument</option>
           </select>
+
 
           {/* ✅ FIXED FILE INPUT */}
           <input
