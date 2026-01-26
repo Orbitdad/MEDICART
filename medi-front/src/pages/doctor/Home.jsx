@@ -1,56 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
+
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
-import { ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
 import { getRecentOrders } from "../../api/orders";
-
 
 import heroImage from "../../../assets/hero.png";
 import "./DoctorHome.css";
 
 export default function DoctorHome() {
   const navigate = useNavigate();
-  const [recentOrders, setRecentOrders] = useState([]);
-
   const { user } = useAuth() || {};
   const { items = [] } = useCart() || {};
+
+  const [recentOrders, setRecentOrders] = useState([]);
 
   const hasCartItems = items.length > 0;
 
   useEffect(() => {
     getRecentOrders()
       .then(setRecentOrders)
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   return (
     <>
-      {/* ================= HERO BANNER ================= */}
-      {/* ================= HERO WITH FLOATING SEARCH ================= */}
+      {/* ================= HERO ================= */}
       <div className="hero-wrapper">
         <div className="hero-banner">
-          <img src={heroImage} alt="MediCart banner" />
+          <img src={heroImage} alt="MediCart Banner" />
 
-          {/* floating search */}
-          <div className="hero-search">
+          {/* <div className="hero-search">
             <input
               type="text"
               placeholder="Search medicines, salts, brands..."
             />
-          </div>
+          </div> */}
         </div>
       </div>
 
-      {/* ================= WELCOME CARD ================= */}
+      {/* ================= WELCOME ================= */}
       <section className="card">
         <div className="welcome-row">
           <div>
-            <h2>
-              Welcome {user?.name ? `, ${user.name}` : ""}
-            </h2>
-
+            <h2>Welcome{user?.name ? `, ${user.name}` : ""}</h2>
             <p className="muted">
               Order medicines and track requests securely
             </p>
@@ -70,7 +64,7 @@ export default function DoctorHome() {
         </div>
       </section>
 
-      {/* ================= QUICK STATS ================= */}
+      {/* ================= STATS ================= */}
       <section className="stats-grid">
         <div
           className="card clickable"
@@ -111,7 +105,7 @@ export default function DoctorHome() {
         </div>
       </section>
 
-      {/* ================= EMPTY STATE ================= */}
+      {/* ================= EMPTY ================= */}
       {!hasCartItems && (
         <section className="card center">
           <p className="muted">
