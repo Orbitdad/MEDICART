@@ -74,30 +74,43 @@
 /* ======================
    PRICE + STOCK
 ====================== */
-.medicine-meta {
+/* ======================
+   PRICE BOX (UPGRADED)
+====================== */
+.medicine-price-box {
+  margin: 0.35rem 0 0.4rem;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mrp-row,
+.price-row {
+  display: flex;
   justify-content: space-between;
-  margin-bottom: 0.45rem;
-}
-
-.medicine-price {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #2563eb;
-}
-
-.medicine-stock {
+  align-items: center;
   font-size: 0.7rem;
+}
+
+.mrp-row .label {
+  color: #64748b;
+}
+
+.price-row .label {
+  color: #334155;
   font-weight: 500;
 }
 
-.medicine-stock.in {
-  color: #16a34a;
+.medicine-mrp {
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-size: 0.7rem;
 }
 
-.medicine-stock.out {
-  color: #dc2626;
+.medicine-price {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2563eb;
 }
 
 /* ======================
@@ -152,4 +165,17 @@
   100% {
     background-position: -100% 0;
   }
+}
+
+
+.medicine-name {
+  font-size: 0.85rem;
+}
+
+.medicine-brand {
+  font-size: 0.68rem;
+}
+
+.medicine-desc {
+  font-size: 0.7rem;
 }

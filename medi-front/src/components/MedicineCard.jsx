@@ -66,32 +66,35 @@ export default function MedicineCard({ med }) {
             </p>
           )}
 
-          {/* PRICE + STOCK */}
-          <div className="medicine-meta">
-            <div className="price-group">
-              {med?.mrp && (
-                <span className="medicine-mrp">
-                  ₹{med.mrp}
-                </span>
-              )}
+{/* PRICE */}
+<div className="medicine-price-box">
+  {med?.mrp && (
+    <div className="mrp-row">
+      <span className="label">MRP</span>
+      <span className="medicine-mrp">₹{med.mrp}</span>
+    </div>
+  )}
 
-              <span className="medicine-price">
-                ₹{med?.price ?? "--"}
-              </span>
-            </div>
+  <div className="price-row">
+    <span className="label">Price</span>
+    <span className="medicine-price">
+      ₹{med?.price ?? "--"}
+    </span>
+  </div>
+</div>
 
-            <span
-              className={
-                (med?.stock ?? 0) > 0
-                  ? "medicine-stock in"
-                  : "medicine-stock out"
-              }
-            >
-              {(med?.stock ?? 0) > 0
-                ? "In Stock"
-                : "Out of Stock"}
-            </span>
-          </div>
+{/* STOCK */}
+<span
+  className={
+    (med?.stock ?? 0) > 0
+      ? "medicine-stock in"
+      : "medicine-stock out"
+  }
+>
+  {(med?.stock ?? 0) > 0
+    ? "In Stock"
+    : "Out of Stock"}
+</span>
 
           {/* EXPIRY */}
           {med?.expiryDate && (
