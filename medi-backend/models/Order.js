@@ -22,7 +22,10 @@ const orderSchema = new mongoose.Schema(
       },
     ],
 
-    notes: String,
+    notes: {
+      type: String,
+      default: "",
+    },
 
     totalAmount: {
       type: Number,

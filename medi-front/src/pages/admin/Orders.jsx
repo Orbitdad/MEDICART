@@ -198,6 +198,18 @@ export default function Orders() {
                 </div>
               </div>
 
+              {/* NOTES */}
+
+{o.notes && o.notes.trim() !== "" && (
+  <div className="bg-slate-50 border rounded-md p-2 text-xs text-slate-700">
+    <span className="font-medium">Notes:</span>{" "}
+    {o.notes}
+  </div>
+)}
+
+
+
+
               {/* MEDICINES */}
               <div className="pt-2 border-t text-xs text-muted space-y-1">
                 {o.items.map((it, idx) => (
