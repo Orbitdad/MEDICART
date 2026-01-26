@@ -28,10 +28,19 @@ export default function Cart() {
   );
 
   const handleQtyChange = (id, value) => {
-    const qty = Number(value);
-    if (isNaN(qty)) return;
-    updateQty(id, qty < 1 ? 1 : qty);
+    // allow empty input
+    if (value === "") {
+      updateQty(id, "");
+      return;
+    }
+
+    // allow only numbers
+    if (!/^\d+$/.test(value)) return;
+
+    updateQty(id, Number(value));
   };
+
+
 
   const confirmPlaceOrder = async (paymentInfo = null) => {
     setLoading(true);
@@ -101,7 +110,9 @@ export default function Cart() {
                   </button>
 
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    className="qty-input"
                     value={it.quantity}
                     onChange={(e) =>
                       handleQtyChange(it._id, e.target.value)
