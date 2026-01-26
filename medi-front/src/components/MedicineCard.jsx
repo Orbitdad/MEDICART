@@ -49,20 +49,25 @@ export default function MedicineCard({ med }) {
 
           {/* BRAND */}
           <p className="medicine-brand">
+                               <span className="label">co:   </span>
+
             {med?.brand || "—"}
           </p>
 
           {/* PACKAGING */}
           {med?.packaging && (
             <p className="medicine-packaging">
-              {med.packaging}
+                    <span className="label">Pack of:   </span>
+{med.packaging}
             </p>
           )}
 
           {/* DESCRIPTION */}
           {med?.description && (
             <p className="medicine-desc">
-              {med.description}
+                   <span className="label">Info:   </span>
+                   {med.description}
+
             </p>
           )}
 

@@ -6,33 +6,32 @@
   padding: 1rem;
 
   display: flex;
-  gap: 0.9rem;
-
+  gap: 0.8rem;
   min-width: 0;
 }
 
 /* ======================
-   IMAGE (FIXED RATIO)
+   IMAGE
 ====================== */
 .medicine-image {
-  width: 96px;
-  aspect-ratio: 1 / 1;          /* ✅ FIXED SQUARE */
-  border-radius: 12px;
+  width: 76px;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
   background: #f8fafc;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  overflow: hidden;             /* 🔒 IMPORTANT */
+  overflow: hidden;
   flex-shrink: 0;
 }
 
 .medicine-image img {
   width: 100%;
   height: 100%;
-  object-fit: contain;          /* ✅ NO CROPPING */
-  padding: 6px;
+  object-fit: contain;
+  padding: 4px;
 }
 
 /* ======================
@@ -43,28 +42,36 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
-
-/* NAME */
+.medicine-info .label {
+  font-weight: 600;
+  color: #334155;
+}
+/* ======================
+   NAME
+====================== */
 .medicine-name {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #0f172a;
-  margin: 0 0 0.2rem 0;
+  line-height: 1.15;
+  margin: 0;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  word-break: break-word;
 }
 
-/* BRAND */
+/* ======================
+   BRAND
+====================== */
 .medicine-brand {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: #64748b;
-  margin-bottom: 0.35rem;
+  line-height: 1.1;
+  margin: 0;
 
   white-space: nowrap;
   overflow: hidden;
@@ -72,16 +79,24 @@
 }
 
 /* ======================
-   PRICE + STOCK
+   PACKAGING / DESC
 ====================== */
+.medicine-packaging,
+.medicine-desc {
+  font-size: 0.7rem;
+  color: #475569;
+  line-height: 1.15;
+  margin: 0;
+}
+
 /* ======================
-   PRICE BOX (UPGRADED)
+   PRICE BOX
 ====================== */
 .medicine-price-box {
-  margin: 0.35rem 0 0.4rem;
+  margin: 4px 0 2px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .mrp-row,
@@ -90,6 +105,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.7rem;
+  line-height: 1.1;
 }
 
 .mrp-row .label {
@@ -104,7 +120,6 @@
 .medicine-mrp {
   color: #94a3b8;
   text-decoration: line-through;
-  font-size: 0.7rem;
 }
 
 .medicine-price {
@@ -114,20 +129,56 @@
 }
 
 /* ======================
+   STOCK
+====================== */
+.medicine-stock {
+  font-size: 0.7rem;
+  line-height: 1;
+  margin: 0;
+}
+
+.medicine-stock.in {
+  color: #16a34a;
+}
+
+.medicine-stock.out {
+  color: #dc2626;
+}
+
+/* ======================
+   EXPIRY
+====================== */
+.medicine-expiry {
+  font-size: 0.65rem;
+  color: #64748b;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.medicine-expiry.near {
+  color: #f59e0b;
+}
+
+.medicine-expiry.expired {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* ======================
    BUTTON
 ====================== */
 .medicine-btn {
   margin-top: auto;
   border: none;
   border-radius: 999px;
-  padding: 0.45rem 0;
+  padding: 0.42rem 0;
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
 
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.32);
   transition: transform 150ms ease;
 }
 
@@ -147,7 +198,7 @@
 .image-skeleton {
   width: 100%;
   height: 100%;
-  border-radius: 12px;
+  border-radius: 10px;
   background: linear-gradient(
     90deg,
     #f1f5f9 25%,
@@ -165,17 +216,4 @@
   100% {
     background-position: -100% 0;
   }
-}
-
-
-.medicine-name {
-  font-size: 0.85rem;
-}
-
-.medicine-brand {
-  font-size: 0.68rem;
-}
-
-.medicine-desc {
-  font-size: 0.7rem;
 }
