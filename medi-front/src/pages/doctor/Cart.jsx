@@ -21,37 +21,43 @@ export default function Cart() {
 
   const navigate = useNavigate();
 
-
+  /* =============================
+     TOTAL ITEMS (EMPTY SAFE)
+  ============================== */
   const totalItems = items.reduce(
-    (sum, it) => sum + it.quantity,
+    (sum, it) => sum + Number(it.quantity || 0),
     0
   );
 
+  /* =============================
+     QTY HANDLER (EMPTY ALLOWED)
+  ============================== */
   const handleQtyChange = (id, value) => {
-    // allow empty input
     if (value === "") {
       updateQty(id, "");
       return;
     }
 
-    // allow only numbers
     if (!/^\d+$/.test(value)) return;
 
     updateQty(id, Number(value));
   };
 
-
-
+  /* =============================
+     PLACE ORDER
+  ============================== */
   const confirmPlaceOrder = async (paymentInfo = null) => {
     setLoading(true);
     setError("");
 
     try {
       await placeOrder({
-        items: items.map((it) => ({
-          medicineId: it._id,
-          quantity: it.quantity,
-        })),
+        items: items
+          .filter((it) => Number(it.quantity) > 0)
+          .map((it) => ({
+            medicineId: it._id,
+            quantity: Number(it.quantity),
+          })),
         notes,
         paymentMode: paymentInfo ? "online" : "credit",
         paymentInfo,
@@ -66,6 +72,9 @@ export default function Cart() {
     }
   };
 
+  /* =============================
+     EMPTY CART
+  ============================== */
   if (!items.length) {
     return (
       <div className="empty-cart">
@@ -80,6 +89,9 @@ export default function Cart() {
     );
   }
 
+  /* =============================
+     UI
+  ============================== */
   return (
     <div className="cart-layout">
 
@@ -94,8 +106,10 @@ export default function Cart() {
               <div className="med-info">
                 <p className="med-name">{it.name}</p>
                 <p className="med-price">
-                  ₹{it.price} × {it.quantity}
-                  <span>₹{it.price * it.quantity}</span>
+                  ₹{it.price} × {it.quantity || 0}
+                  <span>
+                    ₹{Number(it.price) * Number(it.quantity || 0)}
+                  </span>
                 </p>
               </div>
 
@@ -103,7 +117,10 @@ export default function Cart() {
                 <div className="qty-control">
                   <button
                     onClick={() =>
-                      updateQty(it._id, Math.max(1, it.quantity - 1))
+                      updateQty(
+                        it._id,
+                        Number(it.quantity || 0) - 1
+                      )
                     }
                   >
                     −
@@ -114,6 +131,7 @@ export default function Cart() {
                     inputMode="numeric"
                     className="qty-input"
                     value={it.quantity}
+                    placeholder="Qty"
                     onChange={(e) =>
                       handleQtyChange(it._id, e.target.value)
                     }
@@ -121,7 +139,10 @@ export default function Cart() {
 
                   <button
                     onClick={() =>
-                      updateQty(it._id, it.quantity + 1)
+                      updateQty(
+                        it._id,
+                        Number(it.quantity || 0) + 1
+                      )
                     }
                   >
                     +

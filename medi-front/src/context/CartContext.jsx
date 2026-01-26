@@ -11,56 +11,74 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [notes, setNotes] = useState("");
 
+  /* ============================
+     ADD TO CART
+     (START EMPTY)
+  ============================ */
   const addToCart = (medicine) => {
     setItems((prev) => {
       const existing = prev.find(
         (it) => it._id === medicine._id
       );
 
-      if (existing) {
-        if (existing.quantity >= medicine.stock) return prev;
+      if (existing) return prev;
 
-        return prev.map((it) =>
-          it._id === medicine._id
-            ? { ...it, quantity: it.quantity + 1 }
-            : it
-        );
-      }
-
-      return [...prev, { ...medicine, quantity: 1 }];
+      return [
+        ...prev,
+        { ...medicine, quantity: "" },
+      ];
     });
   };
 
+  /* ============================
+     REMOVE
+  ============================ */
   const removeFromCart = (id) => {
-    setItems((prev) => prev.filter((it) => it._id !== id));
+    setItems((prev) =>
+      prev.filter((it) => it._id !== id)
+    );
   };
 
+  /* ============================
+     UPDATE QTY (NO FORCING)
+  ============================ */
   const updateQty = (id, quantity) => {
     setItems((prev) =>
       prev.map((it) =>
         it._id === id
           ? {
               ...it,
-              quantity: Math.max(
-                1,
-                Math.min(quantity, it.stock)
-              ),
+              quantity:
+                quantity === ""
+                  ? ""
+                  : Math.min(
+                      Number(quantity),
+                      it.stock
+                    ),
             }
           : it
       )
     );
   };
 
+  /* ============================
+     CLEAR
+  ============================ */
   const clearCart = () => {
     setItems([]);
     setNotes("");
   };
 
+  /* ============================
+     TOTAL AMOUNT (SAFE)
+  ============================ */
   const totalAmount = useMemo(
     () =>
       items.reduce(
         (sum, it) =>
-          sum + (it.price || 0) * (it.quantity || 1),
+          sum +
+          (Number(it.price) || 0) *
+            (Number(it.quantity) || 0),
         0
       ),
     [items]
