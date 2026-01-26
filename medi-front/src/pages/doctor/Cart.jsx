@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useCart } from "../../context/CartContext.jsx";
 import { placeOrder } from "../../api/orders.js";
 import { useNavigate } from "react-router-dom";
-
+import "./Cart.css";
 export default function Cart() {
   const {
     items,
@@ -25,6 +25,18 @@ export default function Cart() {
     (sum, it) => sum + it.quantity,
     0
   );
+
+  const handleQtyChange = (id, value) => {
+  const qty = Number(value);
+
+  if (isNaN(qty)) return;
+
+  if (qty < 1) {
+    updateQty(id, 1);
+  } else {
+    updateQty(id, qty);
+  }
+};
 
   /* =============================
      PLACE ORDER
@@ -53,6 +65,7 @@ export default function Cart() {
       setLoading(false);
     }
   };
+
 
   /* =============================
      RAZORPAY PAYMENT
@@ -175,21 +188,39 @@ export default function Cart() {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex items-center border rounded-lg">
-                <button
-                  className="px-2"
-                  onClick={() => updateQty(it._id, it.quantity - 1)}
-                >
-                  –
-                </button>
-                <span className="px-3 text-sm">{it.quantity}</span>
-                <button
-                  className="px-2"
-                  onClick={() => updateQty(it._id, it.quantity + 1)}
-                >
-                  +
-                </button>
-              </div>
+             <div className="qty-control">
+  <button
+    className="qty-btn"
+    onClick={() =>
+      updateQty(it._id, Math.max(1, it.quantity - 1))
+    }
+  >
+    −
+  </button>
+
+  <input
+    type="number"
+    min="1"
+    className="qty-input"
+    value={it.quantity}
+    onChange={(e) =>
+      handleQtyChange(it._id, e.target.value)
+    }
+    onBlur={(e) => {
+      if (!e.target.value || Number(e.target.value) < 1) {
+        updateQty(it._id, 1);
+      }
+    }}
+  />
+
+  <button
+    className="qty-btn"
+    onClick={() => updateQty(it._id, it.quantity + 1)}
+  >
+    +
+  </button>
+</div>
+
 
               <button
                 onClick={() => setConfirming(it._id)}

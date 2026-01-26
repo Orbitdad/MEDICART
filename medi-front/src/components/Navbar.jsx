@@ -2,6 +2,8 @@ import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import "./Navbar.css";
+// import logo from "../../assets/SSS logo.png";
+
 
 function Navbar() {
   const { pathname } = useLocation();
@@ -18,7 +20,7 @@ function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        {/* LOGO */}
+      {/* <img src={logo} alt="MediCart Logo" className="logo" /> */}
         <div
           className="navbar-logo"
           onClick={() => {
