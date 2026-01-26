@@ -4,7 +4,6 @@
     "engines": {
         "node": "18.x"
     },
-
     "name": "medi-backend",
     "version": "1.0.0",
     "main": "server.js",
@@ -26,6 +25,7 @@
         "mongoose": "^8.1.0",
         "morgan": "^1.10.0",
         "multer": "^2.0.2",
+        "pdfkit": "^0.17.2",
         "razorpay": "^2.9.6"
     },
     "devDependencies": {

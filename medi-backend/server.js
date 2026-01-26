@@ -15,7 +15,7 @@ import doctorAuthRoutes from "./routes/doctorAuthRoutes.js";
 import medicineRoutes from "./routes/medicineRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
-
+import invoiceRoutes from "./routes/invoiceRoutes.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 
 connectDB();
@@ -40,6 +40,8 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
+app.use("/api/invoice", invoiceRoutes);
+
 
 /* ROUTES */
 app.use("/api/auth/admin", adminAuthRoutes);
