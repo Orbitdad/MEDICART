@@ -1,40 +1,224 @@
+/* =========================
+   BASE LAYOUT (DESKTOP)
+========================= */
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  max-width: 1300px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+/* -------------------------
+   LEFT SIDE
+-------------------------- */
+
+.cart-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.medicine-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.medicine-row {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+}
+
+.med-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.med-price {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.med-price span {
+  margin-left: 8px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* -------------------------
+   ACTIONS
+-------------------------- */
+
+.med-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .qty-control {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
-.qty-btn {
-  width: 30px;
-  height: 30px;
+.qty-control button {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   border: 1px solid #cbd5e1;
   background: #f8fafc;
-  border-radius: 6px;
   font-size: 18px;
   cursor: pointer;
-  line-height: 1;
 }
 
-.qty-btn:hover {
-  background: #eef2ff;
-}
-
-.qty-input {
+.qty-control input {
   width: 52px;
-  height: 30px;
+  height: 32px;
   text-align: center;
+  border-radius: 8px;
   border: 1px solid #cbd5e1;
-  border-radius: 6px;
   font-size: 14px;
   outline: none;
 }
 
-.qty-input::-webkit-inner-spin-button,
-.qty-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+.remove-link {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 
-.qty-input:focus {
-  border-color: #2563eb;
+/* -------------------------
+   RIGHT SNAPSHOT PANEL
+-------------------------- */
+
+.cart-right {
+  align-self: flex-start;
+}
+
+.snapshot-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px;
+  background: #ffffff;
+}
+
+.snapshot-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 14px;
+}
+
+.snapshot-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.snapshot-row.total {
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.snapshot-section {
+  margin-top: 14px;
+}
+
+.snapshot-section textarea {
+  width: 100%;
+  min-height: 70px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  padding: 8px;
+}
+
+.radio {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+/* -------------------------
+   BUTTON
+-------------------------- */
+
+.primary-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+/* --------- Small laptops --------- */
+@media (max-width: 1100px) {
+  .cart-layout {
+    grid-template-columns: 1.7fr 1fr;
+    gap: 20px;
+  }
+}
+
+/* --------- Tablets --------- */
+@media (max-width: 900px) {
+  .cart-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-right {
+    margin-top: 20px;
+  }
+}
+
+/* --------- Mobile --------- */
+@media (max-width: 600px) {
+  .cart-layout {
+    margin: 20px auto;
+    padding: 0 12px;
+  }
+
+  .medicine-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .med-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .qty-control button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .qty-control input {
+    width: 60px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .primary-btn {
+    padding: 14px;
+    font-size: 1rem;
+  }
 }

@@ -3,6 +3,7 @@ import { useCart } from "../../context/CartContext.jsx";
 import { placeOrder } from "../../api/orders.js";
 import { useNavigate } from "react-router-dom";
 import "./Cart.css";
+
 export default function Cart() {
   const {
     items,
@@ -17,34 +18,24 @@ export default function Cart() {
   const [paymentMode, setPaymentMode] = useState("credit");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [confirming, setConfirming] = useState(false);
 
   const navigate = useNavigate();
 
-  const itemCount = items.reduce(
+
+  const totalItems = items.reduce(
     (sum, it) => sum + it.quantity,
     0
   );
 
   const handleQtyChange = (id, value) => {
-  const qty = Number(value);
+    const qty = Number(value);
+    if (isNaN(qty)) return;
+    updateQty(id, qty < 1 ? 1 : qty);
+  };
 
-  if (isNaN(qty)) return;
-
-  if (qty < 1) {
-    updateQty(id, 1);
-  } else {
-    updateQty(id, qty);
-  }
-};
-
-  /* =============================
-     PLACE ORDER
-  ============================== */
   const confirmPlaceOrder = async (paymentInfo = null) => {
-    setConfirming(false);
-    setError("");
     setLoading(true);
+    setError("");
 
     try {
       await placeOrder({
@@ -59,99 +50,19 @@ export default function Cart() {
 
       clearCart();
       navigate("/doctor/order-success");
-    } catch (err) {
-      setError("Order failed. Please try again.");
+    } catch {
+      setError("Order failed. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
-
-  /* =============================
-     RAZORPAY PAYMENT
-  ============================== */
-  const handleOnlinePayment = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const BASE = import.meta.env.VITE_API_URL;
-
-      const res = await fetch(`${BASE}/payment/create-order`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: Number(totalAmount),
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Create order failed");
-      }
-
-      const order = await res.json();
-
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: "INR",
-        order_id: order.id,
-        name: "MediCart",
-        description: "Medicine Order Payment",
-
-        handler: async function (response) {
-          try {
-            const verify = await fetch(`${BASE}/payment/verify`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(response),
-            });
-
-            const data = await verify.json();
-
-            if (data.success) {
-              await confirmPlaceOrder({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-              });
-            } else {
-              setError("Payment verification failed.");
-            }
-          } catch {
-            setError("Payment verification error.");
-          }
-        },
-
-        modal: {
-          ondismiss: () => setLoading(false),
-        },
-
-        theme: {
-          color: "#2563eb",
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-
-    } catch (err) {
-      console.error(err);
-      setError("Payment failed. Please try again.");
-      setLoading(false);
-    }
-  };
-
-  /* =============================
-     EMPTY CART
-  ============================== */
   if (!items.length) {
     return (
-      <div className="card text-center max-w-md mx-auto">
-        <p className="text-muted">Your cart is empty.</p>
+      <div className="empty-cart">
+        <p>Your cart is empty.</p>
         <button
-          className="button button-primary mt-4"
+          className="primary-btn"
           onClick={() => navigate("/doctor/medicines")}
         >
           Browse Medicines
@@ -160,142 +71,125 @@ export default function Cart() {
     );
   }
 
-  /* =============================
-     UI
-  ============================== */
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="cart-layout">
 
-      <div className="text-center">
-        <h2 className="text-2xl font-semibold">Review Order</h2>
-        <p className="text-muted text-sm mt-1">
-          {itemCount} items in your cart
-        </p>
+      {/* LEFT PANEL */}
+      <div className="cart-left">
+        <h2 className="cart-title">Review Order</h2>
+
+        <div className="medicine-stack">
+          {items.map((it) => (
+            <div key={it._id} className="medicine-row">
+
+              <div className="med-info">
+                <p className="med-name">{it.name}</p>
+                <p className="med-price">
+                  ₹{it.price} × {it.quantity}
+                  <span>₹{it.price * it.quantity}</span>
+                </p>
+              </div>
+
+              <div className="med-actions">
+                <div className="qty-control">
+                  <button
+                    onClick={() =>
+                      updateQty(it._id, Math.max(1, it.quantity - 1))
+                    }
+                  >
+                    −
+                  </button>
+
+                  <input
+                    type="number"
+                    value={it.quantity}
+                    onChange={(e) =>
+                      handleQtyChange(it._id, e.target.value)
+                    }
+                  />
+
+                  <button
+                    onClick={() =>
+                      updateQty(it._id, it.quantity + 1)
+                    }
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  className="remove-link"
+                  onClick={() => removeFromCart(it._id)}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* ITEMS */}
-      <div className="card space-y-4">
-        {items.map((it) => (
-          <div
-            key={it._id}
-            className="flex items-center justify-between border-b pb-3 last:border-none"
-          >
-            <div>
-              <p className="font-medium">{it.name}</p>
-              <p className="text-xs text-muted">
-                ₹{it.price} × {it.quantity}
-              </p>
-            </div>
+      {/* RIGHT PANEL */}
+      <div className="cart-right">
+        <div className="snapshot-card">
+          <h3>Order Snapshot</h3>
 
-            <div className="flex items-center gap-3">
-             <div className="qty-control">
-  <button
-    className="qty-btn"
-    onClick={() =>
-      updateQty(it._id, Math.max(1, it.quantity - 1))
-    }
-  >
-    −
-  </button>
-
-  <input
-    type="number"
-    min="1"
-    className="qty-input"
-    value={it.quantity}
-    onChange={(e) =>
-      handleQtyChange(it._id, e.target.value)
-    }
-    onBlur={(e) => {
-      if (!e.target.value || Number(e.target.value) < 1) {
-        updateQty(it._id, 1);
-      }
-    }}
-  />
-
-  <button
-    className="qty-btn"
-    onClick={() => updateQty(it._id, it.quantity + 1)}
-  >
-    +
-  </button>
-</div>
-
-
-              <button
-                onClick={() => setConfirming(it._id)}
-                className="text-red-400 text-xs hover:underline"
-              >
-                Remove
-              </button>
-            </div>
+          <div className="snapshot-row">
+            <span>Total Items</span>
+            <span>{totalItems}</span>
           </div>
-        ))}
-      </div>
 
-      {/* NOTES */}
-      <div className="card">
-        <label className="label">Notes (optional)</label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          className="input min-h-[80px]"
-        />
-      </div>
+          <div className="snapshot-row total">
+            <span>Total Amount</span>
+            <span>₹{totalAmount}</span>
+          </div>
 
-      {/* SUMMARY */}
-      <div className="card space-y-3">
-        <div className="flex justify-between text-sm">
-          <span className="text-muted">
-            Subtotal ({itemCount} items)
-          </span>
-          <span>₹{totalAmount}</span>
+          <div className="snapshot-section">
+            <label>Notes</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </div>
+
+          <div className="snapshot-section">
+            <label>Payment</label>
+
+            <label className="radio">
+              <input
+                type="radio"
+                checked={paymentMode === "credit"}
+                onChange={() => setPaymentMode("credit")}
+              />
+              Cash on Delivery
+            </label>
+
+            <label className="radio">
+              <input
+                type="radio"
+                checked={paymentMode === "online"}
+                onChange={() => setPaymentMode("online")}
+              />
+              Pay Now
+            </label>
+          </div>
+
+          {error && <p className="error">{error}</p>}
+
+          <button
+            className="primary-btn"
+            disabled={loading}
+            onClick={() =>
+              paymentMode === "online"
+                ? alert("Online flow later")
+                : confirmPlaceOrder()
+            }
+          >
+            {loading ? "Processing..." : "Confirm Order"}
+          </button>
         </div>
-
-        <div className="flex justify-between font-semibold">
-          <span>Total Amount</span>
-          <span className="text-primary">₹{totalAmount}</span>
-        </div>
       </div>
 
-      {/* PAYMENT */}
-      <div className="card space-y-2">
-        <p className="font-medium">Payment Option</p>
-
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="radio"
-            checked={paymentMode === "credit"}
-            onChange={() => setPaymentMode("credit")}
-          />
-         Cash on Delivery
-        </label>
-
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="radio"
-            checked={paymentMode === "online"}
-            onChange={() => setPaymentMode("online")}
-          />
-          Pay Now
-        </label>
-      </div>
-
-      {error && <p className="text-red-400 text-sm">{error}</p>}
-
-      <button
-        disabled={loading}
-        className="button button-primary w-full py-3 text-base"
-        onClick={() => {
-          if (paymentMode === "online") {
-            handleOnlinePayment();
-          } else {
-            confirmPlaceOrder();
-          }
-        }}
-      >
-        {loading ? "Processing..." : "Place Order"}
-      </button>
     </div>
   );
 }
