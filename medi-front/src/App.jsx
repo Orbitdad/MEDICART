@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import MobileBottomNav from "./components/MobileBottomNav.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import InitialLoadingScreen from "./components/InitialLoadingScreen.jsx";
 
 /* =========================
    DOCTOR PAGES
@@ -28,6 +29,9 @@ import Inventory from "./pages/admin/Inventory.jsx";
 function App() {
   return (
     <div className="app-root">
+      {/* INITIAL LOADING SCREEN */}
+      <InitialLoadingScreen />
+      
       {/* DESKTOP NAVBAR */}
       <Navbar />
 

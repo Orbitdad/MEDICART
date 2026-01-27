@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Search, ShoppingCart, Pill, FileText, CreditCard } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
 import { getRecentOrders } from "../../api/orders";
 
-import heroImage from "../../../assets/hero.png";
 import "./DoctorHome.css";
 
 export default function DoctorHome() {
@@ -15,6 +14,7 @@ export default function DoctorHome() {
   const { items = [] } = useCart() || {};
 
   const [recentOrders, setRecentOrders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const hasCartItems = items.length > 0;
 
@@ -24,100 +24,133 @@ export default function DoctorHome() {
       .catch(() => {});
   }, []);
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/doctor/medicines?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate("/doctor/medicines");
+    }
+  };
+
   return (
     <>
-      {/* ================= HERO ================= */}
-      <div className="hero-wrapper">
-        <div className="hero-banner">
-          <img src={heroImage} alt="MediCart Banner" />
 
-          {/* <div className="hero-search">
+      {/* ================= SEARCH BAR ================= */}
+      <section className="search-section">
+        <form onSubmit={handleSearch} className="search-form">
+          <div className="search-container-main">
+            <Search size={18} className="search-icon-main" />
             <input
               type="text"
               placeholder="Search medicines, salts, brands..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input-main"
             />
-          </div> */}
-        </div>
-      </div>
+          </div>
+        </form>
+      </section>
 
       {/* ================= WELCOME ================= */}
-      <section className="card">
-        <div className="welcome-row">
-          <div>
-            <h2>Welcome{user?.name ? `, ${user.name}` : ""}</h2>
-            <p className="muted">
+      <section className="welcome-section">
+        <div className="welcome-content">
+          <div className="welcome-text">
+            <h1 className="welcome-title">
+              Welcome{user?.name ? `, ${user.name}` : ""}
+            </h1>
+            <p className="welcome-subtitle">
               Order medicines and track requests securely
             </p>
-
             <div className="chip-row">
-              <span className="chip small">Pay Later Enabled</span>
-              <span className="chip small">Live Inventory</span>
+              <span className="chip chip-success">Pay Later Enabled</span>
+              <span className="chip chip-info">Live Inventory</span>
             </div>
           </div>
-
           <button
-            className="btn-primary"
+            className="btn-primary-action"
             onClick={() => navigate("/doctor/medicines")}
           >
-            + Place New Order
+            <Pill size={18} />
+            Place New Order
           </button>
         </div>
       </section>
 
       {/* ================= STATS ================= */}
-      <section className="stats-grid">
-        <div
-          className="card clickable"
-          onClick={() => navigate("/doctor/cart")}
-        >
-          <div className="stat-header">
-            <h4>Cart</h4>
-            <ChevronRight size={16} />
+      <section className="stats-section">
+        <div className="stats-grid">
+          <div
+            className="stat-card stat-card-clickable"
+            onClick={() => navigate("/doctor/cart")}
+          >
+            <div className="stat-icon-wrapper stat-icon-cart">
+              <ShoppingCart size={20} />
+            </div>
+            <div className="stat-content">
+              <h3 className="stat-title">Cart</h3>
+              <p className="stat-value">
+                {hasCartItems ? `${items.length} items` : "Empty"}
+              </p>
+            </div>
+            <ChevronRight size={18} className="stat-arrow" />
           </div>
-          <p className="muted">
-            {hasCartItems ? `${items.length} items` : "Empty"}
-          </p>
-        </div>
 
-        <div className="card">
-          <h4>Payment</h4>
-          <p className="muted">Hospital Credit</p>
-        </div>
-
-        <div
-          className="card clickable"
-          onClick={() => navigate("/doctor/medicines")}
-        >
-          <div className="stat-header">
-            <h4>Medicines</h4>
-            <ChevronRight size={16} />
+          <div className="stat-card">
+            <div className="stat-icon-wrapper stat-icon-payment">
+              <CreditCard size={20} />
+            </div>
+            <div className="stat-content">
+              <h3 className="stat-title">Payment</h3>
+              <p className="stat-value">Hospital Credit</p>
+            </div>
           </div>
-          <p className="muted">Browse inventory</p>
-        </div>
 
-        <div className="card">
-          <h4>Orders</h4>
-          <p className="muted">
-            {recentOrders.length > 0
-              ? `${recentOrders.length} recent orders`
-              : "No recent orders"}
-          </p>
+          <div
+            className="stat-card stat-card-clickable"
+            onClick={() => navigate("/doctor/medicines")}
+          >
+            <div className="stat-icon-wrapper stat-icon-medicine">
+              <Pill size={20} />
+            </div>
+            <div className="stat-content">
+              <h3 className="stat-title">Medicines</h3>
+              <p className="stat-value">Browse inventory</p>
+            </div>
+            <ChevronRight size={18} className="stat-arrow" />
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon-wrapper stat-icon-orders">
+              <FileText size={20} />
+            </div>
+            <div className="stat-content">
+              <h3 className="stat-title">Orders</h3>
+              <p className="stat-value">
+                {recentOrders.length > 0
+                  ? `${recentOrders.length} recent`
+                  : "No recent orders"}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ================= EMPTY ================= */}
+      {/* ================= EMPTY STATE ================= */}
       {!hasCartItems && (
-        <section className="card center">
-          <p className="muted">
-            You haven't added any medicines yet.
-          </p>
-
-          <button
-            className="btn-primary"
-            onClick={() => navigate("/doctor/medicines")}
-          >
-            Browse Medicines
-          </button>
+        <section className="empty-state-section">
+          <div className="empty-state-card">
+            <p className="empty-state-text">
+              You haven't added any medicines yet.
+            </p>
+            <button
+              className="btn-primary-action"
+              onClick={() => navigate("/doctor/medicines")}
+            >
+              <Pill size={18} />
+              Browse Medicines
+            </button>
+          </div>
         </section>
       )}
     </>

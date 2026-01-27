@@ -3,6 +3,7 @@ import {
   adminFetchOrders,
   markOrderCompleted,
 } from "../../api/orders.js";
+import LoadingScreen from "../../components/LoadingScreen.jsx";
 import { CheckCircle, Clock, Filter } from "lucide-react";
 
 export default function Orders() {
@@ -88,14 +89,7 @@ export default function Orders() {
 
       {/* ORDERS LIST */}
       {loading ? (
-        <div className="space-y-4">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="card h-24 bg-gray-100 animate-pulse"
-            />
-          ))}
-        </div>
+        <LoadingScreen />
       ) : filteredOrders.length === 0 ? (
         <div className="card text-center">
           <p className="text-muted text-sm">

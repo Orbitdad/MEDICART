@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext.jsx";
 import { placeOrder } from "../../api/orders.js";
+import { createRazorpayOrder, verifyRazorpayPayment } from "../../api/payment.js";
 import { useNavigate } from "react-router-dom";
 import "./Cart.css";
 
@@ -44,9 +45,93 @@ export default function Cart() {
   };
 
   /* =============================
-     PLACE ORDER
+     RAZORPAY PAYMENT HANDLER
   ============================== */
-  const confirmPlaceOrder = async (paymentInfo = null) => {
+  const handleRazorpayPayment = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      // Create Razorpay order
+      const razorpayOrder = await createRazorpayOrder(totalAmount);
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: "MediCart",
+        description: `Order for ${totalItems} items`,
+        order_id: razorpayOrder.id,
+        handler: async function (response) {
+          try {
+            // Verify payment
+            await verifyRazorpayPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            // Place order with payment info
+            await placeOrder({
+              items: items
+                .filter((it) => Number(it.quantity) > 0)
+                .map((it) => ({
+                  medicineId: it._id,
+                  quantity: Number(it.quantity),
+                })),
+              notes,
+              paymentMode: "online",
+              paymentInfo: {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+              },
+            });
+
+            clearCart();
+            navigate("/doctor/order-success");
+          } catch (err) {
+            setError("Payment verification failed. Please try again.");
+            setLoading(false);
+          }
+        },
+        prefill: {
+          name: "Doctor",
+          email: "",
+          contact: "",
+        },
+        theme: {
+          color: "#2563eb",
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+          },
+        },
+      };
+
+      // Check if Razorpay is loaded
+      if (!window.Razorpay) {
+        setError("Payment gateway not loaded. Please refresh the page.");
+        setLoading(false);
+        return;
+      }
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on("payment.failed", function (response) {
+        setError("Payment failed. Please try again.");
+        setLoading(false);
+      });
+      razorpay.open();
+    } catch (err) {
+      setError(err.message || "Payment initialization failed. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  /* =============================
+     PLACE ORDER (COD)
+  ============================== */
+  const confirmPlaceOrder = async () => {
     setLoading(true);
     setError("");
 
@@ -59,14 +144,14 @@ export default function Cart() {
             quantity: Number(it.quantity),
           })),
         notes,
-        paymentMode: paymentInfo ? "online" : "credit",
-        paymentInfo,
+        paymentMode: "credit",
+        paymentInfo: null,
       });
 
       clearCart();
       navigate("/doctor/order-success");
-    } catch {
-      setError("Order failed. Try again.");
+    } catch (err) {
+      setError(err.message || "Order failed. Try again.");
     } finally {
       setLoading(false);
     }
@@ -213,7 +298,7 @@ export default function Cart() {
             disabled={loading}
             onClick={() =>
               paymentMode === "online"
-                ? alert("Online flow later")
+                ? handleRazorpayPayment()
                 : confirmPlaceOrder()
             }
           >

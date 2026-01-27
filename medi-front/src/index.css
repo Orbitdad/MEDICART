@@ -31,7 +31,7 @@
 
 body {
   margin: 0;
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  background: #f8fafc;
   color: var(--text-main);
 }
 
@@ -107,9 +107,9 @@ textarea:focus {
 }
 
 .button-primary {
-  background: linear-gradient(135deg, var(--primary), #1d4ed8);
+  background: var(--primary);
   color: white;
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
 }
 
 .button-primary:hover {
@@ -166,7 +166,7 @@ textarea:focus {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
+  gap: 24px;
 }
 
 @media (max-width: 900px) {
@@ -251,3 +251,22 @@ textarea:focus {
 
 
 .body-lock { overflow: hidden !important; }
+
+.loading-loader{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  background: #f8fafc;
+  color: #2563eb;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  gap: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}

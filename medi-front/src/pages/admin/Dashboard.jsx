@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { adminFetchOrders } from "../../api/orders.js";
+import LoadingScreen from "../../components/LoadingScreen.jsx";
 import {
   ClipboardList,
   Clock,
@@ -87,12 +88,9 @@ export default function Dashboard() {
       {/* STATS */}
       <div className="stats-grid">
         {loading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="card h-24 animate-pulse bg-gray-100"
-            />
-          ))
+          <div style={{ gridColumn: "1 / -1" }}>
+            <LoadingScreen />
+          </div>
         ) : (
           <>
             <StatCard
@@ -159,14 +157,7 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-9 bg-gray-100 rounded animate-pulse"
-              />
-            ))}
-          </div>
+          <LoadingScreen />
         ) : orders.length === 0 ? (
           <p className="text-muted text-sm">
             No orders yet.

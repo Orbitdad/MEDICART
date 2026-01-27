@@ -1,196 +1,547 @@
-/* ================= BASIC LAYOUT ================= */
+/* =========================
+   DOCTOR HOME PAGE
+   Professional Medical-Grade UI
+========================= */
 
-.page-container {
-  padding: 20px;
+/* ================= COMPANY INFO CARD ================= */
+
+.company-info-section {
+  margin-bottom: 2rem;
+}
+
+.company-info-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   max-width: 1200px;
-  margin: auto;
+  margin: 0 auto;
 }
 
-.muted {
-  color: #64748b;
-  font-size: 14px;
-}
-
-/* ================= HERO ================= */
-
-.hero-wrapper {
-  width: 100%;
-  overflow: hidden;
-}
-
-.hero-banner {
-  height: 260px;
-  position: relative;
-}
-
-.hero-banner img {
-  width: 100%;
-  height: 100%;
-
-}
-
-
-
-/* ================= FLOATING SEARCH ================= */
-
-.hero-search {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
+/* Logo Box */
+.company-logo-box {
+  width: 180px;
+  height: 100px;
+  background: #000000;
+  border-radius: 12px;
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 0 20px;
+  margin: 0 auto 2rem auto;
 }
 
-.hero-search input {
-  width: 420px;
-  max-width: 100%;
-  padding: 16px 26px;
-  border-radius: 40px;
-  border: none;
+.logo-placeholder {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+/* Company Header */
+.company-info-content {
+  width: 100%;
+}
+
+.company-header-info {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.company-name-main {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.company-tagline-main {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Info Grid */
+.company-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Contact Section */
+.company-contact-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.contact-person {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contact-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.contact-phone {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Address Section */
+.company-address-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.address-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.address-line {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.email-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.email-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.email-value {
+  font-size: 0.95rem;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+/* ================= SEARCH SECTION ================= */
+
+.search-section {
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.search-form {
+  width: 100%;
+}
+
+.search-container-main {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon-main {
+  position: absolute;
+  left: 1rem;
+  color: #64748b;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input-main {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 2.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 0.95rem;
+  color: #0f172a;
   outline: none;
-  font-size: 16px;
-
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+  transition: all 200ms ease;
 }
 
-/* ================= PAGE CONTINUITY ================= */
-
-.page-container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 20px 40px;
+.search-input-main:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* ================= CHIPS ================= */
+.search-input-main::placeholder {
+  color: #94a3b8;
+}
 
-.trust-chips,
+/* ================= WELCOME SECTION ================= */
+
+.welcome-section {
+  margin-bottom: 2rem;
+}
+
+.welcome-content {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.welcome-text {
+  flex: 1;
+}
+
+.welcome-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.welcome-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
 .chip-row {
   display: flex;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
 .chip {
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  background: #f1f5f9;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.875rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid transparent;
 }
 
-.chip.small {
-  font-size: 12px;
-}
-
-.chip.green {
-  background: #dcfce7;
+.chip-success {
+  background: rgba(22, 163, 74, 0.1);
   color: #166534;
+  border-color: rgba(22, 163, 74, 0.2);
 }
 
-.chip.blue {
-  background: #dbeafe;
+.chip-info {
+  background: rgba(37, 99, 235, 0.1);
   color: #1e40af;
+  border-color: rgba(37, 99, 235, 0.2);
 }
 
-.chip.purple {
-  background: #ede9fe;
-  color: #5b21b6;
-}
-
-/* ================= CARDS ================= */
-
-.card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 20px;
-  margin-top: 18px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-}
-
-.card.center {
-  text-align: center;
-}
-
-.clickable {
-  cursor: pointer;
-}
-
-.clickable:hover {
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
-}
-
-/* ================= WELCOME ================= */
-
-.welcome-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.welcome-row h2 {
-  font-size: 20px;
-}
-
-/* ================= BUTTON ================= */
-
-.btn-primary {
+.btn-primary-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
   background: #2563eb;
-  color: white;
+  color: #ffffff;
   border: none;
-  padding: 12px 22px;
-  border-radius: 10px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
-  font-weight: 600;
+  transition: all 200ms ease;
+  white-space: nowrap;
 }
 
-.btn-primary:hover {
+.btn-primary-action:hover {
   background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
-/* ================= STATS GRID ================= */
+.btn-primary-action:active {
+  transform: translateY(0);
+}
+
+/* ================= STATS SECTION ================= */
+
+.stats-section {
+  margin-bottom: 2rem;
+}
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-top: 20px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
 }
 
-.stat-header {
+.stat-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
   display: flex;
-  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 200ms ease;
+}
+
+.stat-card-clickable {
+  cursor: pointer;
+}
+
+.stat-card-clickable:hover {
+  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.stat-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon-cart {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.stat-icon-payment {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+}
+
+.stat-icon-medicine {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.stat-icon-orders {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+  margin: 0 0 0.375rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.stat-arrow {
+  color: #cbd5e1;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+  transition: all 200ms ease;
+}
+
+.stat-card-clickable:hover .stat-arrow {
+  color: #2563eb;
+  transform: translateX(2px);
+}
+
+/* ================= EMPTY STATE ================= */
+
+.empty-state-section {
+  margin-bottom: 2rem;
+}
+
+.empty-state-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.empty-state-text {
+  font-size: 1rem;
+  color: #64748b;
+  margin: 0 0 1.5rem 0;
+}
+
+.empty-state-card .btn-primary-action {
+  margin: 0 auto;
 }
 
 /* ================= RESPONSIVE ================= */
-@media (max-width: 640px) {
-  .hero-banner {
-    height: auto;
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .hero-banner img {
-    height: auto;
-    object-fit: contain;
+  .company-info-grid {
+    gap: 2rem;
   }
 }
+
+@media (max-width: 768px) {
+  .company-info-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .company-logo-box {
+    width: 150px;
+    height: 80px;
+    margin-bottom: 1.5rem;
+  }
+
+  .logo-placeholder {
+    font-size: 1rem;
+  }
+
+  .company-name-main {
+    font-size: 1.75rem;
+  }
+
+  .company-tagline-main {
+    font-size: 0.95rem;
+  }
+
+  .company-info-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .company-header-info {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .search-section {
+    padding: 0 1rem;
+  }
+
+  .welcome-content {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem;
+  }
+
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+
+  .btn-primary-action {
+    width: 100%;
+    justify-content: center;
+  }
+
   .stats-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
-
-  @media (max-width: 600px) {
-  .hero-search {
-    top: 60%; /* move slightly down */
+  .stat-card {
+    padding: 1.25rem;
   }
 
-  .hero-search input {
-    width: 90%;
-    padding: 10px 16px;
-    font-size: 13px;
-    border-radius: 22px;
+  .empty-state-card {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .company-info-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .company-logo-box {
+    width: 120px;
+    height: 70px;
+    margin-bottom: 1.25rem;
+  }
+
+  .logo-placeholder {
+    font-size: 0.875rem;
+  }
+
+  .company-name-main {
+    font-size: 1.5rem;
+  }
+
+  .company-tagline-main {
+    font-size: 0.9rem;
+  }
+
+  .contact-name {
+    font-size: 0.95rem;
+  }
+
+  .contact-phone {
+    font-size: 0.9rem;
+  }
+
+  .address-line {
+    font-size: 0.9rem;
+  }
+
+  .email-value {
+    font-size: 0.9rem;
+  }
+
+  .welcome-content {
+    padding: 1.25rem;
+  }
+
+  .welcome-title {
+    font-size: 1.35rem;
+  }
+
+  .welcome-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-icon-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+
+  .stat-title {
+    font-size: 0.85rem;
+  }
+
+  .stat-value {
+    font-size: 1rem;
   }
 }

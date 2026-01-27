@@ -1,0 +1,142 @@
+/* =========================
+   INITIAL LOADING SCREEN
+   Clean Text-Only Loader
+========================= */
+
+.initial-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeOut 0.6s ease-out 2.4s forwards;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.initial-loading-loader {
+  color: #0f172a;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: 2rem;
+  box-sizing: content-box;
+  height: 50px;
+  padding: 15px 15px;
+  display: flex;
+  align-items: center;
+  border-radius: 0;
+}
+
+.initial-loading-loader p {
+  margin: 0;
+  padding-right: 0.75rem;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+.initial-loading-words {
+  overflow: hidden;
+  position: relative;
+  height: 50px;
+  width: 250px;
+}
+
+.initial-loading-words::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    #ffffff 10%,
+    transparent 30%,
+    transparent 70%,
+    #ffffff 90%
+  );
+  z-index: 20;
+}
+
+.initial-loading-word {
+  display: block;
+  height: 100%;
+  padding-left: 8px;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 2rem;
+  animation: initial-loading-spin 4s infinite;
+}
+
+@keyframes initial-loading-spin {
+  10% {
+    transform: translateY(-102%);
+  }
+  25% {
+    transform: translateY(-100%);
+  }
+  35% {
+    transform: translateY(-202%);
+  }
+  50% {
+    transform: translateY(-200%);
+  }
+  60% {
+    transform: translateY(-302%);
+  }
+  75% {
+    transform: translateY(-300%);
+  }
+  85% {
+    transform: translateY(-402%);
+  }
+  100% {
+    transform: translateY(-400%);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .initial-loading-loader {
+    font-size: 1.5rem;
+  }
+
+  .initial-loading-loader p {
+    font-size: 1.5rem;
+  }
+
+  .initial-loading-word {
+    font-size: 1.5rem;
+  }
+
+  .initial-loading-words {
+    width: 200px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .initial-loading-loader {
+    font-size: 1.25rem;
+  }
+
+  .initial-loading-loader p {
+    font-size: 1.25rem;
+  }
+
+  .initial-loading-word {
+    font-size: 1.25rem;
+  }
+
+  .initial-loading-words {
+    width: 180px;
+    height: 35px;
+  }
+}

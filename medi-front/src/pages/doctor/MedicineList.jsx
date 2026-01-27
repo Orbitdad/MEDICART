@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { getMedicines } from "../../api/medicines.js";
 import MedicineCard from "../../components/MedicineCard.jsx";
 import CartFloatingButton from "../../components/CartFloatingButton.jsx";
+import LoadingScreen from "../../components/LoadingScreen.jsx";
 import "./MedicineList.css";
 
 const CATEGORY_MAP = [
@@ -15,11 +17,22 @@ const CATEGORY_MAP = [
 ];
 
 export default function MedicineList() {
+  const [searchParams] = useSearchParams();
   const [allMedicines, setAllMedicines] = useState([]);
   const [medicines, setMedicines] = useState([]);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("ALL");
   const [loading, setLoading] = useState(false);
+
+  /* =========================
+     INITIALIZE SEARCH FROM URL
+  ========================== */
+  useEffect(() => {
+    const urlSearch = searchParams.get("search");
+    if (urlSearch) {
+      setSearch(decodeURIComponent(urlSearch));
+    }
+  }, [searchParams]);
 
   /* =========================
      FETCH ONCE
@@ -109,11 +122,7 @@ useEffect(() => {
 
         {/* CONTENT */}
         {loading ? (
-          <div className="medicine-grid">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="medicine-card skeleton-card" />
-            ))}
-          </div>
+          <LoadingScreen />
         ) : medicines.length === 0 ? (
           <div className="medicine-empty">
             <p>No medicines found.</p>
