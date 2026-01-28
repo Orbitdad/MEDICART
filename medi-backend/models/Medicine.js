@@ -25,16 +25,21 @@ const medicineSchema = new mongoose.Schema(
     },
 
     /* --------------------
-       PRICING
-    -------------------- */
+   PRICING
+-------------------- */
     mrp: {
       type: Number,
       required: true,
     },
 
     price: {
-      type: Number, // selling price
+      type: Number,
       required: true,
+    },
+
+    gstPercent: {
+      type: Number,
+      default: 5,
     },
 
     /* --------------------

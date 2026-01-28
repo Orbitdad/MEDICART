@@ -38,17 +38,19 @@ export const adminGetMedicines = async (req, res, next) => {
 ----------------------------------- */
 export const adminCreateMedicine = async (req, res, next) => {
   try {
-    const {
-      name,
-      brand,
-      description,
-      packaging,
-      mrp,
-      price,
-      stock,
-      expiryDate,
-      category,
-    } = req.body;
+   const {
+  name,
+  brand,
+  description,
+  packaging,
+  mrp,
+  price,
+  gstPercent,
+  stock,
+  expiryDate,
+  category,
+} = req.body;
+
 
     /* ✅ HARD VALIDATION */
     if (
@@ -80,18 +82,20 @@ export const adminCreateMedicine = async (req, res, next) => {
       }
     }
 
-    const medicine = await Medicine.create({
-      name: name.trim(),
-      brand: brand?.trim(),
-      description: description?.trim(),
-      packaging: packaging?.trim(),
-      mrp: Number(mrp),
-      price: Number(price),
-      stock: Number(stock),
-      expiryDate: new Date(expiryDate),
-      category,
-      images: imageUrls,
-    });
+   const medicine = await Medicine.create({
+  name: name.trim(),
+  brand: brand?.trim(),
+  description: description?.trim(),
+  packaging: packaging?.trim(),
+  mrp: Number(mrp),
+  price: Number(price),
+  gstPercent: gstPercent ? Number(gstPercent) : 5,
+  stock: Number(stock),
+  expiryDate: new Date(expiryDate),
+  category,
+  images: imageUrls,
+});
+
 
     res.status(201).json(medicine);
   } catch (err) {
