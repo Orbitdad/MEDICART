@@ -27,9 +27,26 @@ const orderSchema = new mongoose.Schema(
       default: "",
     },
 
-    totalAmount: {
-      type: Number,
-      required: true,
+    /* ======================
+       BILLING (GST INVOICE)
+    ====================== */
+    billing: {
+      taxableAmount: {
+        type: Number,
+        required: true,
+      },
+      cgstAmount: {
+        type: Number,
+        required: true,
+      },
+      sgstAmount: {
+        type: Number,
+        required: true,
+      },
+      finalAmount: {
+        type: Number,
+        required: true,
+      },
     },
 
     /* ======================
@@ -53,7 +70,7 @@ const orderSchema = new mongoose.Schema(
     },
 
     /* ======================
-       ADMIN DECISION STATUS
+       ADMIN STATUS
     ====================== */
     adminStatus: {
       type: String,

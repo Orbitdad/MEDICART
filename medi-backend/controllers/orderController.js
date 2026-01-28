@@ -11,15 +11,24 @@ export const placeOrder = async (req, res, next) => {
       notes,
       paymentMode,
       paymentInfo,
+      billing,
     } = req.body;
 
     if (!items || items.length === 0) {
-      return res.status(400).json({ message: "No items in order" });
+      return res
+        .status(400)
+        .json({ message: "No items in order" });
     }
 
-    let total = 0;
+    if (!billing) {
+      return res
+        .status(400)
+        .json({ message: "Billing data missing" });
+    }
+
     const orderItems = [];
 
+    // STOCK CHECK ONLY
     for (const item of items) {
       const medicine = await Medicine.findOneAndUpdate(
         {
@@ -36,8 +45,6 @@ export const placeOrder = async (req, res, next) => {
           .json({ message: "Insufficient stock" });
       }
 
-      total += medicine.price * item.quantity;
-
       orderItems.push({
         medicineId: medicine._id,
         quantity: item.quantity,
@@ -48,10 +55,10 @@ export const placeOrder = async (req, res, next) => {
       doctor: req.user._id,
       items: orderItems,
       notes,
-      totalAmount: total,
+
+      billing,
 
       paymentMode,
-
       paymentStatus:
         paymentMode === "online" ? "paid" : "pending",
 
@@ -59,8 +66,6 @@ export const placeOrder = async (req, res, next) => {
         paymentMode === "online" ? paymentInfo : null,
 
       orderStatus: "placed",
-
-      // ✅ NEW
       adminStatus: "pending",
     });
 
@@ -68,7 +73,6 @@ export const placeOrder = async (req, res, next) => {
       message: "Order placed successfully",
       order,
     });
-
   } catch (err) {
     console.error("ORDER ERROR:", err);
     next(err);
@@ -91,7 +95,9 @@ export const adminGetOrders = async (req, res, next) => {
   }
 };
 
-
+/* ----------------------------------
+   DOCTOR: RECENT ORDERS
+----------------------------------- */
 export const getRecentOrders = async (req, res) => {
   const orders = await Order.find({
     doctor: req.user._id,
@@ -104,7 +110,30 @@ export const getRecentOrders = async (req, res) => {
 };
 
 /* ----------------------------------
-   ADMIN: MARK ORDER COMPLETED
+   GET SINGLE ORDER (INVOICE)
+----------------------------------- */
+export const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate("doctor", "name email")
+      .populate("items.medicineId");
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ message: "Order not found" });
+    }
+
+    res.json(order);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch order" });
+  }
+};
+
+/* ----------------------------------
+   ADMIN: MARK COMPLETED
 ----------------------------------- */
 export const adminMarkOrderCompleted = async (req, res, next) => {
   try {
@@ -117,7 +146,6 @@ export const adminMarkOrderCompleted = async (req, res, next) => {
     }
 
     order.adminStatus = "completed";
-
     await order.save();
 
     res.json({
@@ -130,7 +158,7 @@ export const adminMarkOrderCompleted = async (req, res, next) => {
 };
 
 /* ----------------------------------
-   ADMIN: UPDATE DELIVERY STATUS
+   ADMIN: UPDATE ORDER STATUS
 ----------------------------------- */
 export const adminUpdateOrderStatus = async (req, res, next) => {
   try {
@@ -144,7 +172,8 @@ export const adminUpdateOrderStatus = async (req, res, next) => {
         .json({ message: "Order not found" });
     }
 
-    order.orderStatus = orderStatus || order.orderStatus;
+    order.orderStatus =
+      orderStatus || order.orderStatus;
 
     await order.save();
 
