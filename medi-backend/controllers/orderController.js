@@ -2,6 +2,20 @@ import Order from "../models/Order.js";
 import Medicine from "../models/Medicine.js";
 import Invoice from "../models/Invoice.js";
 
+
+
+function generateInvoiceNo() {
+  const date = new Date();
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  const rand = Math.floor(1000 + Math.random() * 9000);
+
+  return `INV-${yyyy}${mm}${dd}-${rand}`;
+}
+
+
+
 /* ----------------------------------
    DOCTOR: PLACE ORDER
 ----------------------------------- */
@@ -50,10 +64,18 @@ export const placeOrder = async (req, res) => {
 
       orderItems.push({
         medicineId: medicine._id,
+
+        // 👇 required for invoice
+        name: medicine.name,
+        brand: medicine.brand,
+        packaging: medicine.packaging,
+        mrp: medicine.mrp,
+
         quantity: item.quantity,
         price,
         gstPercent,
       });
+
     }
 
     const cgstAmount = Number((gstTotal / 2).toFixed(2));
@@ -64,45 +86,63 @@ export const placeOrder = async (req, res) => {
        CREATE ORDER
     ------------------------------ */
     const order = await Order.create({
-  doctor: req.user._id,
-  items: orderItems,
-  notes,
+      doctor: req.user._id,
+      items: orderItems,
+      notes,
 
-  billing: {
-    taxableAmount: subTotal,
-    cgstAmount,
-    sgstAmount,
-    finalAmount,
-  },
+      billing: {
+        taxableAmount: subTotal,
+        cgstAmount,
+        sgstAmount,
+        finalAmount,
+      },
 
-  subTotal,
-  gstAmount: gstTotal,
-  totalAmount: finalAmount,
+      subTotal,
+      gstAmount: gstTotal,
+      totalAmount: finalAmount,
 
-  paymentMode,
-  paymentStatus: paymentMode === "online" ? "paid" : "pending",
+      paymentMode,
+      paymentStatus: paymentMode === "online" ? "paid" : "pending",
 
-  ...(paymentMode === "online" && { paymentInfo }),
+      ...(paymentMode === "online" && { paymentInfo }),
 
-  orderStatus: "placed",
-  adminStatus: "pending",
-});
+      orderStatus: "placed",
+      adminStatus: "pending",
+    });
 
     /* -----------------------------
        CREATE INVOICE
     ------------------------------ */
     await Invoice.create({
+      invoiceNo: generateInvoiceNo(),
+
       orderId: order._id,
-      doctor: order.doctor,
-      items: order.items,
 
-      billing: order.billing,
+      doctor: {
+        name: req.user.name,
+        clinic: req.user.clinic || "",
+        phone: req.user.phone || "",
+        city: req.user.city || "",
+      },
 
-      subTotal: order.subTotal,
-      gstAmount: order.gstAmount,
-      totalAmount: order.totalAmount,
+      items: orderItems.map((it) => ({
+        name: it.name || "",
+        company: it.brand || "",
+        packaging: it.packaging || "",
+        expiry: "",
+        qty: it.quantity,
+        mrp: it.mrp || it.price,
+        price: it.price,
+        gstPercent: it.gstPercent,
+        amount: it.price * it.quantity,
+      })),
 
-      status: "generated",
+      taxableAmount: subTotal,
+      cgstAmount,
+      sgstAmount,
+      igstAmount: 0,
+
+      totalAmount: finalAmount,
     });
 
     return res.status(201).json({
