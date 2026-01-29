@@ -52,6 +52,7 @@ app.use("/api/orders", orderRoutes);
 
 app.use("/api/admin/medicines", adminMedicineRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
+app.use("/api/invoices", invoiceRoutes);
 app.use("/api/payment", paymentRoutes);
 
 /* STATIC */
