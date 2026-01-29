@@ -12,7 +12,6 @@ export const placeOrder = async (req, res) => {
       notes,
       paymentMode,
       paymentInfo,
-      billing,
     } = req.body;
 
     if (!req.user || !req.user._id) {
@@ -22,9 +21,6 @@ export const placeOrder = async (req, res) => {
     if (!items || items.length === 0) {
       return res.status(400).json({ message: "No items in order" });
     }
-
-    // ✅ FIX: always use safe billing object
-    const safeBilling = billing || {};
 
     const orderItems = [];
     let subTotal = 0;
@@ -65,10 +61,9 @@ export const placeOrder = async (req, res) => {
       });
     }
 
-    const grandTotal = subTotal + gstTotal;
-
     const cgstAmount = gstTotal / 2;
     const sgstAmount = gstTotal / 2;
+    const finalAmount = subTotal + gstTotal;
 
     /* -----------------------------
        CREATE ORDER
@@ -79,14 +74,15 @@ export const placeOrder = async (req, res) => {
       notes,
 
       billing: {
-        ...safeBilling,
+        taxableAmount: subTotal,
         cgstAmount,
         sgstAmount,
+        finalAmount,
       },
 
       subTotal,
       gstAmount: gstTotal,
-      totalAmount: grandTotal,
+      totalAmount: finalAmount,
 
       paymentMode,
       paymentStatus: paymentMode === "online" ? "paid" : "pending",
@@ -184,84 +180,5 @@ export const getOrderById = async (req, res) => {
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch order" });
-  }
-};
-
-/* ----------------------------------
-   ADMIN: UPDATE ORDER STATUS
------------------------------------ */
-export const adminUpdateOrderStatus = async (req, res) => {
-  try {
-    const { orderStatus } = req.body;
-
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
-
-    order.orderStatus = orderStatus || order.orderStatus;
-    await order.save();
-
-    res.json({
-      message: "Order status updated",
-      order,
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Failed to update order status",
-      error: err.message,
-    });
-  }
-};
-
-/* ----------------------------------
-   ADMIN: MARK ORDER COMPLETED
------------------------------------ */
-export const adminMarkOrderCompleted = async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
-
-    order.adminStatus = "completed";
-    await order.save();
-
-    res.json({
-      message: "Order marked as completed",
-      order,
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Failed to mark order completed",
-      error: err.message,
-    });
-  }
-};
-
-/* ----------------------------------
-   ADMIN: INVENTORY SUMMARY
------------------------------------ */
-export const inventorySummary = async (req, res) => {
-  try {
-    const medicines = await Medicine.find();
-
-    res.json({
-      totalMedicines: medicines.length,
-      totalUnits: medicines.reduce(
-        (sum, m) => sum + m.stock,
-        0
-      ),
-      lowStockCount: medicines.filter(
-        (m) => m.stock <= 5
-      ).length,
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Failed to fetch inventory summary",
-      error: err.message,
-    });
   }
 };
