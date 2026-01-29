@@ -64,28 +64,29 @@ export const placeOrder = async (req, res) => {
        CREATE ORDER
     ------------------------------ */
     const order = await Order.create({
-      doctor: req.user._id,
-      items: orderItems,
-      notes: notes || "",
+  doctor: req.user._id,
+  items: orderItems,
+  notes,
 
-      billing: {
-        taxableAmount: Number(subTotal.toFixed(2)),
-        cgstAmount,
-        sgstAmount,
-        finalAmount,
-      },
+  billing: {
+    taxableAmount: subTotal,
+    cgstAmount,
+    sgstAmount,
+    finalAmount,
+  },
 
-      subTotal: Number(subTotal.toFixed(2)),
-      gstAmount: Number(gstTotal.toFixed(2)),
-      totalAmount: finalAmount,
+  subTotal,
+  gstAmount: gstTotal,
+  totalAmount: finalAmount,
 
-      paymentMode,
-      paymentStatus: paymentMode === "online" ? "paid" : "pending",
-      paymentInfo: paymentMode === "online" ? paymentInfo || {} : {},
+  paymentMode,
+  paymentStatus: paymentMode === "online" ? "paid" : "pending",
 
-      orderStatus: "placed",
-      adminStatus: "pending",
-    });
+  ...(paymentMode === "online" && { paymentInfo }),
+
+  orderStatus: "placed",
+  adminStatus: "pending",
+});
 
     /* -----------------------------
        CREATE INVOICE

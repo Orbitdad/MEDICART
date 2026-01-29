@@ -12,34 +12,40 @@ const medicineSchema = new mongoose.Schema(
     },
 
     brand: {
-      type: String, // company / manufacturer
+      type: String,
       required: true,
     },
 
     description: {
       type: String,
+      default: "",
     },
 
     packaging: {
-      type: String, // Strip of 10 tablets
+      type: String,
+      default: "",
     },
 
     /* --------------------
-   PRICING
--------------------- */
+       PRICING
+    -------------------- */
     mrp: {
       type: Number,
       required: true,
+      min: 0,
     },
 
     price: {
       type: Number,
       required: true,
+      min: 0,
+      default: 0, // 🔥 SAFETY: prevents NaN
     },
 
     gstPercent: {
       type: Number,
-      default: 5,
+      default: 5, // 🔥 SAFETY: always defined
+      min: 0,
     },
 
     /* --------------------
@@ -49,6 +55,7 @@ const medicineSchema = new mongoose.Schema(
       type: Number,
       required: true,
       default: 0,
+      min: 0,
     },
 
     expiryDate: {
@@ -62,7 +69,6 @@ const medicineSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: ["SYP", "TAB", "CAP", "EE", "INJ", "INSTR"],
-      required: true,
       default: "TAB",
     },
 
@@ -71,7 +77,7 @@ const medicineSchema = new mongoose.Schema(
     -------------------- */
     images: [
       {
-        type: String, // filename
+        type: String,
       },
     ],
 
