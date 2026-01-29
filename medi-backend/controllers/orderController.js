@@ -48,10 +48,6 @@ export const placeOrder = async (req, res) => {
         return res.status(400).json({ message: "Insufficient stock" });
       }
 
-      if (typeof medicine.price !== "number") {
-        throw new Error(`Price missing for medicine ${medicine._id}`);
-      }
-
       const price = medicine.price;
       const gstPercent = medicine.gstPercent ?? 5;
 
@@ -71,11 +67,20 @@ export const placeOrder = async (req, res) => {
 
     const grandTotal = subTotal + gstTotal;
 
+    /* ✅ FIX: split GST into CGST + SGST */
+    const cgstAmount = gstTotal / 2;
+    const sgstAmount = gstTotal / 2;
+
     const order = await Order.create({
       doctor: req.user._id,
       items: orderItems,
       notes,
-      billing,
+
+      billing: {
+        ...billing,
+        cgstAmount,
+        sgstAmount,
+      },
 
       subTotal,
       gstAmount: gstTotal,
@@ -241,5 +246,3 @@ export const inventorySummary = async (req, res) => {
     });
   }
 };
-
-
