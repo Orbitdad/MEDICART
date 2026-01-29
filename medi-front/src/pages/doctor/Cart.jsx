@@ -15,7 +15,7 @@ export default function Cart() {
     removeFromCart,
     clearCart,
 
-    // GST VALUES
+    // DISPLAY ONLY (backend calculates real values)
     taxableAmount,
     cgst,
     sgst,
@@ -31,17 +31,11 @@ export default function Cart() {
 
   const navigate = useNavigate();
 
-  /* =============================
-     TOTAL ITEMS
-  ============================== */
   const totalItems = items.reduce(
     (sum, it) => sum + Number(it.quantity || 0),
     0
   );
 
-  /* =============================
-     QTY HANDLER
-  ============================== */
   const handleQtyChange = (id, value) => {
     if (value === "") {
       updateQty(id, "");
@@ -59,7 +53,6 @@ export default function Cart() {
     setError("");
 
     try {
-      // Razorpay expects amount in paise (number)
       const razorpayOrder = await createRazorpayOrder(
         Math.round(Number(finalAmount) * 100)
       );
@@ -80,7 +73,6 @@ export default function Cart() {
               razorpay_signature: response.razorpay_signature,
             });
 
-            // ✅ STORE RESPONSE
             const res = await placeOrder({
               items: items
                 .filter((it) => Number(it.quantity) > 0)
@@ -96,17 +88,11 @@ export default function Cart() {
                 razorpay_order_id:
                   response.razorpay_order_id,
               },
-              billing: {
-                taxableAmount,
-                cgst,
-                sgst,
-                finalAmount,
-              },
+              billing: {}, // ✅ backend fills GST
             });
-            const order = res.order;
 
             clearCart();
-            navigate(`/doctor/order-success/${order._id}`);
+            navigate(`/doctor/order-success/${res.order._id}`);
           } catch (err) {
             setError("Payment verification failed.");
             setLoading(false);
@@ -114,9 +100,7 @@ export default function Cart() {
         },
 
         theme: { color: "#2563eb" },
-        modal: {
-          ondismiss: () => setLoading(false),
-        },
+        modal: { ondismiss: () => setLoading(false) },
       };
 
       if (!window.Razorpay) {
@@ -135,7 +119,7 @@ export default function Cart() {
   };
 
   /* =============================
-     COD ORDER
+     CASH ON DELIVERY
   ============================== */
   const confirmPlaceOrder = async () => {
     setLoading(true);
@@ -151,18 +135,11 @@ export default function Cart() {
           })),
         notes,
         paymentMode: "credit",
-        billing: {
-          taxableAmount,
-          cgst,
-          sgst,
-          finalAmount,
-        },
+        billing: {}, // ✅ backend fills GST
       });
-      const order = res.order;
-
 
       clearCart();
-      navigate(`/doctor/order-success/${order._id}`);
+      navigate(`/doctor/order-success/${res.order._id}`);
     } catch (err) {
       setError(err.message || "Order failed.");
     } finally {
@@ -170,9 +147,6 @@ export default function Cart() {
     }
   };
 
-  /* =============================
-     EMPTY CART
-  ============================== */
   if (!items.length) {
     return (
       <div className="empty-cart">
@@ -187,12 +161,8 @@ export default function Cart() {
     );
   }
 
-  /* =============================
-     UI
-  ============================== */
   return (
     <div className="cart-layout">
-      {/* LEFT */}
       <div className="cart-left">
         <h2 className="cart-title">Review Order</h2>
 
@@ -259,7 +229,6 @@ export default function Cart() {
         </div>
       </div>
 
-      {/* RIGHT */}
       <div className="cart-right">
         <div className="snapshot-card">
           <h3>Invoice Summary</h3>

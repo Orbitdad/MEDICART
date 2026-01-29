@@ -3,85 +3,51 @@ import client from "./client.js";
 /* =========================
    DOCTOR
 ========================= */
+
+/* PLACE ORDER */
 export async function placeOrder(payload) {
-  return client.post("/orders", payload);
+  const res = await client.post("/orders", payload);
+  return res.data;
 }
-/* ----------------------------------
-   DOCTOR: RECENT ORDERS
------------------------------------ */
-export const getRecentOrders = async () => {
-  const res = await fetch(
-    `${import.meta.env.VITE_API_URL}/orders/recent`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-  );
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch recent orders");
-  }
-
-  return res.json();
-};
+/* RECENT ORDERS */
+export async function getRecentOrders() {
+  const res = await client.get("/orders/recent");
+  return res.data;
+}
 
 /* =========================
    ADMIN
 ========================= */
+
+/* FETCH ALL ORDERS */
 export async function adminFetchOrders() {
-  return client.get("/admin/orders");
+  const res = await client.get("/admin/orders");
+  return res.data;
 }
 
-/* ----------------------------------
-   ADMIN: DELIVERY STATUS
-   (placed → approved → dispatched)
------------------------------------ */
+/* UPDATE ORDER STATUS */
 export async function updateOrderStatus(orderId, orderStatus) {
-  const res = await fetch(
-    `${import.meta.env.VITE_API_URL}/admin/orders/${orderId}/status`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("medicart_token")}`,
-      },
-      body: JSON.stringify({ orderStatus }),
-    }
+  const res = await client.put(
+    `/admin/orders/${orderId}/status`,
+    { orderStatus }
   );
-
-  if (!res.ok) {
-    throw new Error("Failed to update order status");
-  }
-
-  return res.json();
+  return res.data;
 }
 
-/* ----------------------------------
-   ADMIN: MARK ORDER COMPLETED
-   (ADMIN DECISION)
------------------------------------ */
+/* MARK ORDER COMPLETED */
 export async function markOrderCompleted(orderId) {
-  const res = await fetch(
-    `${import.meta.env.VITE_API_URL}/admin/orders/${orderId}/complete`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("medicart_token")}`,
-      },
-    }
+  const res = await client.put(
+    `/admin/orders/${orderId}/complete`
   );
-
-  if (!res.ok) {
-    throw new Error("Failed to mark order completed");
-  }
-
-  return res.json();
+  return res.data;
 }
 
 /* =========================
    INVENTORY
 ========================= */
+
 export async function fetchInventorySummary() {
-  return client.get("/admin/orders/inventory");
+  const res = await client.get("/admin/orders/inventory");
+  return res.data;
 }

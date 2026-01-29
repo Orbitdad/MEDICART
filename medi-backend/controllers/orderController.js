@@ -23,9 +23,8 @@ export const placeOrder = async (req, res) => {
       return res.status(400).json({ message: "No items in order" });
     }
 
-    if (!billing) {
-      return res.status(400).json({ message: "Billing data missing" });
-    }
+    // ✅ FIX: always use safe billing object
+    const safeBilling = billing || {};
 
     const orderItems = [];
     let subTotal = 0;
@@ -80,7 +79,7 @@ export const placeOrder = async (req, res) => {
       notes,
 
       billing: {
-        ...billing,
+        ...safeBilling,
         cgstAmount,
         sgstAmount,
       },
@@ -98,7 +97,7 @@ export const placeOrder = async (req, res) => {
     });
 
     /* -----------------------------
-       CREATE INVOICE (IMPORTANT)
+       CREATE INVOICE
     ------------------------------ */
     await Invoice.create({
       orderId: order._id,
