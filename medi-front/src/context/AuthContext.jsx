@@ -11,6 +11,9 @@ const TOKEN_KEY = "medicart_token";
 const ROLE_KEY = "medicart_role";
 const USER_KEY = "medicart_user";
 
+/* =========================
+   SAFE HELPERS
+========================= */
 function safeValue(value) {
   if (!value || value === "undefined" || value === "null") {
     return null;
@@ -27,18 +30,27 @@ function safeParse(value) {
   }
 }
 
+/* =========================
+   PROVIDER
+========================= */
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(undefined);
-  const [role, setRole] = useState(undefined);
-  const [user, setUser] = useState(undefined);
+  // ✅ NEVER use undefined in global context
+  const [token, setToken] = useState(null);
+  const [role, setRole] = useState(null);
+  const [user, setUser] = useState(null);
 
-  // 🔥 hydrate after mount
+  /* =========================
+     HYDRATE FROM STORAGE
+  ========================= */
   useEffect(() => {
     setToken(safeValue(localStorage.getItem(TOKEN_KEY)));
     setRole(safeValue(localStorage.getItem(ROLE_KEY)));
     setUser(safeParse(localStorage.getItem(USER_KEY)));
   }, []);
 
+  /* =========================
+     LOGIN
+  ========================= */
   const login = ({ token, role, user }) => {
     if (!token) return;
 
@@ -51,6 +63,9 @@ export function AuthProvider({ children }) {
     setUser(user);
   };
 
+  /* =========================
+     LOGOUT
+  ========================= */
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ROLE_KEY);
@@ -77,6 +92,9 @@ export function AuthProvider({ children }) {
   );
 }
 
+/* =========================
+   HOOK
+========================= */
 export function useAuth() {
   return useContext(AuthContext);
 }

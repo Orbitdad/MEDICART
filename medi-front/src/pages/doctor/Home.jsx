@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Search, ShoppingCart, Pill, FileText, CreditCard } from "lucide-react";
+import {
+  ChevronRight,
+  Search,
+  ShoppingCart,
+  Pill,
+  FileText,
+  CreditCard,
+} from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
@@ -18,25 +25,37 @@ export default function DoctorHome() {
 
   const hasCartItems = items.length > 0;
 
+  /* =========================
+     LOAD RECENT ORDERS (SAFE)
+  ========================= */
   useEffect(() => {
     getRecentOrders()
-      .then(setRecentOrders)
-      .catch(() => {});
+      .then((res) => {
+        // ✅ HARD GUARANTEE ARRAY
+        if (Array.isArray(res)) {
+          setRecentOrders(res);
+        } else {
+          setRecentOrders([]);
+        }
+      })
+      .catch(() => {
+        setRecentOrders([]);
+      });
   }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/doctor/medicines?search=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      navigate("/doctor/medicines");
-    }
+    const q = searchQuery.trim();
+    navigate(
+      q
+        ? `/doctor/medicines?search=${encodeURIComponent(q)}`
+        : "/doctor/medicines"
+    );
   };
 
   return (
     <>
-
-      {/* ================= SEARCH BAR ================= */}
+      {/* ================= SEARCH ================= */}
       <section className="search-section">
         <form onSubmit={handleSearch} className="search-form">
           <div className="search-container-main">
@@ -67,6 +86,7 @@ export default function DoctorHome() {
               <span className="chip chip-info">Live Inventory</span>
             </div>
           </div>
+
           <button
             className="btn-primary-action"
             onClick={() => navigate("/doctor/medicines")}
@@ -120,7 +140,10 @@ export default function DoctorHome() {
             <ChevronRight size={18} className="stat-arrow" />
           </div>
 
-          <div className="stat-card">
+          <div
+            className="stat-card stat-card-clickable"
+            onClick={() => navigate("/doctor/orders")}
+          >
             <div className="stat-icon-wrapper stat-icon-orders">
               <FileText size={20} />
             </div>

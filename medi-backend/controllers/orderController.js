@@ -81,7 +81,7 @@ export const placeOrder = async (req, res) => {
 
       paymentMode,
       paymentStatus: paymentMode === "online" ? "paid" : "pending",
-      paymentInfo: paymentMode === "online" ? paymentInfo : null,
+paymentInfo: paymentMode === "online" ? paymentInfo : {},
 
       orderStatus: "placed",
       adminStatus: "pending",

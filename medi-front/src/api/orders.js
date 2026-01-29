@@ -6,14 +6,12 @@ import client from "./client.js";
 
 /* PLACE ORDER */
 export async function placeOrder(payload) {
-  const res = await client.post("/orders", payload);
-  return res.data;
+  return client.post("/orders", payload);
 }
 
 /* RECENT ORDERS */
 export async function getRecentOrders() {
-  const res = await client.get("/orders/recent");
-  return res.data;
+  return client.get("/orders/recent"); // ✅ RETURN DIRECTLY
 }
 
 /* =========================
@@ -22,32 +20,25 @@ export async function getRecentOrders() {
 
 /* FETCH ALL ORDERS */
 export async function adminFetchOrders() {
-  const res = await client.get("/admin/orders");
-  return res.data;
+  return client.get("/admin/orders");
 }
 
 /* UPDATE ORDER STATUS */
 export async function updateOrderStatus(orderId, orderStatus) {
-  const res = await client.put(
+  return client.put(
     `/admin/orders/${orderId}/status`,
     { orderStatus }
   );
-  return res.data;
 }
 
 /* MARK ORDER COMPLETED */
 export async function markOrderCompleted(orderId) {
-  const res = await client.put(
-    `/admin/orders/${orderId}/complete`
-  );
-  return res.data;
+  return client.put(`/admin/orders/${orderId}/complete`);
 }
 
 /* =========================
    INVENTORY
 ========================= */
-
 export async function fetchInventorySummary() {
-  const res = await client.get("/admin/orders/inventory");
-  return res.data;
+  return client.get("/admin/orders/inventory");
 }

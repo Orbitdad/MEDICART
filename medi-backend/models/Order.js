@@ -64,10 +64,16 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
     },
 
-    paymentInfo: {
-      razorpay_payment_id: String,
-      razorpay_order_id: String,
-    },
+  paymentInfo: {
+  razorpay_payment_id: {
+    type: String,
+    default: null,
+  },
+  razorpay_order_id: {
+    type: String,
+    default: null,
+  },
+},
 
     /* ======================
        ADMIN STATUS
