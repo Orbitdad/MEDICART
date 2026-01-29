@@ -4,7 +4,7 @@ import Medicine from "../models/Medicine.js";
 /* ----------------------------------
    DOCTOR: PLACE ORDER
 ----------------------------------- */
-export const placeOrder = async (req, res, next) => {
+export const placeOrder = async (req, res) => {
   try {
     const {
       items,
@@ -14,22 +14,29 @@ export const placeOrder = async (req, res, next) => {
       billing,
     } = req.body;
 
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
     if (!items || items.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "No items in order" });
+      return res.status(400).json({ message: "No items in order" });
     }
 
     if (!billing) {
-      return res
-        .status(400)
-        .json({ message: "Billing data missing" });
+      return res.status(400).json({ message: "Billing data missing" });
     }
 
     const orderItems = [];
+    let subTotal = 0;
+    let gstTotal = 0;
 
-    // STOCK CHECK ONLY
+    const updatedMedicines = []; // for rollback
+
     for (const item of items) {
+      if (!item.medicineId || !item.quantity) {
+        return res.status(400).json({ message: "Invalid order item" });
+      }
+
       const medicine = await Medicine.findOneAndUpdate(
         {
           _id: item.medicineId,
@@ -40,30 +47,50 @@ export const placeOrder = async (req, res, next) => {
       );
 
       if (!medicine) {
-        return res
-          .status(400)
-          .json({ message: "Insufficient stock" });
+        return res.status(400).json({ message: "Insufficient stock" });
       }
+
+      if (typeof medicine.price !== "number") {
+        throw new Error(`Price missing for medicine ${medicine._id}`);
+      }
+
+      const price = medicine.price;
+      const gstPercent = medicine.gstPercent ?? 5;
+
+      const itemTotal = price * item.quantity;
+      const itemGst = (itemTotal * gstPercent) / 100;
+
+      subTotal += itemTotal;
+      gstTotal += itemGst;
 
       orderItems.push({
         medicineId: medicine._id,
         quantity: item.quantity,
+        price,
+        gstPercent,
+      });
+
+      updatedMedicines.push({
+        id: medicine._id,
+        qty: item.quantity,
       });
     }
+
+    const grandTotal = subTotal + gstTotal;
 
     const order = await Order.create({
       doctor: req.user._id,
       items: orderItems,
       notes,
-
       billing,
 
-      paymentMode,
-      paymentStatus:
-        paymentMode === "online" ? "paid" : "pending",
+      subTotal,
+      gstAmount: gstTotal,
+      totalAmount: grandTotal,
 
-      paymentInfo:
-        paymentMode === "online" ? paymentInfo : null,
+      paymentMode,
+      paymentStatus: paymentMode === "online" ? "paid" : "pending",
+      paymentInfo: paymentMode === "online" ? paymentInfo : null,
 
       orderStatus: "placed",
       adminStatus: "pending",
@@ -75,14 +102,28 @@ export const placeOrder = async (req, res, next) => {
     });
   } catch (err) {
     console.error("ORDER ERROR:", err);
-    next(err);
+
+    // rollback stock on failure
+    if (req.body?.items) {
+      for (const item of req.body.items) {
+        await Medicine.updateOne(
+          { _id: item.medicineId },
+          { $inc: { stock: item.quantity } }
+        );
+      }
+    }
+
+    res.status(500).json({
+      message: "Order creation failed",
+      error: err.message,
+    });
   }
 };
 
 /* ----------------------------------
    ADMIN: GET ALL ORDERS
 ----------------------------------- */
-export const adminGetOrders = async (req, res, next) => {
+export const adminGetOrders = async (req, res) => {
   try {
     const orders = await Order.find()
       .populate("doctor", "name email")
@@ -91,7 +132,7 @@ export const adminGetOrders = async (req, res, next) => {
 
     res.json(orders);
   } catch (err) {
-    next(err);
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -99,9 +140,11 @@ export const adminGetOrders = async (req, res, next) => {
    DOCTOR: RECENT ORDERS
 ----------------------------------- */
 export const getRecentOrders = async (req, res) => {
-  const orders = await Order.find({
-    doctor: req.user._id,
-  })
+  if (!req.user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const orders = await Order.find({ doctor: req.user._id })
     .sort({ createdAt: -1 })
     .limit(3)
     .populate("items.medicineId", "name");
@@ -119,91 +162,11 @@ export const getOrderById = async (req, res) => {
       .populate("items.medicineId");
 
     if (!order) {
-      return res
-        .status(404)
-        .json({ message: "Order not found" });
+      return res.status(404).json({ message: "Order not found" });
     }
 
     res.json(order);
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch order" });
-  }
-};
-
-/* ----------------------------------
-   ADMIN: MARK COMPLETED
------------------------------------ */
-export const adminMarkOrderCompleted = async (req, res, next) => {
-  try {
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-      return res
-        .status(404)
-        .json({ message: "Order not found" });
-    }
-
-    order.adminStatus = "completed";
-    await order.save();
-
-    res.json({
-      message: "Order marked as completed",
-      order,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-/* ----------------------------------
-   ADMIN: UPDATE ORDER STATUS
------------------------------------ */
-export const adminUpdateOrderStatus = async (req, res, next) => {
-  try {
-    const { orderStatus } = req.body;
-
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-      return res
-        .status(404)
-        .json({ message: "Order not found" });
-    }
-
-    order.orderStatus =
-      orderStatus || order.orderStatus;
-
-    await order.save();
-
-    res.json({
-      message: "Order updated successfully",
-      order,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-/* ----------------------------------
-   ADMIN: INVENTORY SUMMARY
------------------------------------ */
-export const inventorySummary = async (req, res, next) => {
-  try {
-    const medicines = await Medicine.find();
-
-    res.json({
-      totalMedicines: medicines.length,
-      totalUnits: medicines.reduce(
-        (sum, m) => sum + m.stock,
-        0
-      ),
-      lowStockCount: medicines.filter(
-        (m) => m.stock <= 5
-      ).length,
-    });
-  } catch (err) {
-    next(err);
+    res.status(500).json({ message: "Failed to fetch order" });
   }
 };
