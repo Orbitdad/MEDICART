@@ -1,48 +1,30 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { CheckCircle } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function OrderSuccess() {
+  const { id } = useParams(); // this comes from /order-success/:id
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center px-4">
-      <div className="card max-w-md w-full text-center space-y-5">
+    <div className="order-success">
+      <h2>Order Placed Successfully ✅</h2>
+      <p>Order ID: <strong>{id}</strong></p>
 
-        <div className="flex justify-center">
-          <CheckCircle size={72} className="text-green-500" />
-        </div>
+      <button
+        className="primary-btn"
+        onClick={() =>
+          navigate(`/doctor/orders/${id}/invoice`)
+        }
+      >
+        View Invoice
+      </button>
 
-        <div>
-          <h2 className="text-2xl font-semibold">
-            Order Placed Successfully
-          </h2>
-          <p className="text-muted text-sm mt-2">
-            Your order has been received and is being processed.
-          </p>
-        </div>
-
-        <div className="bg-green-50 border border-green-100 rounded-lg p-3 text-sm text-green-700">
-          You’ll be notified once the order is approved and dispatched.
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <button
-            className="button button-primary w-full"
-            onClick={() => navigate("/doctor/medicines")}
-          >
-            Place Another Order
-          </button>
-
-          <button
-            className="button button-outline w-full"
-            onClick={() => navigate("/doctor/home")}
-          >
-            Go to Home
-          </button>
-        </div>
-
-      </div>
+      <button
+        className="secondary-btn"
+        onClick={() => navigate("/doctor/medicines")}
+      >
+        Continue Shopping
+      </button>
     </div>
   );
 }

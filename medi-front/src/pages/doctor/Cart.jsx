@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useCart } from "../../context/CartContext.jsx";
 import { placeOrder } from "../../api/orders.js";
-import { createRazorpayOrder, verifyRazorpayPayment } from "../../api/payment.js";
+import {
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+} from "../../api/payment.js";
 import { useNavigate } from "react-router-dom";
 import "./Cart.css";
 
@@ -11,7 +14,13 @@ export default function Cart() {
     updateQty,
     removeFromCart,
     clearCart,
-    totalAmount,
+
+    // GST VALUES
+    taxableAmount,
+    cgst,
+    sgst,
+    finalAmount,
+
     notes,
     setNotes,
   } = useCart();
@@ -23,7 +32,7 @@ export default function Cart() {
   const navigate = useNavigate();
 
   /* =============================
-     TOTAL ITEMS (EMPTY SAFE)
+     TOTAL ITEMS
   ============================== */
   const totalItems = items.reduce(
     (sum, it) => sum + Number(it.quantity || 0),
@@ -31,48 +40,48 @@ export default function Cart() {
   );
 
   /* =============================
-     QTY HANDLER (EMPTY ALLOWED)
+     QTY HANDLER
   ============================== */
   const handleQtyChange = (id, value) => {
     if (value === "") {
       updateQty(id, "");
       return;
     }
-
     if (!/^\d+$/.test(value)) return;
-
     updateQty(id, Number(value));
   };
 
   /* =============================
-     RAZORPAY PAYMENT HANDLER
+     RAZORPAY PAYMENT
   ============================== */
   const handleRazorpayPayment = async () => {
     setLoading(true);
     setError("");
 
     try {
-      // Create Razorpay order
-      const razorpayOrder = await createRazorpayOrder(totalAmount);
+      // Razorpay expects amount in paise (number)
+      const razorpayOrder = await createRazorpayOrder(
+        Math.round(Number(finalAmount) * 100)
+      );
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         name: "MediCart",
-        description: `Order for ${totalItems} items`,
+        description: `Medical order (${totalItems} items)`,
         order_id: razorpayOrder.id,
+
         handler: async function (response) {
           try {
-            // Verify payment
             await verifyRazorpayPayment({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
 
-            // Place order with payment info
-            await placeOrder({
+            // ✅ STORE RESPONSE
+            const res = await placeOrder({
               items: items
                 .filter((it) => Number(it.quantity) > 0)
                 .map((it) => ({
@@ -82,61 +91,58 @@ export default function Cart() {
               notes,
               paymentMode: "online",
               paymentInfo: {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id:
+                  response.razorpay_payment_id,
+                razorpay_order_id:
+                  response.razorpay_order_id,
+              },
+              billing: {
+                taxableAmount,
+                cgst,
+                sgst,
+                finalAmount,
               },
             });
+            const order = res.order;
 
             clearCart();
-            navigate("/doctor/order-success");
+            navigate(`/doctor/order-success/${order._id}`);
           } catch (err) {
-            setError("Payment verification failed. Please try again.");
+            setError("Payment verification failed.");
             setLoading(false);
           }
         },
-        prefill: {
-          name: "Doctor",
-          email: "",
-          contact: "",
-        },
-        theme: {
-          color: "#2563eb",
-        },
+
+        theme: { color: "#2563eb" },
         modal: {
-          ondismiss: function () {
-            setLoading(false);
-          },
+          ondismiss: () => setLoading(false),
         },
       };
 
-      // Check if Razorpay is loaded
       if (!window.Razorpay) {
-        setError("Payment gateway not loaded. Please refresh the page.");
+        setError("Payment gateway not loaded.");
         setLoading(false);
         return;
       }
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.on("payment.failed", function (response) {
-        setError("Payment failed. Please try again.");
-        setLoading(false);
-      });
-      razorpay.open();
+      new window.Razorpay(options).open();
     } catch (err) {
-      setError(err.message || "Payment initialization failed. Please try again.");
+      setError(
+        err.message || "Payment initialization failed."
+      );
       setLoading(false);
     }
   };
 
   /* =============================
-     PLACE ORDER (COD)
+     COD ORDER
   ============================== */
   const confirmPlaceOrder = async () => {
     setLoading(true);
     setError("");
 
     try {
-      await placeOrder({
+      const res = await placeOrder({
         items: items
           .filter((it) => Number(it.quantity) > 0)
           .map((it) => ({
@@ -145,13 +151,20 @@ export default function Cart() {
           })),
         notes,
         paymentMode: "credit",
-        paymentInfo: null,
+        billing: {
+          taxableAmount,
+          cgst,
+          sgst,
+          finalAmount,
+        },
       });
+      const order = res.order;
+
 
       clearCart();
-      navigate("/doctor/order-success");
+      navigate(`/doctor/order-success/${order._id}`);
     } catch (err) {
-      setError(err.message || "Order failed. Try again.");
+      setError(err.message || "Order failed.");
     } finally {
       setLoading(false);
     }
@@ -179,21 +192,21 @@ export default function Cart() {
   ============================== */
   return (
     <div className="cart-layout">
-
-      {/* LEFT PANEL */}
+      {/* LEFT */}
       <div className="cart-left">
         <h2 className="cart-title">Review Order</h2>
 
         <div className="medicine-stack">
           {items.map((it) => (
             <div key={it._id} className="medicine-row">
-
               <div className="med-info">
                 <p className="med-name">{it.name}</p>
                 <p className="med-price">
                   ₹{it.price} × {it.quantity || 0}
                   <span>
-                    ₹{Number(it.price) * Number(it.quantity || 0)}
+                    ₹
+                    {Number(it.price) *
+                      Number(it.quantity || 0)}
                   </span>
                 </p>
               </div>
@@ -212,13 +225,13 @@ export default function Cart() {
                   </button>
 
                   <input
-                    type="text"
-                    inputMode="numeric"
-                    className="qty-input"
                     value={it.quantity}
                     placeholder="Qty"
                     onChange={(e) =>
-                      handleQtyChange(it._id, e.target.value)
+                      handleQtyChange(
+                        it._id,
+                        e.target.value
+                      )
                     }
                   />
 
@@ -246,19 +259,29 @@ export default function Cart() {
         </div>
       </div>
 
-      {/* RIGHT PANEL */}
+      {/* RIGHT */}
       <div className="cart-right">
         <div className="snapshot-card">
-          <h3>Order Snapshot</h3>
+          <h3>Invoice Summary</h3>
 
           <div className="snapshot-row">
-            <span>Total Items</span>
-            <span>{totalItems}</span>
+            <span>Taxable Amount</span>
+            <span>₹{taxableAmount}</span>
+          </div>
+
+          <div className="snapshot-row">
+            <span>CGST</span>
+            <span>₹{cgst}</span>
+          </div>
+
+          <div className="snapshot-row">
+            <span>SGST</span>
+            <span>₹{sgst}</span>
           </div>
 
           <div className="snapshot-row total">
-            <span>Total Amount</span>
-            <span>₹{totalAmount}</span>
+            <span>Final Amount</span>
+            <span>₹{finalAmount}</span>
           </div>
 
           <div className="snapshot-section">
@@ -306,7 +329,6 @@ export default function Cart() {
           </button>
         </div>
       </div>
-
     </div>
   );
 }

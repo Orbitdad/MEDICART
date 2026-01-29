@@ -13,7 +13,6 @@ export function CartProvider({ children }) {
 
   /* ============================
      ADD TO CART
-     (START EMPTY)
   ============================ */
   const addToCart = (medicine) => {
     setItems((prev) => {
@@ -25,7 +24,7 @@ export function CartProvider({ children }) {
 
       return [
         ...prev,
-        { ...medicine, quantity: "" },
+        { ...medicine, quantity: "1" },
       ];
     });
   };
@@ -40,7 +39,7 @@ export function CartProvider({ children }) {
   };
 
   /* ============================
-     UPDATE QTY (NO FORCING)
+     UPDATE QTY (SAFE)
   ============================ */
   const updateQty = (id, quantity) => {
     setItems((prev) =>
@@ -62,7 +61,7 @@ export function CartProvider({ children }) {
   };
 
   /* ============================
-     CLEAR
+     CLEAR CART
   ============================ */
   const clearCart = () => {
     setItems([]);
@@ -70,19 +69,54 @@ export function CartProvider({ children }) {
   };
 
   /* ============================
-     TOTAL AMOUNT (SAFE)
+     TAXABLE AMOUNT
   ============================ */
-  const totalAmount = useMemo(
-    () =>
-      items.reduce(
-        (sum, it) =>
-          sum +
-          (Number(it.price) || 0) *
-            (Number(it.quantity) || 0),
-        0
-      ),
-    [items]
-  );
+  const taxableAmount = useMemo(() => {
+    return items.reduce(
+      (sum, it) =>
+        sum +
+        (Number(it.price) || 0) *
+          (Number(it.quantity) || 0),
+      0
+    );
+  }, [items]);
+
+  /* ============================
+     GST CALCULATION
+  ============================ */
+  const gstSummary = useMemo(() => {
+    let cgst = 0;
+    let sgst = 0;
+
+    items.forEach((it) => {
+      const qty = Number(it.quantity) || 0;
+      const price = Number(it.price) || 0;
+      const gstPercent =
+        Number(it.gstPercent) || 0;
+
+      const amount = qty * price;
+      const gst = (amount * gstPercent) / 100;
+
+      cgst += gst / 2;
+      sgst += gst / 2;
+    });
+
+    return {
+      cgst: cgst.toFixed(2),
+      sgst: sgst.toFixed(2),
+      totalGST: (cgst + sgst).toFixed(2),
+    };
+  }, [items]);
+
+  /* ============================
+     FINAL AMOUNT
+  ============================ */
+  const finalAmount = useMemo(() => {
+    return (
+      taxableAmount +
+      Number(gstSummary.totalGST)
+    ).toFixed(2);
+  }, [taxableAmount, gstSummary]);
 
   return (
     <CartContext.Provider
@@ -92,9 +126,16 @@ export function CartProvider({ children }) {
         removeFromCart,
         updateQty,
         clearCart,
-        totalAmount,
+
+        // existing
         notes,
         setNotes,
+
+        // invoice
+        taxableAmount: taxableAmount.toFixed(2),
+        cgst: gstSummary.cgst,
+        sgst: gstSummary.sgst,
+        finalAmount,
       }}
     >
       {children}

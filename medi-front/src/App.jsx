@@ -15,6 +15,7 @@ import Home from "./pages/doctor/Home.jsx";
 import MedicineList from "./pages/doctor/MedicineList.jsx";
 import Cart from "./pages/doctor/Cart.jsx";
 import OrderSuccess from "./pages/doctor/OrderSuccess.jsx";
+import InvoicePage from "./pages/doctor/InvoicePage.jsx";
 import Profile from "./pages/doctor/Profile.jsx";
 
 /* =========================
@@ -31,7 +32,7 @@ function App() {
     <div className="app-root">
       {/* INITIAL LOADING SCREEN */}
       <InitialLoadingScreen />
-      
+
       {/* DESKTOP NAVBAR */}
       <Navbar />
 
@@ -58,7 +59,18 @@ function App() {
             <Route path="/doctor/home" element={<Home />} />
             <Route path="/doctor/medicines" element={<MedicineList />} />
             <Route path="/doctor/cart" element={<Cart />} />
-            <Route path="/doctor/order-success" element={<OrderSuccess />} />
+            <Route
+              path="/doctor/order-success/:id"
+              element={<OrderSuccess />}
+            />
+
+            <Route
+              path="/doctor/orders/:id/invoice"
+              element={<InvoicePage />}
+            />
+
+
+
             <Route path="/doctor/profile" element={<Profile />} />
           </Route>
 

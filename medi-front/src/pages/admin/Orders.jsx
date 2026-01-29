@@ -34,8 +34,8 @@ export default function Orders() {
     filter === "all"
       ? orders
       : orders.filter(
-        (o) => o.adminStatus === filter
-      );
+          (o) => o.adminStatus === filter
+        );
 
   /* =========================
      ADMIN ACTION
@@ -44,7 +44,7 @@ export default function Orders() {
     setUpdatingId(orderId);
 
     try {
-      const res = await markOrderCompleted(orderId);
+      await markOrderCompleted(orderId);
 
       setOrders((prev) =>
         prev.map((o) =>
@@ -53,7 +53,6 @@ export default function Orders() {
             : o
         )
       );
-
     } catch (err) {
       console.error("Failed to update order", err);
     } finally {
@@ -78,12 +77,16 @@ export default function Orders() {
         <Filter size={16} className="text-muted" />
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) =>
+            setFilter(e.target.value)
+          }
           className="input max-w-xs"
         >
           <option value="all">All Orders</option>
           <option value="pending">Pending</option>
-          <option value="completed">Completed</option>
+          <option value="completed">
+            Completed
+          </option>
         </select>
       </div>
 
@@ -111,26 +114,56 @@ export default function Orders() {
                     #{o._id.slice(-6)}
                   </p>
                   <p className="text-xs text-muted">
-                    Dr. {o.doctor?.name || "Unknown"}
+                    Dr.{" "}
+                    {o.doctor?.name ||
+                      "Unknown"}
                   </p>
                   <p className="text-xs text-muted">
-                    {o.items?.length || 0} items
+                    {o.items?.length || 0}{" "}
+                    items
                   </p>
                 </div>
 
                 {/* RIGHT */}
                 <div className="text-right space-y-1 relative">
+                  {/* ✅ FINAL BILL AMOUNT */}
                   <p className="text-sm font-medium">
-                    ₹{o.totalAmount}
+                    ₹
+                    {o.billing?.finalAmount ??
+                      0}
                   </p>
 
+                  {/* ✅ BILLING BREAKDOWN */}
+                  {o.billing && (
+                    <div className="text-[11px] text-muted leading-tight">
+                      <div>
+                        Taxable: ₹
+                        {
+                          o.billing
+                            .taxableAmount
+                        }
+                      </div>
+                      <div>
+                        CGST: ₹
+                        {o.billing.cgstAmount}
+                      </div>
+                      <div>
+                        SGST: ₹
+                        {o.billing.sgstAmount}
+                      </div>
+                    </div>
+                  )}
+
                   <span
-                    className={`flex items-center justify-end gap-1 text-xs font-medium ${o.adminStatus === "pending"
+                    className={`flex items-center justify-end gap-1 text-xs font-medium ${
+                      o.adminStatus ===
+                      "pending"
                         ? "text-orange-600"
                         : "text-green-600"
-                      }`}
+                    }`}
                   >
-                    {o.adminStatus === "pending" ? (
+                    {o.adminStatus ===
+                    "pending" ? (
                       <Clock size={14} />
                     ) : (
                       <CheckCircle size={14} />
@@ -138,13 +171,15 @@ export default function Orders() {
                     {o.adminStatus}
                   </span>
 
-                  {o.adminStatus === "pending" && (
+                  {o.adminStatus ===
+                    "pending" && (
                     <>
                       <button
                         type="button"
                         onClick={() =>
                           setConfirmingId(
-                            confirmingId === o._id
+                            confirmingId ===
+                              o._id
                               ? null
                               : o._id
                           )
@@ -154,18 +189,22 @@ export default function Orders() {
                         Mark as completed
                       </button>
 
-                      {/* CONFIRM */}
-                      {confirmingId === o._id && (
+                      {/* CONFIRM BOX */}
+                      {confirmingId ===
+                        o._id && (
                         <div className="absolute right-0 mt-2 w-52 bg-white border rounded-lg shadow-lg p-3 z-20">
                           <p className="text-xs text-muted mb-2">
-                            Confirm completion?
+                            Confirm
+                            completion?
                           </p>
 
                           <div className="flex gap-2">
                             <button
                               className="button button-outline w-full text-xs"
                               onClick={() =>
-                                setConfirmingId(null)
+                                setConfirmingId(
+                                  null
+                                )
                               }
                             >
                               Cancel
@@ -173,14 +212,18 @@ export default function Orders() {
 
                             <button
                               disabled={
-                                updatingId === o._id
+                                updatingId ===
+                                o._id
                               }
                               className="button button-primary w-full text-xs"
                               onClick={() =>
-                                markCompleted(o._id)
+                                markCompleted(
+                                  o._id
+                                )
                               }
                             >
-                              {updatingId === o._id
+                              {updatingId ===
+                              o._id
                                 ? "Updating…"
                                 : "Confirm"}
                             </button>
@@ -193,27 +236,29 @@ export default function Orders() {
               </div>
 
               {/* NOTES */}
-
-{o.notes && o.notes.trim() !== "" && (
-  <div className="bg-slate-50 border rounded-md p-2 text-xs text-slate-700">
-    <span className="font-medium">Notes:</span>{" "}
-    {o.notes}
-  </div>
-)}
-
-
-
+              {o.notes &&
+                o.notes.trim() !== "" && (
+                  <div className="bg-slate-50 border rounded-md p-2 text-xs text-slate-700">
+                    <span className="font-medium">
+                      Notes:
+                    </span>{" "}
+                    {o.notes}
+                  </div>
+                )}
 
               {/* MEDICINES */}
               <div className="pt-2 border-t text-xs text-muted space-y-1">
-                {o.items.map((it, idx) => (
-                  <div key={idx}>
-                    •{" "}
-                    {it.medicineId?.name ||
-                      "Deleted medicine"}{" "}
-                    × {it.quantity}
-                  </div>
-                ))}
+                {o.items.map(
+                  (it, idx) => (
+                    <div key={idx}>
+                      •{" "}
+                      {it.medicineId
+                        ?.name ||
+                        "Deleted medicine"}{" "}
+                      × {it.quantity}
+                    </div>
+                  )
+                )}
               </div>
             </div>
           ))}
