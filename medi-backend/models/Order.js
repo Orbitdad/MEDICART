@@ -8,6 +8,7 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+
     items: [
       {
         medicineId: {
@@ -19,8 +20,19 @@ const orderSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
+        price: {
+          type: Number,
+          required: true,
+        },
+        gstPercent: {
+          type: Number,
+          required: true,
+          default: 5,
+        },
       },
     ],
+
+
 
     notes: {
       type: String,
@@ -64,16 +76,16 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
     },
 
-  paymentInfo: {
-  razorpay_payment_id: {
-    type: String,
-    default: null,
-  },
-  razorpay_order_id: {
-    type: String,
-    default: null,
-  },
-},
+    paymentInfo: {
+      razorpay_payment_id: {
+        type: String,
+        default: null,
+      },
+      razorpay_order_id: {
+        type: String,
+        default: null,
+      },
+    },
 
     /* ======================
        ADMIN STATUS

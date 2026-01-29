@@ -11,8 +11,10 @@ export async function placeOrder(payload) {
 
 /* RECENT ORDERS */
 export async function getRecentOrders() {
-  return client.get("/orders/recent"); // ✅ RETURN DIRECTLY
+  const orders = await client.get("/orders/recent");
+  return Array.isArray(orders) ? orders : [];
 }
+
 
 /* =========================
    ADMIN
