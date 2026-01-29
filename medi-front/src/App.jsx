@@ -12,6 +12,7 @@ import InitialLoadingScreen from "./components/InitialLoadingScreen.jsx";
 import DoctorLogin from "./pages/doctor/DoctorLogin.jsx";
 import DoctorSignup from "./pages/doctor/DoctorSignup.jsx";
 import Home from "./pages/doctor/Home.jsx";
+import DoctorOrders from "./pages/doctor/Orders.jsx";
 import MedicineList from "./pages/doctor/MedicineList.jsx";
 import Cart from "./pages/doctor/Cart.jsx";
 import OrderSuccess from "./pages/doctor/OrderSuccess.jsx";
@@ -57,6 +58,9 @@ function App() {
             }
           >
             <Route path="/doctor/home" element={<Home />} />
+            <Route path="/doctor/orders" element={<DoctorOrders />} />
+
+
             <Route path="/doctor/medicines" element={<MedicineList />} />
             <Route path="/doctor/cart" element={<Cart />} />
             <Route
