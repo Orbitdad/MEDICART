@@ -7,7 +7,7 @@ export default function InvoicePage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [order, setOrder] = useState(null);
+  const [invoice, setInvoice] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export default function InvoicePage() {
   async function fetchInvoice() {
     try {
       const res = await axios.get(
-  `${import.meta.env.VITE_API_URL}/invoice/by-order/${id}`,
+        `${import.meta.env.VITE_API_URL}/invoice/by-order/${id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem(
@@ -30,7 +30,7 @@ export default function InvoicePage() {
           },
         }
       );
-      setOrder(res.data);
+      setInvoice(res.data);
     } catch (err) {
       console.error("Invoice fetch error:", err);
       setError(
@@ -56,7 +56,7 @@ export default function InvoicePage() {
     );
   }
 
-  if (!order) return <p>Loading invoice...</p>;
+  if (!invoice) return <p>Loading invoice...</p>;
 
   return (
     <div className="invoice-wrapper">
@@ -73,19 +73,18 @@ export default function InvoicePage() {
         <div className="invoice-meta">
           <div>
             <strong>Invoice No:</strong>{" "}
-            INV-{order._id.slice(-6)}
+            INV-{invoice._id.slice(-6)}
           </div>
           <div>
             <strong>Date:</strong>{" "}
-            {new Date(order.createdAt).toLocaleDateString()}
+            {new Date(invoice.createdAt).toLocaleDateString()}
           </div>
         </div>
-
 
         {/* DOCTOR */}
         <div className="invoice-doctor">
           <strong>Doctor:</strong>{" "}
-          {order.doctor?.name}
+          {invoice.doctor?.name}
         </div>
 
         {/* ITEMS */}
@@ -100,9 +99,8 @@ export default function InvoicePage() {
             </tr>
           </thead>
           <tbody>
-            {order.items.map((it, i) => {
-              const price =
-                it.medicineId?.price || 0;
+            {invoice.items.map((it, i) => {
+              const price = it.price || 0;
               const qty = it.quantity;
               const amount = price * qty;
 
@@ -112,9 +110,7 @@ export default function InvoicePage() {
                   <td>{it.medicineId?.name}</td>
                   <td>₹{price}</td>
                   <td>₹{amount.toFixed(2)}</td>
-                  <td>
-                    {it.medicineId?.gstPercent || 5}%
-                  </td>
+                  <td>{it.gstPercent}%</td>
                 </tr>
               );
             })}
@@ -125,55 +121,35 @@ export default function InvoicePage() {
         <div className="invoice-summary">
           <div>
             <span>Taxable Amount</span>
-            <span>
-              ₹{order.billing.taxableAmount}
-            </span>
+            <span>₹{invoice.subTotal.toFixed(2)}</span>
           </div>
 
           <div>
             <span>CGST</span>
-            <span>
-              ₹{order.billing.cgstAmount}
-            </span>
+            <span>₹{invoice.billing.cgstAmount.toFixed(2)}</span>
           </div>
 
           <div>
             <span>SGST</span>
-            <span>
-              ₹{order.billing.sgstAmount}
-            </span>
+            <span>₹{invoice.billing.sgstAmount.toFixed(2)}</span>
           </div>
 
           <hr />
 
           <div className="final">
             <span>FINAL AMOUNT</span>
-            <span>
-              ₹{order.billing.finalAmount}
-            </span>
+            <span>₹{invoice.totalAmount.toFixed(2)}</span>
           </div>
         </div>
 
         {/* FOOTER */}
         <div className="invoice-footer">
-          <p>
-            This is a computer generated invoice.
-          </p>
+          <p>This is a computer generated invoice.</p>
 
           <button
             onClick={() => window.print()}
             className="print-btn"
-            
           >
-
-            <a
-  href={`${import.meta.env.VITE_API_URL}/invoice/generate/${invoice._id}`}
-  target="_blank"
-  rel="noreferrer"
->
-  Download PDF
-</a>
-
             Print Invoice
           </button>
         </div>

@@ -1,5 +1,6 @@
 import Order from "../models/Order.js";
 import Medicine from "../models/Medicine.js";
+import Invoice from "../models/Invoice.js";
 
 /* ----------------------------------
    DOCTOR: PLACE ORDER
@@ -67,10 +68,12 @@ export const placeOrder = async (req, res) => {
 
     const grandTotal = subTotal + gstTotal;
 
-    /* ✅ FIX: split GST into CGST + SGST */
     const cgstAmount = gstTotal / 2;
     const sgstAmount = gstTotal / 2;
 
+    /* -----------------------------
+       CREATE ORDER
+    ------------------------------ */
     const order = await Order.create({
       doctor: req.user._id,
       items: orderItems,
@@ -92,6 +95,23 @@ export const placeOrder = async (req, res) => {
 
       orderStatus: "placed",
       adminStatus: "pending",
+    });
+
+    /* -----------------------------
+       CREATE INVOICE (IMPORTANT)
+    ------------------------------ */
+    await Invoice.create({
+      orderId: order._id,
+      doctor: order.doctor,
+      items: order.items,
+
+      billing: order.billing,
+
+      subTotal: order.subTotal,
+      gstAmount: order.gstAmount,
+      totalAmount: order.totalAmount,
+
+      status: "generated",
     });
 
     res.status(201).json({
