@@ -214,6 +214,32 @@ export const getRecentOrders = async (req, res) => {
   res.json(orders);
 };
 
+
+/* ----------------------------------
+   ADMIN: INVENTORY SUMMARY
+----------------------------------- */
+export const inventorySummary = async (req, res) => {
+  try {
+    const medicines = await Medicine.find();
+
+    res.json({
+      totalMedicines: medicines.length,
+      totalUnits: medicines.reduce(
+        (sum, m) => sum + m.stock,
+        0
+      ),
+      lowStockCount: medicines.filter(
+        (m) => m.stock <= 5
+      ).length,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to fetch inventory summary",
+      error: err.message,
+    });
+  }
+};
+
 /* ----------------------------------
    GET SINGLE ORDER (INVOICE)
 ----------------------------------- */
