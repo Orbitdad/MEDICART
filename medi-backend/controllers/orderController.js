@@ -13,7 +13,7 @@ export const placeOrder = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    if (!items || items.length === 0) {
+    if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: "No items in order" });
     }
 
@@ -39,8 +39,8 @@ export const placeOrder = async (req, res) => {
         return res.status(400).json({ message: "Insufficient stock" });
       }
 
-      const price = medicine.price;
-      const gstPercent = medicine.gstPercent ?? 5;
+      const price = Number(medicine.price) || 0;
+      const gstPercent = Number(medicine.gstPercent ?? 5);
 
       const itemTotal = price * item.quantity;
       const itemGst = (itemTotal * gstPercent) / 100;
@@ -56,9 +56,9 @@ export const placeOrder = async (req, res) => {
       });
     }
 
-    const cgstAmount = gstTotal / 2;
-    const sgstAmount = gstTotal / 2;
-    const finalAmount = subTotal + gstTotal;
+    const cgstAmount = Number((gstTotal / 2).toFixed(2));
+    const sgstAmount = Number((gstTotal / 2).toFixed(2));
+    const finalAmount = Number((subTotal + gstTotal).toFixed(2));
 
     /* -----------------------------
        CREATE ORDER
@@ -66,22 +66,22 @@ export const placeOrder = async (req, res) => {
     const order = await Order.create({
       doctor: req.user._id,
       items: orderItems,
-      notes,
+      notes: notes || "",
 
       billing: {
-        taxableAmount: subTotal,
+        taxableAmount: Number(subTotal.toFixed(2)),
         cgstAmount,
         sgstAmount,
         finalAmount,
       },
 
-      subTotal,
-      gstAmount: gstTotal,
+      subTotal: Number(subTotal.toFixed(2)),
+      gstAmount: Number(gstTotal.toFixed(2)),
       totalAmount: finalAmount,
 
       paymentMode,
       paymentStatus: paymentMode === "online" ? "paid" : "pending",
-paymentInfo: paymentMode === "online" ? paymentInfo : {},
+      paymentInfo: paymentMode === "online" ? paymentInfo || {} : {},
 
       orderStatus: "placed",
       adminStatus: "pending",
@@ -104,23 +104,26 @@ paymentInfo: paymentMode === "online" ? paymentInfo : {},
       status: "generated",
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Order placed successfully",
       order,
     });
   } catch (err) {
     console.error("ORDER ERROR:", err);
 
-    if (req.body?.items) {
+    // rollback stock
+    if (Array.isArray(req.body?.items)) {
       for (const item of req.body.items) {
-        await Medicine.updateOne(
-          { _id: item.medicineId },
-          { $inc: { stock: item.quantity } }
-        );
+        if (item?.medicineId && item?.quantity) {
+          await Medicine.updateOne(
+            { _id: item.medicineId },
+            { $inc: { stock: item.quantity } }
+          );
+        }
       }
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Order creation failed",
       error: err.message,
     });
@@ -141,12 +144,12 @@ export const adminMarkOrderCompleted = async (req, res) => {
     order.adminStatus = "completed";
     await order.save();
 
-    res.json({
+    return res.json({
       message: "Order marked as completed",
       order,
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Failed to mark order completed",
       error: err.message,
     });
@@ -169,18 +172,17 @@ export const adminUpdateOrderStatus = async (req, res) => {
     order.orderStatus = orderStatus || order.orderStatus;
     await order.save();
 
-    res.json({
+    return res.json({
       message: "Order status updated",
       order,
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Failed to update order status",
       error: err.message,
     });
   }
 };
-
 
 /* ----------------------------------
    ADMIN: GET ALL ORDERS
@@ -192,9 +194,9 @@ export const adminGetOrders = async (req, res) => {
       .populate("items.medicineId", "name brand price")
       .sort({ createdAt: -1 });
 
-    res.json(orders);
+    return res.json(orders);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
@@ -202,7 +204,7 @@ export const adminGetOrders = async (req, res) => {
    DOCTOR: RECENT ORDERS
 ----------------------------------- */
 export const getRecentOrders = async (req, res) => {
-  if (!req.user) {
+  if (!req.user || !req.user._id) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -211,9 +213,8 @@ export const getRecentOrders = async (req, res) => {
     .limit(3)
     .populate("items.medicineId", "name");
 
-  res.json(orders);
+  return res.json(orders);
 };
-
 
 /* ----------------------------------
    ADMIN: INVENTORY SUMMARY
@@ -222,18 +223,13 @@ export const inventorySummary = async (req, res) => {
   try {
     const medicines = await Medicine.find();
 
-    res.json({
+    return res.json({
       totalMedicines: medicines.length,
-      totalUnits: medicines.reduce(
-        (sum, m) => sum + m.stock,
-        0
-      ),
-      lowStockCount: medicines.filter(
-        (m) => m.stock <= 5
-      ).length,
+      totalUnits: medicines.reduce((sum, m) => sum + m.stock, 0),
+      lowStockCount: medicines.filter((m) => m.stock <= 5).length,
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Failed to fetch inventory summary",
       error: err.message,
     });
@@ -253,8 +249,8 @@ export const getOrderById = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    res.json(order);
+    return res.json(order);
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch order" });
+    return res.status(500).json({ message: "Failed to fetch order" });
   }
 };
