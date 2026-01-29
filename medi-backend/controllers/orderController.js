@@ -7,12 +7,7 @@ import Invoice from "../models/Invoice.js";
 ----------------------------------- */
 export const placeOrder = async (req, res) => {
   try {
-    const {
-      items,
-      notes,
-      paymentMode,
-      paymentInfo,
-    } = req.body;
+    const { items, notes, paymentMode, paymentInfo } = req.body;
 
     if (!req.user || !req.user._id) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -127,6 +122,32 @@ export const placeOrder = async (req, res) => {
 
     res.status(500).json({
       message: "Order creation failed",
+      error: err.message,
+    });
+  }
+};
+
+/* ----------------------------------
+   ADMIN: MARK ORDER COMPLETED
+----------------------------------- */
+export const adminMarkOrderCompleted = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.adminStatus = "completed";
+    await order.save();
+
+    res.json({
+      message: "Order marked as completed",
+      order,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to mark order completed",
       error: err.message,
     });
   }
