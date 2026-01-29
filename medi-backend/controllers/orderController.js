@@ -154,6 +154,35 @@ export const adminMarkOrderCompleted = async (req, res) => {
 };
 
 /* ----------------------------------
+   ADMIN: UPDATE ORDER STATUS
+----------------------------------- */
+export const adminUpdateOrderStatus = async (req, res) => {
+  try {
+    const { orderStatus } = req.body;
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.orderStatus = orderStatus || order.orderStatus;
+    await order.save();
+
+    res.json({
+      message: "Order status updated",
+      order,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to update order status",
+      error: err.message,
+    });
+  }
+};
+
+
+/* ----------------------------------
    ADMIN: GET ALL ORDERS
 ----------------------------------- */
 export const adminGetOrders = async (req, res) => {
