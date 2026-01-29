@@ -30,8 +30,6 @@ export const placeOrder = async (req, res) => {
     let subTotal = 0;
     let gstTotal = 0;
 
-    const updatedMedicines = []; // for rollback
-
     for (const item of items) {
       if (!item.medicineId || !item.quantity) {
         return res.status(400).json({ message: "Invalid order item" });
@@ -69,11 +67,6 @@ export const placeOrder = async (req, res) => {
         price,
         gstPercent,
       });
-
-      updatedMedicines.push({
-        id: medicine._id,
-        qty: item.quantity,
-      });
     }
 
     const grandTotal = subTotal + gstTotal;
@@ -103,7 +96,6 @@ export const placeOrder = async (req, res) => {
   } catch (err) {
     console.error("ORDER ERROR:", err);
 
-    // rollback stock on failure
     if (req.body?.items) {
       for (const item of req.body.items) {
         await Medicine.updateOne(
@@ -170,3 +162,84 @@ export const getOrderById = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch order" });
   }
 };
+
+/* ----------------------------------
+   ADMIN: UPDATE ORDER STATUS
+----------------------------------- */
+export const adminUpdateOrderStatus = async (req, res) => {
+  try {
+    const { orderStatus } = req.body;
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.orderStatus = orderStatus || order.orderStatus;
+    await order.save();
+
+    res.json({
+      message: "Order status updated",
+      order,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to update order status",
+      error: err.message,
+    });
+  }
+};
+
+/* ----------------------------------
+   ADMIN: MARK ORDER COMPLETED
+----------------------------------- */
+export const adminMarkOrderCompleted = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.adminStatus = "completed";
+    await order.save();
+
+    res.json({
+      message: "Order marked as completed",
+      order,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to mark order completed",
+      error: err.message,
+    });
+  }
+};
+
+/* ----------------------------------
+   ADMIN: INVENTORY SUMMARY
+----------------------------------- */
+export const inventorySummary = async (req, res) => {
+  try {
+    const medicines = await Medicine.find();
+
+    res.json({
+      totalMedicines: medicines.length,
+      totalUnits: medicines.reduce(
+        (sum, m) => sum + m.stock,
+        0
+      ),
+      lowStockCount: medicines.filter(
+        (m) => m.stock <= 5
+      ).length,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to fetch inventory summary",
+      error: err.message,
+    });
+  }
+};
+
+
