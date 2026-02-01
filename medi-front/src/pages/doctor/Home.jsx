@@ -12,7 +12,7 @@ import {
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
 import { getRecentOrders } from "../../api/orders";
-import doctorHeroImg from "../../public/illustrations/doctor-hero.png";
+import doctorHeroImg from "../../public/illustrations/shreelogo.png";
 import "./DoctorHome.css";
 
 export default function DoctorHome() {
