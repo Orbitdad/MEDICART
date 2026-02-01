@@ -175,6 +175,13 @@ textarea:focus {
   }
 }
 
+/* Mobile: stack stats in one column so no horizontal overflow (overrides 900px rule) */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* =========================
    ADMIN LAYOUT
 ========================= */

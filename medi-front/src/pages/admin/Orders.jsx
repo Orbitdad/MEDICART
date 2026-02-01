@@ -184,7 +184,7 @@ export default function Orders() {
                               : o._id
                           )
                         }
-                        className="text-xs text-primary hover:underline"
+                        className="text-xs text-primary"
                       >
                         Mark as completed
                       </button>

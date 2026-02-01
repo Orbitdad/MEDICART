@@ -54,7 +54,13 @@ navigate(`/doctor/orders/${order._id}/invoice`)
 
           <div>
             <strong>Total</strong>
-            <p>₹{order.totalAmount}</p>
+<p>
+  ₹{(
+    order.totalAmount ??
+    order.billing?.finalAmount ??
+    0
+  ).toFixed(2)}
+</p>
           </div>
 
           <div>

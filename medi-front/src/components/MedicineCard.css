@@ -125,7 +125,7 @@
 .medicine-price {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #2563eb;
+  color: var(--primary);
 }
 
 /* ======================
@@ -176,21 +176,17 @@
   font-weight: 500;
   cursor: pointer;
 
-  background: #2563eb;
+  background: var(--primary);
   color: white;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
   transition: all 150ms ease;
 }
 
 .medicine-btn:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  background: var(--primary-dark);
 }
 
 .medicine-btn:disabled {
-  background: #cbd5f5;
-  box-shadow: none;
+  background: #cbd5e1;
   cursor: not-allowed;
 }
 

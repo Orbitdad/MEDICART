@@ -58,7 +58,7 @@
   display: block;
   height: 100%;
   padding-left: 6px;
-  color: #2563eb;
+  color: var(--primary);
   font-weight: 600;
   animation: loading-spin 4s infinite;
 }

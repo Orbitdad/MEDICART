@@ -81,7 +81,7 @@
 }
 
 .empty-orders button {
-  background: #2563eb;
+  background: var(--primary);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -92,7 +92,7 @@
 }
 
 .empty-orders button:hover {
-  background: #1d4ed8;
+  background: var(--primary-dark);
 }
 
 /* =========================

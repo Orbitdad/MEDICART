@@ -26,10 +26,10 @@
     font-weight: 500;
   }
 
-  .mobile-bottom-nav a.active {
-    color: #2563eb;
-    font-weight: 600;
-  }
+.mobile-bottom-nav a.active {
+  color: var(--primary);
+  font-weight: 600;
+}
 
   /* Prevent content from hiding */
   .app-root {

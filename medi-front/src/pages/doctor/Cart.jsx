@@ -99,7 +99,7 @@ export default function Cart() {
           }
         },
 
-        theme: { color: "#2563eb" },
+        theme: { color: "#059669" },
         modal: { ondismiss: () => setLoading(false) },
       };
 

@@ -157,7 +157,7 @@
   width: 100%;
   margin-top: 16px;
   padding: 12px;
-  background: #2563eb;
+  background: var(--primary);
   color: #ffffff;
   border: none;
   border-radius: 10px;

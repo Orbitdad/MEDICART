@@ -12,7 +12,7 @@ import {
 import { useAuth } from "../../context/AuthContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
 import { getRecentOrders } from "../../api/orders";
-
+import doctorHeroImg from "../../public/illustrations/doctor-hero.png";
 import "./DoctorHome.css";
 
 export default function DoctorHome() {
@@ -55,21 +55,52 @@ export default function DoctorHome() {
 
   return (
     <>
-      {/* ================= SEARCH ================= */}
-      <section className="search-section">
-        <form onSubmit={handleSearch} className="search-form">
-          <div className="search-container-main">
-            <Search size={18} className="search-icon-main" />
-            <input
-              type="text"
-              placeholder="Search medicines, salts, brands..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input-main"
-            />
-          </div>
-        </form>
-      </section>
+      <section className="landing-hero">
+              <div className="landing-hero-inner">
+                {/* Flow: image above, then Shree Sai text, subtitle, search, chips */}
+                <div className="landing-hero-visual">
+                  <div className="landing-hero-image-wrap">
+                    <img
+                      src={doctorHeroImg}
+                      alt="Healthcare professional and medicines"
+                      className="landing-hero-image"
+                      width={400}
+                      height={320}
+                    />
+                  </div>
+                </div>
+                <div className="landing-hero-content">
+                  <h1 className="landing-hero-title">
+                    Shree Sai Surgical <br />
+                    <span className="landing-hero-title-accent">Pharmaceutical & Surgical Distributor</span>
+                  </h1>
+                  <p className="landing-hero-subtitle">
+                    Ghatkopar (W), Mumbai – 86. Order medicines, surgical instruments & supplies.
+                    Contact: 9833667560, 9967684004 · shreesaisurgical16@yahoo.in
+                  </p>
+                  <form onSubmit={handleSearch} className="landing-hero-search">
+                    <Search size={20} className="landing-hero-search-icon" aria-hidden />
+                    <input
+                      type="text"
+                      placeholder="Search for medicines, salts, or brands..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="landing-hero-search-input"
+                      aria-label="Search medicines"
+                    />
+                    <button type="submit" className="landing-hero-search-btn">
+                      Search
+                    </button>
+                  </form>
+                  <div className="landing-hero-chips">
+                    <span className="landing-chip">Pharmaceutical</span>
+                    <span className="landing-chip">Surgical</span>
+                    <span className="landing-chip">Trusted distributor</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+      
 
       {/* ================= WELCOME ================= */}
       <section className="welcome-section">
