@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, MapPin, ShoppingCart, Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
-import CapsuleLogo from "./CapsuleLogo.jsx";
 import "./Navbar.css";
 
 function Navbar() {
@@ -49,7 +48,6 @@ function Navbar() {
     <header className="navbar">
       <div className="navbar-inner">
         <button type="button" className="navbar-logo" onClick={goHome} aria-label="MediCart Home">
-          <CapsuleLogo size={28} className="navbar-logo-icon" />
           <span className="logo-text">
             <span className="logo-main">Medi</span>
             <span className="logo-accent">Cart</span>
