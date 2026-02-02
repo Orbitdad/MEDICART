@@ -149,7 +149,7 @@ export default function Cart() {
 
   if (!items.length) {
     return (
-      <div className="empty-cart">
+      <main className="empty-cart" aria-label="Empty cart">
         <p>Your cart is empty.</p>
         <button
           className="primary-btn"
@@ -157,12 +157,12 @@ export default function Cart() {
         >
           Browse Medicines
         </button>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="cart-layout">
+    <main className="cart-layout" aria-label="Review and place order">
       <div className="cart-left">
         <h2 className="cart-title">Review Order</h2>
 
@@ -184,6 +184,8 @@ export default function Cart() {
               <div className="med-actions">
                 <div className="qty-control">
                   <button
+                    type="button"
+                    aria-label={`Decrease quantity of ${it.name}`}
                     onClick={() =>
                       updateQty(
                         it._id,
@@ -203,9 +205,12 @@ export default function Cart() {
                         e.target.value
                       )
                     }
+                    aria-label={`Quantity for ${it.name}`}
                   />
 
                   <button
+                    type="button"
+                    aria-label={`Increase quantity of ${it.name}`}
                     onClick={() =>
                       updateQty(
                         it._id,
@@ -219,6 +224,7 @@ export default function Cart() {
 
                 <button
                   className="remove-link"
+                  type="button"
                   onClick={() => removeFromCart(it._id)}
                 >
                   Remove
@@ -258,6 +264,7 @@ export default function Cart() {
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
+              aria-label="Notes for this order"
             />
           </div>
 
@@ -283,7 +290,11 @@ export default function Cart() {
             </label>
           </div>
 
-          {error && <p className="error">{error}</p>}
+          {error && (
+            <p className="error" role="alert" aria-live="assertive">
+              {error}
+            </p>
+          )}
 
           <button
             className="primary-btn"
@@ -298,6 +309,6 @@ export default function Cart() {
           </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

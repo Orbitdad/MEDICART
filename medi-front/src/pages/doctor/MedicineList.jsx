@@ -86,7 +86,7 @@ useEffect(() => {
 
   return (
     <>
-      <div className="medicine-page">
+      <main className="medicine-page" aria-label="Medicine catalog">
         {/* HEADER */}
         <div className="medicine-header">
           <h1>Medicine Catalog</h1>
@@ -100,11 +100,16 @@ useEffect(() => {
             placeholder="Search medicines..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search medicines"
           />
         </div>
 
         {/* CATEGORIES */}
-        <div className="medicine-categories">
+        <div
+          className="medicine-categories"
+          role="tablist"
+          aria-label="Filter by category"
+        >
           {CATEGORY_MAP.map((cat) => (
             <button
               key={cat.code}
@@ -113,6 +118,8 @@ useEffect(() => {
                   ? "cat active"
                   : "cat"
               }
+              role="tab"
+              aria-selected={activeCategory === cat.code}
               onClick={() => setActiveCategory(cat.code)}
             >
               {cat.label}
@@ -134,7 +141,7 @@ useEffect(() => {
             ))}
           </div>
         )}
-      </div>
+      </main>
 
       <CartFloatingButton />
     </>
