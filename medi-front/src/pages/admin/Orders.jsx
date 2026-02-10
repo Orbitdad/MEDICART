@@ -62,7 +62,10 @@ export default function Orders() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <main
+      className="space-y-6 max-w-5xl mx-auto"
+      aria-label="Admin orders"
+    >
       {/* HEADER */}
       <div>
         <div className="badge mb-2">Admin</div>
@@ -94,17 +97,18 @@ export default function Orders() {
       {loading ? (
         <LoadingScreen />
       ) : filteredOrders.length === 0 ? (
-        <div className="card text-center">
+        <div className="card text-center" aria-label="No admin orders">
           <p className="text-muted text-sm">
             No orders found.
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4" aria-label="Admin orders list">
           {filteredOrders.map((o) => (
-            <div
+            <section
               key={o._id}
               className="card space-y-3 relative"
+              aria-label={`Order ${o._id.slice(-6)}`}
             >
               {/* TOP ROW */}
               <div className="flex items-start justify-between">
@@ -260,10 +264,10 @@ export default function Orders() {
                   )
                 )}
               </div>
-            </div>
+            </section>
           ))}
         </div>
       )}
-    </div>
+    </main>
   );
 }

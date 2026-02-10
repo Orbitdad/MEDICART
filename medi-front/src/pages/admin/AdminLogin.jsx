@@ -31,7 +31,10 @@ function AdminLogin() {
   };
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center">
+    <main
+      className="min-h-[70vh] flex items-center justify-center"
+      aria-label="Admin login"
+    >
       <div className="w-full max-w-md card">
         <div className="mb-6">
           <div className="badge mb-2">Admin Access</div>
@@ -67,19 +70,26 @@ function AdminLogin() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-400">{error}</p>
+            <p
+              className="text-sm text-red-400"
+              role="alert"
+              aria-live="assertive"
+            >
+              {error}
+            </p>
           )}
 
           <button
             className="button button-primary w-full"
             type="submit"
             disabled={loading}
+            aria-busy={loading}
           >
             {loading ? "Logging in…" : "Login"}
           </button>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
 

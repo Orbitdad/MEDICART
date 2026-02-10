@@ -3,11 +3,11 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 function ProtectedRoute({ allowedRoles, redirectTo = "/" }) {
-  const { token, role } = useAuth();
+  const { token, role, loading } = useAuth();
 
   // Wait until auth state is resolved
-  if (token === undefined) {
-    return null;
+  if (loading || token === undefined) {
+    return null; // or loader
   }
 
   // Not logged in
@@ -16,7 +16,7 @@ function ProtectedRoute({ allowedRoles, redirectTo = "/" }) {
   }
 
   // Role mismatch
-  if (allowedRoles && !allowedRoles.includes(role)) {
+  if (allowedRoles && role && !allowedRoles.includes(role)) {
     return <Navigate to={redirectTo} replace />;
   }
 

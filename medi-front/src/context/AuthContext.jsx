@@ -39,13 +39,23 @@ export function AuthProvider({ children }) {
   const [role, setRole] = useState(null);
   const [user, setUser] = useState(null);
 
+  // ✅ CRITICAL: hydration flag
+  const [loading, setLoading] = useState(true);
+
   /* =========================
      HYDRATE FROM STORAGE
   ========================= */
   useEffect(() => {
-    setToken(safeValue(localStorage.getItem(TOKEN_KEY)));
-    setRole(safeValue(localStorage.getItem(ROLE_KEY)));
-    setUser(safeParse(localStorage.getItem(USER_KEY)));
+    const storedToken = safeValue(localStorage.getItem(TOKEN_KEY));
+    const storedRole = safeValue(localStorage.getItem(ROLE_KEY));
+    const storedUser = safeParse(localStorage.getItem(USER_KEY));
+
+    setToken(storedToken);
+    setRole(storedRole);
+    setUser(storedUser);
+
+    // ✅ hydration complete
+    setLoading(false);
   }, []);
 
   /* =========================
@@ -82,6 +92,7 @@ export function AuthProvider({ children }) {
         token,
         role,
         user,
+        loading, // ✅ EXPOSE loading
         login,
         logout,
         isAuthenticated: Boolean(token),

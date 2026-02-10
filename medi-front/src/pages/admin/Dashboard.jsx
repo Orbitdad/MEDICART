@@ -75,7 +75,7 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="space-y-8">
+    <main className="admin-dashboard space-y-8" aria-label="Admin dashboard">
       {/* HEADER */}
       <div>
         <span className="badge">Admin</span>
@@ -86,7 +86,7 @@ export default function Dashboard() {
       </div>
 
       {/* STATS */}
-      <div className="stats-grid">
+      <div className="stats-grid" aria-label="Admin stats overview">
         {loading ? (
           <div style={{ gridColumn: "1 / -1" }}>
             <LoadingScreen />
@@ -163,12 +163,16 @@ export default function Dashboard() {
             No orders yet.
           </p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2" aria-label="Recent orders list">
             {orders.slice(0, 5).map((o) => (
-              <div
+              <button
                 key={o._id}
+                type="button"
                 onClick={() => navigate("/admin/orders")}
-                className="flex items-center justify-between p-2 border rounded-md cursor-pointer hover:bg-gray-50"
+                className="flex items-center justify-between p-2 border rounded-md cursor-pointer hover:bg-gray-50 w-full text-left"
+                aria-label={`Order ${o._id.slice(-6)} by Dr. ${
+                  o.doctor?.name || "Unknown"
+                }`}
               >
                 <div>
                   <p className="text-sm font-medium">
@@ -193,11 +197,11 @@ export default function Dashboard() {
                     {o.status}
                   </span>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

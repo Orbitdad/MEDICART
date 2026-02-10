@@ -93,7 +93,7 @@ export default function InvoicePage() {
           <strong>Doctor:</strong> {doctor?.name || "-"}
         </div>
 
-        {/* ITEMS */}
+        {/* ITEMS - SALES BILL FOR DOCTOR */}
         <table className="invoice-table">
           <thead>
             <tr>

@@ -251,7 +251,6 @@ export const getRecentOrders = async (req, res) => {
 
   const orders = await Order.find({ doctor: req.user._id })
     .sort({ createdAt: -1 })
-    .limit(3)
     .populate("items.medicineId", "name");
 
   return res.json(orders);

@@ -1,31 +1,17 @@
 import React, { useEffect, useState } from "react";
 import {
-  adminAddMedicine,
   adminGetMedicines,
   adminUpdateMedicine,
   adminDeleteMedicine,
 } from "../../api/medicines.js";
 
 function Medicines() {
-  const [form, setForm] = useState({
-    name: "",
-    brand: "",
-    description: "",
-    packaging: "",
-    mrp: "",
-    price: "",
-    stock: "",
-    expiryDate: "",
-    category: "",
-  });
-
-  const [images, setImages] = useState([]);
   const [medicines, setMedicines] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [loadingId, setLoadingId] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     loadMedicines();
@@ -37,44 +23,6 @@ function Medicines() {
       setMedicines(Array.isArray(data) ? data : []);
     } catch {
       setError("Failed to load medicines");
-    }
-  };
-
-  /* ================= CREATE ================= */
-
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
-      images.forEach((img) => fd.append("images", img));
-
-      await adminAddMedicine(fd);
-
-      setForm({
-        name: "",
-        brand: "",
-        description: "",
-        packaging: "",
-        mrp: "",
-        price: "",
-        stock: "",
-        expiryDate: "",
-        category: "",
-      });
-
-      setImages([]);
-      loadMedicines();
-    } catch {
-      setError("Failed to add medicine");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -129,64 +77,52 @@ function Medicines() {
     }
   };
 
+  const normalizedSearch = search.trim().toLowerCase();
+  const filteredMedicines = normalizedSearch
+    ? medicines.filter((m) => {
+        const name = (m.name || "").toLowerCase();
+        const brand = (m.brand || "").toLowerCase();
+        const category = (m.category || "").toLowerCase();
+        return (
+          name.includes(normalizedSearch) ||
+          brand.includes(normalizedSearch) ||
+          category.includes(normalizedSearch)
+        );
+      })
+    : medicines;
+
   return (
-    <div className="admin-medicines">
+    <main className="admin-medicines" aria-label="Admin medicine management">
       <div className="admin-header">
         <h1>Medicine Management</h1>
         <p className="text-muted">
-          Add, edit and manage live inventory.
+          View and edit existing medicines. To add new stock, use Purchase Entry.
         </p>
-      </div>
-
-      {/* ================= ADD MEDICINE ================= */}
-
-      <div className="card">
-        <h3 className="card-title">Add Medicine</h3>
-
-        <form onSubmit={handleSubmit} className="add-form-grid">
-          <input className="input" name="name" placeholder="Medicine Name" value={form.name} onChange={handleChange} required />
-
-          <input className="input" name="brand" placeholder="Company / Brand" value={form.brand} onChange={handleChange} />
-
-          <input className="input" name="description" placeholder="Description" value={form.description} onChange={handleChange} />
-
-          <input className="input" name="packaging" placeholder="Packaging (Strip of 10 tablets)" value={form.packaging} onChange={handleChange} />
-
-          <input className="input" name="mrp" type="number" placeholder="MRP" value={form.mrp} onChange={handleChange} required />
-
-          <input className="input" name="price" type="number" placeholder="Selling Price" value={form.price} onChange={handleChange} required />
-
-          <input className="input" name="stock" type="number" placeholder="Stock" value={form.stock} onChange={handleChange} required />
-
-          <input className="input" name="expiryDate" type="date" value={form.expiryDate} onChange={handleChange} required />
-
-          <select name="category" className="input" value={form.category} onChange={handleChange} required>
-            <option value="">Select category</option>
-            <option value="TAB">Tablet</option>
-            <option value="CAP">Capsule</option>
-            <option value="SYP">Syrup</option>
-            <option value="EE">Eye / Ear</option>
-            <option value="INJ">Injection</option>
-            <option value="INSTR">Instrument</option>
-          </select>
-
-          <input type="file" multiple accept="image/*" className="input" onChange={(e) => setImages([...e.target.files])} />
-
-          <button className="button button-primary" disabled={loading}>
-            {loading ? "Adding…" : "Add Medicine"}
-          </button>
-        </form>
-
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </div>
 
       {/* ================= INVENTORY ================= */}
 
       <div className="card">
-        <h3 className="card-title">Inventory</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+          <h3 className="card-title m-0">Inventory</h3>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input
+              className="input input-sm w-full sm:w-64"
+              type="text"
+              placeholder="Search by name, brand, category..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search medicines"
+            />
+          </div>
+        </div>
 
         <div className="table-wrapper">
-          <table className="table">
+          <table
+            className="table admin-orders-table"
+            aria-label="Medicines inventory table"
+          >
             <thead>
               <tr>
                 <th>Name</th>
@@ -201,7 +137,7 @@ function Medicines() {
             </thead>
 
             <tbody>
-              {medicines.map((m) => (
+              {filteredMedicines.map((m) => (
                 <tr key={m._id}>
                   {editingId === m._id ? (
                     <>
@@ -222,8 +158,20 @@ function Medicines() {
                         </select>
                       </td>
                       <td className="actions">
-                        <button className="button button-primary" onClick={() => saveEdit(m._id)}>Save</button>
-                        <button className="button button-outline" onClick={cancelEdit}>Cancel</button>
+                        <button
+                          type="button"
+                          className="button button-primary"
+                          onClick={() => saveEdit(m._id)}
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          className="button button-outline"
+                          onClick={cancelEdit}
+                        >
+                          Cancel
+                        </button>
                       </td>
                     </>
                   ) : (
@@ -236,8 +184,19 @@ function Medicines() {
                       <td>{m.expiryDate ? new Date(m.expiryDate).toLocaleDateString() : "-"}</td>
                       <td>{m.category}</td>
                       <td className="actions">
-                        <button className="button button-outline" onClick={() => startEdit(m)}>Edit</button>
-                        <button className="button button-danger" disabled={loadingId === m._id} onClick={() => handleDelete(m._id)}>
+                        <button
+                          type="button"
+                          className="button button-outline"
+                          onClick={() => startEdit(m)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="button button-danger"
+                          disabled={loadingId === m._id}
+                          onClick={() => handleDelete(m._id)}
+                        >
                           {loadingId === m._id ? "Deleting…" : "Delete"}
                         </button>
                       </td>
@@ -249,7 +208,7 @@ function Medicines() {
           </table>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

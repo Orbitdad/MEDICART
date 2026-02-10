@@ -160,6 +160,35 @@ textarea:focus {
   color: var(--text-muted);
 }
 
+/* Scroll container for wide tables (mobile friendly) */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Purchase entry grid – make cell values easier to read */
+.purchase-table input {
+  font-size: 0.9rem;
+  padding: 0.45rem 0.6rem;
+  min-width: 70px;        /* ensure full numbers are visible */
+  text-align: right;      /* align numeric values neatly */
+}
+
+.purchase-table td {
+  vertical-align: middle;
+}
+
+/* Remove tiny spinner buttons on number inputs (so text is clearer) */
+.purchase-table input[type="number"]::-webkit-inner-spin-button,
+.purchase-table input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.purchase-table input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 /* =========================
    STATS GRID
 ========================= */

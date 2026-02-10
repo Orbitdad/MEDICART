@@ -5,6 +5,8 @@ import Navbar from "./components/Navbar.jsx";
 import MobileBottomNav from "./components/MobileBottomNav.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import InitialLoadingScreen from "./components/InitialLoadingScreen.jsx";
+import Footer from "./components/Footer";
+
 
 /* =========================
    DOCTOR PAGES
@@ -27,6 +29,7 @@ import Dashboard from "./pages/admin/Dashboard.jsx";
 import Orders from "./pages/admin/Orders.jsx";
 import Medicines from "./pages/admin/Medicines.jsx";
 import Inventory from "./pages/admin/Inventory.jsx";
+import PurchaseEntry from "./pages/admin/PurchaseEntry.jsx";
 
 function App() {
   return (
@@ -71,6 +74,7 @@ function App() {
             <Route
               path="/doctor/orders/:id/invoice"
               element={<InvoicePage />}
+            
             />
 
 
@@ -91,6 +95,7 @@ function App() {
             <Route path="/admin/orders" element={<Orders />} />
             <Route path="/admin/medicines" element={<Medicines />} />
             <Route path="/admin/inventory" element={<Inventory />} />
+            <Route path="/admin/purchase" element={<PurchaseEntry />} />
           </Route>
 
           {/* 404 */}
@@ -104,6 +109,9 @@ function App() {
           />
         </Routes>
       </main>
+
+      {/* FOOTER – visible on all routes */}
+      <Footer />
 
       {/* MOBILE BOTTOM NAV (ISOLATED, SAFE) */}
       <MobileBottomNav />

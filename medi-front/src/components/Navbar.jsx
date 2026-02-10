@@ -93,7 +93,6 @@ function Navbar() {
               <nav className="navbar-nav-links">
                 <Link to="/admin/dashboard">Dashboard</Link>
                 <Link to="/admin/orders">Orders</Link>
-                <Link to="/admin/medicines">Medicines</Link>
                 <Link to="/admin/inventory">Inventory</Link>
               </nav>
               <span className="navbar-user-name">{user?.name}</span>
@@ -158,7 +157,6 @@ function Navbar() {
               <>
                 <Link to="/admin/dashboard" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
                 <Link to="/admin/orders" onClick={() => setMobileMenuOpen(false)}>Orders</Link>
-                <Link to="/admin/medicines" onClick={() => setMobileMenuOpen(false)}>Medicines</Link>
                 <Link to="/admin/inventory" onClick={() => setMobileMenuOpen(false)}>Inventory</Link>
                 <button type="button" onClick={onLogout}>Logout</button>
               </>
