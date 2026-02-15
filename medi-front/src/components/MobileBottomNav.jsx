@@ -32,8 +32,8 @@ function MobileBottomNav() {
         <>
           <Link to="/admin/dashboard">Dashboard</Link>
           <Link to="/admin/orders">Orders</Link>
-          <Link to="/admin/medicines">Medicines</Link>
           <Link to="/admin/inventory">Inventory</Link>
+          <Link to="/admin/payments">Payments</Link>
         </>
       )}
     </nav>
