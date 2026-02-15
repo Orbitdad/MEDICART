@@ -2,6 +2,7 @@ import express from "express";
 import {
   adminGetOrders,
   adminUpdateOrderStatus,
+  adminUpdatePaymentStatus,
   adminMarkOrderCompleted,
   inventorySummary,
 } from "../controllers/orderController.js";
@@ -21,6 +22,12 @@ router.put(
   "/:id/status",
   protect(["admin"]),
   adminUpdateOrderStatus
+);
+
+router.put(
+  "/:id/payment",
+  protect(["admin"]),
+  adminUpdatePaymentStatus
 );
 
 /* ✅ MARK COMPLETED */

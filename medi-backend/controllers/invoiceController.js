@@ -1,17 +1,17 @@
- import PDFDocument from "pdfkit";
+import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
-import Order from "../models/Order.js";
+import Invoice from "../models/Invoice.js";
 
 export const generateInvoicePDF = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const invoice = await Invoice.findOne({ orderId: req.params.id });
 
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+    if (!invoice) {
+      return res.status(404).json({ message: "Invoice not found for this order" });
     }
 
-    const invoicePath = `invoices/invoice-${order.invoiceNo}.pdf`;
+    const invoicePath = `invoices/invoice-${invoice.invoiceNo}.pdf`;
 
     const doc = new PDFDocument({ margin: 40 });
     doc.pipe(fs.createWriteStream(invoicePath));
@@ -29,19 +29,19 @@ export const generateInvoicePDF = async (req, res) => {
       .moveDown(1);
 
     doc.fontSize(9);
-    doc.text(`Invoice No: ${order.invoiceNo}`);
-    doc.text(`Invoice Date: ${new Date(order.createdAt).toLocaleDateString()}`);
-    doc.text(`Order ID: ${order._id}`);
+    doc.text(`Invoice No: ${invoice.invoiceNo}`);
+    doc.text(`Invoice Date: ${new Date(invoice.createdAt).toLocaleDateString()}`);
+    doc.text(`Order ID: ${invoice.orderId}`);
     doc.moveDown();
 
     /* ---------------- DOCTOR ---------------- */
 
     doc.fontSize(10).text("Bill To:");
     doc.fontSize(9);
-    doc.text(`Doctor: ${order.doctor.name}`);
-    doc.text(`Clinic: ${order.doctor.clinic}`);
-    doc.text(`Mobile: ${order.doctor.phone}`);
-    doc.text(`City: ${order.doctor.city}`);
+    doc.text(`Doctor: ${invoice.doctor.name}`);
+    doc.text(`Clinic: ${invoice.doctor.clinic}`);
+    doc.text(`Mobile: ${invoice.doctor.phone}`);
+    doc.text(`City: ${invoice.doctor.city}`);
     doc.moveDown();
 
     /* ---------------- TABLE HEADER ---------------- */
@@ -65,7 +65,7 @@ export const generateInvoicePDF = async (req, res) => {
 
     /* ---------------- ITEMS ---------------- */
 
-    order.items.forEach((item) => {
+    invoice.items.forEach((item) => {
       doc.text(item.qty, 40, y);
       doc.text(item.name, 70, y, { width: 120 });
       doc.text(item.company, 200, y);
@@ -82,15 +82,15 @@ export const generateInvoicePDF = async (req, res) => {
 
     /* ---------------- TOTALS ---------------- */
 
-    doc.text(`Taxable Amount: ₹${order.taxableAmount.toFixed(2)}`, {
+    doc.text(`Taxable Amount: ₹${invoice.taxableAmount.toFixed(2)}`, {
       align: "right",
     });
 
-    doc.text(`SGST Amount: ₹${order.sgstAmount.toFixed(2)}`, {
+    doc.text(`SGST Amount: ₹${invoice.sgstAmount.toFixed(2)}`, {
       align: "right",
     });
 
-    doc.text(`CGST Amount: ₹${order.cgstAmount.toFixed(2)}`, {
+    doc.text(`CGST Amount: ₹${invoice.cgstAmount.toFixed(2)}`, {
       align: "right",
     });
 
@@ -98,7 +98,7 @@ export const generateInvoicePDF = async (req, res) => {
 
     doc
       .fontSize(11)
-      .text(`FINAL AMOUNT: ₹${order.totalAmount.toFixed(2)}`, {
+      .text(`FINAL AMOUNT: ₹${invoice.totalAmount.toFixed(2)}`, {
         align: "right",
       });
 

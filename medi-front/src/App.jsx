@@ -30,6 +30,7 @@ import Orders from "./pages/admin/Orders.jsx";
 import Medicines from "./pages/admin/Medicines.jsx";
 import Inventory from "./pages/admin/Inventory.jsx";
 import PurchaseEntry from "./pages/admin/PurchaseEntry.jsx";
+import PaymentEntry from "./pages/admin/PaymentEntry.jsx";
 
 function App() {
   return (
@@ -74,7 +75,7 @@ function App() {
             <Route
               path="/doctor/orders/:id/invoice"
               element={<InvoicePage />}
-            
+
             />
 
 
@@ -95,7 +96,9 @@ function App() {
             <Route path="/admin/orders" element={<Orders />} />
             <Route path="/admin/medicines" element={<Medicines />} />
             <Route path="/admin/inventory" element={<Inventory />} />
+            <Route path="/admin/inventory" element={<Inventory />} />
             <Route path="/admin/purchase" element={<PurchaseEntry />} />
+            <Route path="/admin/payments" element={<PaymentEntry />} />
           </Route>
 
           {/* 404 */}

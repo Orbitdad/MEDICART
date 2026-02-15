@@ -66,7 +66,7 @@ function Navbar() {
           />
         </form>
 
-        
+
         <div className="navbar-actions">
           {!isAuthenticated && (
             <>
@@ -94,6 +94,7 @@ function Navbar() {
                 <Link to="/admin/dashboard">Dashboard</Link>
                 <Link to="/admin/orders">Orders</Link>
                 <Link to="/admin/inventory">Inventory</Link>
+                <Link to="/admin/payments">Payments</Link>
               </nav>
               <span className="navbar-user-name">{user?.name}</span>
               <button type="button" className="nav-logout" onClick={onLogout}>Logout</button>
@@ -158,6 +159,7 @@ function Navbar() {
                 <Link to="/admin/dashboard" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
                 <Link to="/admin/orders" onClick={() => setMobileMenuOpen(false)}>Orders</Link>
                 <Link to="/admin/inventory" onClick={() => setMobileMenuOpen(false)}>Inventory</Link>
+                <Link to="/admin/payments" onClick={() => setMobileMenuOpen(false)}>Payments</Link>
                 <button type="button" onClick={onLogout}>Logout</button>
               </>
             )}

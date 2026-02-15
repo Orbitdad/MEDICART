@@ -70,6 +70,7 @@ export const placeOrder = async (req, res) => {
         brand: medicine.brand,
         packaging: medicine.packaging,
         mrp: medicine.mrp,
+        expiryDate: medicine.expiryDate,
 
         quantity: item.quantity,
         price,
@@ -108,13 +109,14 @@ export const placeOrder = async (req, res) => {
 
       orderStatus: "placed",
       adminStatus: "pending",
+      invoiceNo: generateInvoiceNo()
     });
 
     /* -----------------------------
        CREATE INVOICE
     ------------------------------ */
     await Invoice.create({
-      invoiceNo: generateInvoiceNo(),
+      invoiceNo: order.invoiceNo,
 
       orderId: order._id,
 
@@ -192,6 +194,34 @@ export const adminMarkOrderCompleted = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       message: "Failed to mark order completed",
+      error: err.message,
+    });
+  }
+};
+
+/* ----------------------------------
+   ADMIN: UPDATE PAYMENT STATUS
+----------------------------------- */
+export const adminUpdatePaymentStatus = async (req, res) => {
+  try {
+    const { paymentStatus } = req.body; // "paid" or "pending"
+
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.paymentStatus = paymentStatus;
+    await order.save();
+
+    return res.json({
+      message: "Payment status updated",
+      order,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Failed to update payment status",
       error: err.message,
     });
   }

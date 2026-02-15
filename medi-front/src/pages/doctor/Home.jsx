@@ -33,6 +33,13 @@ export default function DoctorHome() {
       .then((res) => {
         // ✅ HARD GUARANTEE ARRAY
         if (Array.isArray(res)) {
+          console.log("Recent Orders Detailed:", res.map(o => ({
+            id: o._id,
+            payStatus: o.paymentStatus,
+            payMode: o.paymentMode,
+            total: o.totalAmount,
+            billingFinal: o.billing?.finalAmount
+          })));
           setRecentOrders(res);
         } else {
           setRecentOrders([]);
@@ -56,51 +63,51 @@ export default function DoctorHome() {
   return (
     <>
       <section className="landing-hero">
-              <div className="landing-hero-inner">
-                {/* Flow: image above, then Shree Sai text, subtitle, search, chips */}
-                <div className="landing-hero-visual">
-                  <div className="landing-hero-image-wrap">
-                    <img
-                      src={doctorHeroImg}
-                      alt="Healthcare professional and medicines"
-                      className="landing-hero-image"
-                      width={400}
-                      height={320}
-                    />
-                  </div>
-                </div>
-                <div className="landing-hero-content">
-                  <h1 className="landing-hero-title">
-                    Shree Sai Surgical <br />
-                    <span className="landing-hero-title-accent">Pharmaceutical & Surgical Distributor</span>
-                  </h1>
-                  <p className="landing-hero-subtitle">
-                    Ghatkopar (W), Mumbai – 86. Order medicines, surgical instruments & supplies.
-                    Contact: 9833667560, 9967684004 · shreesaisurgical16@yahoo.in
-                  </p>
-                  <form onSubmit={handleSearch} className="landing-hero-search">
-                    <Search size={20} className="landing-hero-search-icon" aria-hidden />
-                    <input
-                      type="text"
-                      placeholder="Search for medicines, salts, or brands..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="landing-hero-search-input"
-                      aria-label="Search medicines"
-                    />
-                    <button type="submit" className="landing-hero-search-btn">
-                      Search
-                    </button>
-                  </form>
-                  <div className="landing-hero-chips">
-                    <span className="landing-chip">Pharmaceutical</span>
-                    <span className="landing-chip">Surgical</span>
-                    <span className="landing-chip">Trusted distributor</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-      
+        <div className="landing-hero-inner">
+          {/* Flow: image above, then Shree Sai text, subtitle, search, chips */}
+          <div className="landing-hero-visual">
+            <div className="landing-hero-image-wrap">
+              <img
+                src={doctorHeroImg}
+                alt="Healthcare professional and medicines"
+                className="landing-hero-image"
+                width={400}
+                height={320}
+              />
+            </div>
+          </div>
+          <div className="landing-hero-content">
+            <h1 className="landing-hero-title">
+              Shree Sai Surgical <br />
+              <span className="landing-hero-title-accent">Pharmaceutical & Surgical Distributor</span>
+            </h1>
+            <p className="landing-hero-subtitle">
+              Ghatkopar (W), Mumbai – 86. Order medicines, surgical instruments & supplies.
+              Contact: 9833667560, 9967684004 · shreesaisurgical16@yahoo.in
+            </p>
+            <form onSubmit={handleSearch} className="landing-hero-search">
+              <Search size={20} className="landing-hero-search-icon" aria-hidden />
+              <input
+                type="text"
+                placeholder="Search for medicines, salts, or brands..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="landing-hero-search-input"
+                aria-label="Search medicines"
+              />
+              <button type="submit" className="landing-hero-search-btn">
+                Search
+              </button>
+            </form>
+            <div className="landing-hero-chips">
+              <span className="landing-chip">Pharmaceutical</span>
+              <span className="landing-chip">Surgical</span>
+              <span className="landing-chip">Trusted distributor</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       {/* ================= WELCOME ================= */}
       <section className="welcome-section">
@@ -152,8 +159,14 @@ export default function DoctorHome() {
               <CreditCard size={20} />
             </div>
             <div className="stat-content">
-              <h3 className="stat-title">Payment</h3>
-              <p className="stat-value">Hospital Credit</p>
+              <h3 className="stat-title">Outstanding Due</h3>
+              <p className="stat-value">
+                ₹
+                {recentOrders
+                  .filter((o) => o?.paymentStatus === "pending")
+                  .reduce((sum, o) => sum + (o.totalAmount || o.billing?.finalAmount || 0), 0)
+                  .toFixed(2)}
+              </p>
             </div>
           </div>
 

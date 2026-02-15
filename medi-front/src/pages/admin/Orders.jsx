@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   adminFetchOrders,
   markOrderCompleted,
+  updatePaymentStatus,
 } from "../../api/orders.js";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 import { CheckCircle, Clock, Filter } from "lucide-react";
@@ -34,12 +35,29 @@ export default function Orders() {
     filter === "all"
       ? orders
       : orders.filter(
-          (o) => o.adminStatus === filter
-        );
+        (o) => o.adminStatus === filter
+      );
 
   /* =========================
      ADMIN ACTION
   ========================== */
+  /* =========================
+     PAYMENT ACTION
+  ========================== */
+  async function togglePaymentStatus(orderId, currentStatus) {
+    const newStatus = currentStatus === "paid" ? "pending" : "paid";
+    try {
+      await updatePaymentStatus(orderId, newStatus);
+      setOrders((prev) =>
+        prev.map((o) =>
+          o._id === orderId ? { ...o, paymentStatus: newStatus } : o
+        )
+      );
+    } catch (err) {
+      console.error("Failed to update payment status", err);
+    }
+  }
+
   async function markCompleted(orderId) {
     setUpdatingId(orderId);
 
@@ -159,15 +177,14 @@ export default function Orders() {
                   )}
 
                   <span
-                    className={`flex items-center justify-end gap-1 text-xs font-medium ${
-                      o.adminStatus ===
+                    className={`flex items-center justify-end gap-1 text-xs font-medium ${o.adminStatus ===
                       "pending"
-                        ? "text-orange-600"
-                        : "text-green-600"
-                    }`}
+                      ? "text-orange-600"
+                      : "text-green-600"
+                      }`}
                   >
                     {o.adminStatus ===
-                    "pending" ? (
+                      "pending" ? (
                       <Clock size={14} />
                     ) : (
                       <CheckCircle size={14} />
@@ -175,67 +192,83 @@ export default function Orders() {
                     {o.adminStatus}
                   </span>
 
+                  {/* PAYMENT STATUS TOGGLE */}
+                  <div className="flex items-center justify-end gap-2 mt-1">
+                    <span className="text-xs text-muted">Payment:</span>
+                    <button
+                      onClick={() =>
+                        togglePaymentStatus(o._id, o.paymentStatus)
+                      }
+                      className={`text-xs font-medium px-2 py-0.5 rounded border ${o.paymentStatus === "paid"
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : "bg-orange-50 text-orange-700 border-orange-200"
+                        }`}
+                    >
+                      {o.paymentStatus === "paid" ? "PAID" : "PENDING"}
+                    </button>
+                  </div>
+
                   {o.adminStatus ===
                     "pending" && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setConfirmingId(
-                            confirmingId ===
-                              o._id
-                              ? null
-                              : o._id
-                          )
-                        }
-                        className="text-xs text-primary"
-                      >
-                        Mark as completed
-                      </button>
-
-                      {/* CONFIRM BOX */}
-                      {confirmingId ===
-                        o._id && (
-                        <div className="absolute right-0 mt-2 w-52 bg-white border rounded-lg shadow-lg p-3 z-20">
-                          <p className="text-xs text-muted mb-2">
-                            Confirm
-                            completion?
-                          </p>
-
-                          <div className="flex gap-2">
-                            <button
-                              className="button button-outline w-full text-xs"
-                              onClick={() =>
-                                setConfirmingId(
-                                  null
-                                )
-                              }
-                            >
-                              Cancel
-                            </button>
-
-                            <button
-                              disabled={
-                                updatingId ===
+                      <>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setConfirmingId(
+                              confirmingId ===
                                 o._id
-                              }
-                              className="button button-primary w-full text-xs"
-                              onClick={() =>
-                                markCompleted(
-                                  o._id
-                                )
-                              }
-                            >
-                              {updatingId ===
-                              o._id
-                                ? "Updating…"
-                                : "Confirm"}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
+                                ? null
+                                : o._id
+                            )
+                          }
+                          className="text-xs text-primary"
+                        >
+                          Mark as completed
+                        </button>
+
+                        {/* CONFIRM BOX */}
+                        {confirmingId ===
+                          o._id && (
+                            <div className="absolute right-0 mt-2 w-52 bg-white border rounded-lg shadow-lg p-3 z-20">
+                              <p className="text-xs text-muted mb-2">
+                                Confirm
+                                completion?
+                              </p>
+
+                              <div className="flex gap-2">
+                                <button
+                                  className="button button-outline w-full text-xs"
+                                  onClick={() =>
+                                    setConfirmingId(
+                                      null
+                                    )
+                                  }
+                                >
+                                  Cancel
+                                </button>
+
+                                <button
+                                  disabled={
+                                    updatingId ===
+                                    o._id
+                                  }
+                                  className="button button-primary w-full text-xs"
+                                  onClick={() =>
+                                    markCompleted(
+                                      o._id
+                                    )
+                                  }
+                                >
+                                  {updatingId ===
+                                    o._id
+                                    ? "Updating…"
+                                    : "Confirm"}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                      </>
+                    )}
                 </div>
               </div>
 

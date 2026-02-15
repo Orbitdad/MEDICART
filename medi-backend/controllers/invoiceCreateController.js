@@ -27,14 +27,14 @@ export const createInvoice = async (orderId) => {
 
     items: order.items.map((item) => ({
       name: item.name,
-      company: item.company,
+      company: item.brand,
       packaging: item.packaging,
-      expiry: item.expiry,
-      qty: item.qty,
+      expiry: item.expiryDate ? new Date(item.expiryDate).toLocaleDateString() : "",
+      qty: item.quantity,
       mrp: item.mrp,
       price: item.price,
       gstPercent: item.gstPercent,
-      amount: item.amount,
+      amount: item.price * item.quantity,
     })),
 
     taxableAmount: order.taxableAmount,

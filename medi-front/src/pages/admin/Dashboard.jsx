@@ -14,19 +14,17 @@ function StatCard({ label, value, icon: Icon, urgent, onClick }) {
   return (
     <div
       onClick={onClick}
-      className={`card cursor-pointer transition ${
-        urgent
-          ? "ring-2 ring-orange-400/40 bg-orange-50"
-          : "hover:shadow-md"
-      }`}
+      className={`card cursor-pointer transition ${urgent
+        ? "ring-2 ring-orange-400/40 bg-orange-50"
+        : "hover:shadow-md"
+        }`}
     >
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs text-muted">{label}</p>
           <p
-            className={`text-2xl font-semibold mt-1 ${
-              urgent ? "text-orange-600" : ""
-            }`}
+            className={`text-2xl font-semibold mt-1 ${urgent ? "text-orange-600" : ""
+              }`}
           >
             {value}
           </p>
@@ -64,10 +62,10 @@ export default function Dashboard() {
 
   const totalOrders = orders.length;
   const pendingOrders = orders.filter(
-    (o) => o.status === "pending"
+    (o) => o.adminStatus === "pending"
   ).length;
   const completedOrders = orders.filter(
-    (o) => o.status === "completed"
+    (o) => o.adminStatus === "completed"
   ).length;
   const revenue = orders.reduce(
     (sum, o) => sum + (o.totalAmount || 0),
@@ -170,9 +168,8 @@ export default function Dashboard() {
                 type="button"
                 onClick={() => navigate("/admin/orders")}
                 className="flex items-center justify-between p-2 border rounded-md cursor-pointer hover:bg-gray-50 w-full text-left"
-                aria-label={`Order ${o._id.slice(-6)} by Dr. ${
-                  o.doctor?.name || "Unknown"
-                }`}
+                aria-label={`Order ${o._id.slice(-6)} by Dr. ${o.doctor?.name || "Unknown"
+                  }`}
               >
                 <div>
                   <p className="text-sm font-medium">
@@ -188,13 +185,12 @@ export default function Dashboard() {
                     ₹{o.totalAmount}
                   </p>
                   <span
-                    className={`text-xs font-medium ${
-                      o.status === "pending"
+                    className={`text-xs font-medium ${o.orderStatus === "placed" || o.orderStatus === "approved"
                         ? "text-orange-600"
                         : "text-green-600"
-                    }`}
+                      }`}
                   >
-                    {o.status}
+                    {o.orderStatus}
                   </span>
                 </div>
               </button>

@@ -16,6 +16,11 @@ const orderSchema = new mongoose.Schema(
           ref: "Medicine",
           required: true,
         },
+        name: String,
+        brand: String,
+        packaging: String,
+        mrp: Number,
+        expiryDate: Date,
         quantity: {
           type: Number,
           required: true,
@@ -31,6 +36,11 @@ const orderSchema = new mongoose.Schema(
         },
       },
     ],
+
+    invoiceNo: {
+      type: String,
+      default: null
+    },
 
 
 
@@ -66,7 +76,7 @@ const orderSchema = new mongoose.Schema(
     ====================== */
     paymentMode: {
       type: String,
-      enum: ["credit", "online"],
+      enum: ["credit", "online", "cod"],
       required: true,
     },
 

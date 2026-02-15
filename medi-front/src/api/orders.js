@@ -33,6 +33,11 @@ export async function updateOrderStatus(orderId, orderStatus) {
   );
 }
 
+/* UPDATE PAYMENT STATUS */
+export async function updatePaymentStatus(orderId, paymentStatus) {
+  return client.put(`/admin/orders/${orderId}/payment`, { paymentStatus });
+}
+
 /* MARK ORDER COMPLETED */
 export async function markOrderCompleted(orderId) {
   return client.put(`/admin/orders/${orderId}/complete`);

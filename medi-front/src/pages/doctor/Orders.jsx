@@ -44,7 +44,7 @@ export default function DoctorOrders() {
           key={order._id}
           className="order-card"
           onClick={() =>
-navigate(`/doctor/orders/${order._id}/invoice`)
+            navigate(`/doctor/orders/${order._id}/invoice`)
           }
         >
           <div>
@@ -54,13 +54,26 @@ navigate(`/doctor/orders/${order._id}/invoice`)
 
           <div>
             <strong>Total</strong>
-<p>
-  ₹{(
-    order.totalAmount ??
-    order.billing?.finalAmount ??
-    0
-  ).toFixed(2)}
-</p>
+            <p>
+              ₹{(
+                order.totalAmount ??
+                order.billing?.finalAmount ??
+                0
+              ).toFixed(2)}
+            </p>
+          </div>
+
+          <div>
+            <strong>Payment</strong>
+            <p
+              className={
+                order.paymentStatus === "paid"
+                  ? "text-green-600"
+                  : "text-orange-600"
+              }
+            >
+              {order.paymentStatus}
+            </p>
           </div>
 
           <div>
