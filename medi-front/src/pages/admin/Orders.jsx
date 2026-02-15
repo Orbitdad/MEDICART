@@ -2,21 +2,30 @@ import React, { useEffect, useState } from "react";
 import {
   adminFetchOrders,
   markOrderCompleted,
-  updatePaymentStatus,
 } from "../../api/orders.js";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 import { CheckCircle, Clock, Filter } from "lucide-react";
 
+import { useSearchParams } from "react-router-dom";
+
 export default function Orders() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialFilter = searchParams.get("status") || "all";
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState(initialFilter);
   const [confirmingId, setConfirmingId] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
 
   useEffect(() => {
     loadOrders();
   }, []);
+
+  useEffect(() => {
+    const status = searchParams.get("status");
+    if (status) setFilter(status);
+  }, [searchParams]);
 
   async function loadOrders() {
     setLoading(true);
@@ -41,23 +50,6 @@ export default function Orders() {
   /* =========================
      ADMIN ACTION
   ========================== */
-  /* =========================
-     PAYMENT ACTION
-  ========================== */
-  async function togglePaymentStatus(orderId, currentStatus) {
-    const newStatus = currentStatus === "paid" ? "pending" : "paid";
-    try {
-      await updatePaymentStatus(orderId, newStatus);
-      setOrders((prev) =>
-        prev.map((o) =>
-          o._id === orderId ? { ...o, paymentStatus: newStatus } : o
-        )
-      );
-    } catch (err) {
-      console.error("Failed to update payment status", err);
-    }
-  }
-
   async function markCompleted(orderId) {
     setUpdatingId(orderId);
 
@@ -98,9 +90,10 @@ export default function Orders() {
         <Filter size={16} className="text-muted" />
         <select
           value={filter}
-          onChange={(e) =>
-            setFilter(e.target.value)
-          }
+          onChange={(e) => {
+            setFilter(e.target.value);
+            setSearchParams({ status: e.target.value });
+          }}
           className="input max-w-xs"
         >
           <option value="all">All Orders</option>
@@ -191,22 +184,6 @@ export default function Orders() {
                     )}
                     {o.adminStatus}
                   </span>
-
-                  {/* PAYMENT STATUS TOGGLE */}
-                  <div className="flex items-center justify-end gap-2 mt-1">
-                    <span className="text-xs text-muted">Payment:</span>
-                    <button
-                      onClick={() =>
-                        togglePaymentStatus(o._id, o.paymentStatus)
-                      }
-                      className={`text-xs font-medium px-2 py-0.5 rounded border ${o.paymentStatus === "paid"
-                        ? "bg-green-50 text-green-700 border-green-200"
-                        : "bg-orange-50 text-orange-700 border-orange-200"
-                        }`}
-                    >
-                      {o.paymentStatus === "paid" ? "PAID" : "PENDING"}
-                    </button>
-                  </div>
 
                   {o.adminStatus ===
                     "pending" && (

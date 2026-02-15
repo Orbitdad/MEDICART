@@ -102,13 +102,13 @@ export default function Dashboard() {
               value={pendingOrders}
               icon={Clock}
               urgent={pendingOrders > 0}
-              onClick={() => navigate("/admin/orders")}
+              onClick={() => navigate("/admin/orders?status=pending")}
             />
             <StatCard
               label="Completed Orders"
               value={completedOrders}
               icon={CheckCircle}
-              onClick={() => navigate("/admin/orders")}
+              onClick={() => navigate("/admin/orders?status=completed")}
             />
             <StatCard
               label="Revenue"
@@ -128,7 +128,7 @@ export default function Dashboard() {
           </p>
           <button
             className="button button-primary flex items-center gap-1"
-            onClick={() => navigate("/admin/orders")}
+            onClick={() => navigate("/admin/orders?status=pending")}
           >
             Review
             <ArrowRight size={16} />
@@ -186,8 +186,8 @@ export default function Dashboard() {
                   </p>
                   <span
                     className={`text-xs font-medium ${o.orderStatus === "placed" || o.orderStatus === "approved"
-                        ? "text-orange-600"
-                        : "text-green-600"
+                      ? "text-orange-600"
+                      : "text-green-600"
                       }`}
                   >
                     {o.orderStatus}
