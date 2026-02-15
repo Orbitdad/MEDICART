@@ -123,3 +123,39 @@ export const loginDoctor = async (req, res) => {
     });
   }
 };
+
+/* =========================
+   UPDATE PROFILE
+   ========================= */
+export const updateDoctorProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.phone = req.body.phone || user.phone;
+      user.address = req.body.address || user.address;
+      user.hospital = req.body.hospital || user.hospital;
+
+      const updatedUser = await user.save();
+
+      return res.json({
+        success: true,
+        user: {
+          id: updatedUser._id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          phone: updatedUser.phone,
+          address: updatedUser.address,
+          hospital: updatedUser.hospital,
+        },
+      });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ message: "Update failed" });
+  }
+};

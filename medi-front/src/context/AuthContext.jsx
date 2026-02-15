@@ -83,7 +83,17 @@ export function AuthProvider({ children }) {
 
     setToken(null);
     setRole(null);
+    setToken(null);
+    setRole(null);
     setUser(null);
+  };
+
+  /* =========================
+     UPDATE USER
+     ========================= */
+  const updateUser = (userData) => {
+    localStorage.setItem(USER_KEY, JSON.stringify(userData));
+    setUser(userData);
   };
 
   return (
@@ -95,6 +105,7 @@ export function AuthProvider({ children }) {
         loading, // ✅ EXPOSE loading
         login,
         logout,
+        updateUser,
         isAuthenticated: Boolean(token),
       }}
     >

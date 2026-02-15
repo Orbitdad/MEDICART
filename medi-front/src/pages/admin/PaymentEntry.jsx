@@ -190,6 +190,8 @@ export default function PaymentEntry() {
                     </form>
                 </section>
             )}
+            {/* LOADING OVERLAY */}
+            {loading && <LoadingScreen />}
         </main>
     );
 }

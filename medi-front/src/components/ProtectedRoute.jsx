@@ -2,12 +2,14 @@ import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
+import LoadingScreen from "./LoadingScreen.jsx";
+
 function ProtectedRoute({ allowedRoles, redirectTo = "/" }) {
   const { token, role, loading } = useAuth();
 
   // Wait until auth state is resolved
   if (loading || token === undefined) {
-    return null; // or loader
+    return <LoadingScreen />;
   }
 
   // Not logged in

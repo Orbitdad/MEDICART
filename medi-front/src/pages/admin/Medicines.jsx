@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import LoadingScreen from "../../components/LoadingScreen.jsx";
 import {
   adminGetMedicines,
   adminUpdateMedicine,
@@ -7,6 +7,7 @@ import {
 
 function Medicines() {
   const [medicines, setMedicines] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [loadingId, setLoadingId] = useState(null);
@@ -19,12 +20,17 @@ function Medicines() {
 
   const loadMedicines = async () => {
     try {
+      setLoading(true);
       const data = await adminGetMedicines();
       setMedicines(Array.isArray(data) ? data : []);
     } catch {
       setError("Failed to load medicines");
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) return <LoadingScreen />;
 
   /* ================= EDIT ================= */
 
@@ -80,15 +86,15 @@ function Medicines() {
   const normalizedSearch = search.trim().toLowerCase();
   const filteredMedicines = normalizedSearch
     ? medicines.filter((m) => {
-        const name = (m.name || "").toLowerCase();
-        const brand = (m.brand || "").toLowerCase();
-        const category = (m.category || "").toLowerCase();
-        return (
-          name.includes(normalizedSearch) ||
-          brand.includes(normalizedSearch) ||
-          category.includes(normalizedSearch)
-        );
-      })
+      const name = (m.name || "").toLowerCase();
+      const brand = (m.brand || "").toLowerCase();
+      const category = (m.category || "").toLowerCase();
+      return (
+        name.includes(normalizedSearch) ||
+        brand.includes(normalizedSearch) ||
+        category.includes(normalizedSearch)
+      );
+    })
     : medicines;
 
   return (

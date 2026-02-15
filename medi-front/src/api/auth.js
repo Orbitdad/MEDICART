@@ -38,6 +38,11 @@ export const doctorSignup = async (name, email, password) => {
   };
 };
 
+export const updateProfile = async (data) => {
+  const res = await client.put("/auth/doctor/profile", data);
+  return res.user;
+};
+
 /* =========================
    ADMIN AUTH
 ========================= */

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getRecentOrders } from "../../api/orders";
+import LoadingScreen from "../../components/LoadingScreen.jsx";
 import "./Orders.css";
 
 export default function DoctorOrders() {
@@ -20,7 +21,7 @@ export default function DoctorOrders() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="page-msg">Loading orders…</p>;
+  if (loading) return <LoadingScreen />;
 
   if (error)
     return <p className="page-msg error">{error}</p>;

@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import InitialLoadingScreen from "./components/InitialLoadingScreen.jsx";
 import Footer from "./components/Footer";
 
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 /* =========================
    DOCTOR PAGES
@@ -35,6 +36,7 @@ import PaymentEntry from "./pages/admin/PaymentEntry.jsx";
 function App() {
   return (
     <div className="app-root">
+      <ScrollToTop />
       {/* INITIAL LOADING SCREEN */}
       <InitialLoadingScreen />
 

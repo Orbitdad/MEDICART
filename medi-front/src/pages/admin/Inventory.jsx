@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { fetchInventorySummary } from "../../api/orders.js";
+import LoadingScreen from "../../components/LoadingScreen.jsx";
 import Medicines from "./Medicines.jsx";
 import PurchaseEntry from "./PurchaseEntry.jsx";
 
 function Inventory() {
   const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("overview"); // "overview" | "medicines" | "purchase"
 
@@ -15,9 +17,13 @@ function Inventory() {
         setSummary(data);
       } catch (err) {
         setError(err.message || "Failed to load inventory summary");
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
+
+  if (loading) return <LoadingScreen />;
 
   return (
     <main
@@ -39,11 +45,10 @@ function Inventory() {
           <button
             type="button"
             role="tab"
-            className={`button button-sm ${
-              activeTab === "overview"
+            className={`button button-sm ${activeTab === "overview"
                 ? "button-primary"
                 : "button-outline"
-            }`}
+              }`}
             aria-selected={activeTab === "overview"}
             onClick={() => setActiveTab("overview")}
           >
@@ -52,11 +57,10 @@ function Inventory() {
           <button
             type="button"
             role="tab"
-            className={`button button-sm ${
-              activeTab === "medicines"
+            className={`button button-sm ${activeTab === "medicines"
                 ? "button-primary"
                 : "button-outline"
-            }`}
+              }`}
             aria-selected={activeTab === "medicines"}
             onClick={() => setActiveTab("medicines")}
           >
@@ -65,11 +69,10 @@ function Inventory() {
           <button
             type="button"
             role="tab"
-            className={`button button-sm ${
-              activeTab === "purchase"
+            className={`button button-sm ${activeTab === "purchase"
                 ? "button-primary"
                 : "button-outline"
-            }`}
+              }`}
             aria-selected={activeTab === "purchase"}
             onClick={() => setActiveTab("purchase")}
           >
