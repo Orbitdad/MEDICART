@@ -130,7 +130,7 @@ export default function DoctorSignup() {
                 value={form.name}
                 onChange={handleChange}
                 className="input pl-9"
-                placeholder="Dr. Rahul Sharma"
+                placeholder=" Your  Name"
                 disabled={loading}
               />
             </div>
