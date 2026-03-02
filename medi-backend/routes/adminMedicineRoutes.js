@@ -24,7 +24,7 @@ router.post(
   adminCreateMedicine
 );
 
-router.put("/:id", protect(["admin"]), adminUpdateMedicine);
+router.put("/:id", protect(["admin"]), upload.array("images"), adminUpdateMedicine);
 
 router.delete("/:id", protect(["admin"]), adminDeleteMedicine);
 

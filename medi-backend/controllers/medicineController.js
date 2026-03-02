@@ -38,18 +38,18 @@ export const adminGetMedicines = async (req, res, next) => {
 ----------------------------------- */
 export const adminCreateMedicine = async (req, res, next) => {
   try {
-   const {
-  name,
-  brand,
-  description,
-  packaging,
-  mrp,
-  price,
-  gstPercent,
-  stock,
-  expiryDate,
-  category,
-} = req.body;
+    const {
+      name,
+      brand,
+      description,
+      packaging,
+      mrp,
+      price,
+      gstPercent,
+      stock,
+      expiryDate,
+      category,
+    } = req.body;
 
 
     /* ✅ HARD VALIDATION */
@@ -82,19 +82,19 @@ export const adminCreateMedicine = async (req, res, next) => {
       }
     }
 
-   const medicine = await Medicine.create({
-  name: name.trim(),
-  brand: brand?.trim(),
-  description: description?.trim(),
-  packaging: packaging?.trim(),
-  mrp: Number(mrp),
-  price: Number(price),
-  gstPercent: gstPercent ? Number(gstPercent) : 5,
-  stock: Number(stock),
-  expiryDate: new Date(expiryDate),
-  category,
-  images: imageUrls,
-});
+    const medicine = await Medicine.create({
+      name: name.trim(),
+      brand: brand?.trim(),
+      description: description?.trim(),
+      packaging: packaging?.trim(),
+      mrp: Number(mrp),
+      price: Number(price),
+      gstPercent: gstPercent ? Number(gstPercent) : 5,
+      stock: Number(stock),
+      expiryDate: new Date(expiryDate),
+      category,
+      images: imageUrls,
+    });
 
 
     res.status(201).json(medicine);
@@ -115,6 +115,7 @@ export const adminUpdateMedicine = async (req, res, next) => {
       "packaging",
       "mrp",
       "price",
+      "gstPercent",
       "stock",
       "expiryDate",
       "category",
@@ -132,17 +133,50 @@ export const adminUpdateMedicine = async (req, res, next) => {
       }
     }
 
+    /* --------------------------
+       HANDLE IMAGE REMOVALS
+    -------------------------- */
+    const medicine = await Medicine.findById(req.params.id);
+    if (!medicine) {
+      return res.status(404).json({ message: "Medicine not found" });
+    }
+
+    let currentImages = [...(medicine.images || [])];
+
+    // removedImages comes as a JSON string array of URLs to remove
+    if (req.body.removedImages) {
+      try {
+        const toRemove = JSON.parse(req.body.removedImages);
+        if (Array.isArray(toRemove)) {
+          currentImages = currentImages.filter(
+            (url) => !toRemove.includes(url)
+          );
+        }
+      } catch {
+        // ignore parse errors
+      }
+    }
+
+    /* --------------------------
+       UPLOAD NEW IMAGES
+    -------------------------- */
+    if (req.files?.length) {
+      for (const file of req.files) {
+        const result = await cloudinary.uploader.upload(
+          `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
+          { folder: "medicart/medicines" }
+        );
+        currentImages.push(result.secure_url);
+      }
+    }
+
+    updates.images = currentImages;
+
     const updated = await Medicine.findByIdAndUpdate(
       req.params.id,
       updates,
       { new: true, runValidators: true }
     );
-
-    if (!updated) {
-      return res.status(404).json({
-        message: "Medicine not found",
-      });
-    }
 
     res.json(updated);
   } catch (err) {

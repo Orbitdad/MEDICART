@@ -51,14 +51,11 @@ export const adminAddMedicine = async (formData) => {
 };
 
 /* UPDATE */
-export const adminUpdateMedicine = async (id, payload) => {
+export const adminUpdateMedicine = async (id, formData) => {
   const res = await fetch(`${BASE}/admin/medicines/${id}`, {
     method: "PUT",
-    headers: {
-      ...authHeader(),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
+    headers: authHeader(),
+    body: formData,
   });
 
   if (!res.ok) {

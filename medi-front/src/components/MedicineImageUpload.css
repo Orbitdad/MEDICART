@@ -1,0 +1,165 @@
+/* ============================
+   MEDICINE IMAGE UPLOAD STYLES
+   ============================ */
+
+/* Image column in tables */
+.img-cell {
+  width: 80px;
+  min-width: 80px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Thumbnail in table rows */
+.img-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid rgba(99, 102, 241, 0.15);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.img-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+}
+
+/* Placeholder when no image */
+.img-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a5b4fc;
+  font-size: 20px;
+  margin: 0 auto;
+}
+
+/* ============================
+   IMAGE UPLOAD ZONE (edit mode)
+   ============================ */
+.img-upload-zone {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+}
+
+/* Each uploaded / existing image */
+.img-upload-item {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid rgba(99, 102, 241, 0.15);
+  flex-shrink: 0;
+}
+.img-upload-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.img-upload-item .img-remove-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  border: none;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.img-upload-item:hover .img-remove-btn {
+  opacity: 1;
+}
+
+/* Add-image button */
+.img-add-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  border: 2px dashed #a5b4fc;
+  background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+  color: #6366f1;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  flex-shrink: 0;
+}
+.img-add-btn:hover {
+  border-color: #6366f1;
+  background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%);
+  transform: scale(1.08);
+}
+
+/* Small camera button for purchase entry rows */
+.img-cam-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1.5px dashed #c7d2fe;
+  background: #f5f3ff;
+  color: #6366f1;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin: 0 auto;
+}
+.img-cam-btn:hover {
+  border-color: #6366f1;
+  background: #e0e7ff;
+}
+
+/* Mini thumbnail for purchase rows */
+.img-mini-thumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1.5px solid #c7d2fe;
+  transition: transform 0.15s;
+  margin: 0 auto;
+  display: block;
+}
+.img-mini-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Upload status indicator */
+.img-uploading {
+  position: relative;
+}
+.img-uploading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  animation: imgPulse 1s ease-in-out infinite;
+}
+@keyframes imgPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}

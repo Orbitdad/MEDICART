@@ -1,19 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
+import ImageViewer from "../../components/ImageViewer.jsx";
 import {
   adminGetMedicines,
   adminUpdateMedicine,
   adminDeleteMedicine,
 } from "../../api/medicines.js";
+import "../../components/MedicineImageUpload.css";
 
 function Medicines() {
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [newImages, setNewImages] = useState([]);         // File objects to upload
+  const [removedImages, setRemovedImages] = useState([]); // URLs to remove
   const [loadingId, setLoadingId] = useState(null);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [previewImage, setPreviewImage] = useState(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     loadMedicines();
@@ -44,21 +50,68 @@ function Medicines() {
       packaging: m.packaging || "",
       mrp: m.mrp || "",
       price: m.price || "",
+      gstPercent: m.gstPercent ?? 5,
       stock: m.stock || "",
       expiryDate: m.expiryDate?.slice(0, 10) || "",
       category: m.category || "",
+      existingImages: [...(m.images || [])],
     });
+    setNewImages([]);
+    setRemovedImages([]);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
     setEditForm({});
+    setNewImages([]);
+    setRemovedImages([]);
+  };
+
+  const handleAddImages = (e) => {
+    const files = Array.from(e.target.files);
+    setNewImages((prev) => [...prev, ...files]);
+    e.target.value = "";
+  };
+
+  const handleRemoveExisting = (url) => {
+    setRemovedImages((prev) => [...prev, url]);
+    setEditForm((prev) => ({
+      ...prev,
+      existingImages: prev.existingImages.filter((u) => u !== url),
+    }));
+  };
+
+  const handleRemoveNew = (idx) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const saveEdit = async (id) => {
     setLoadingId(id);
     try {
-      await adminUpdateMedicine(id, editForm);
+      const fd = new FormData();
+
+      // Append text fields
+      const textFields = [
+        "name", "brand", "description", "packaging",
+        "mrp", "price", "gstPercent", "stock", "expiryDate", "category",
+      ];
+      for (const key of textFields) {
+        if (editForm[key] !== undefined && editForm[key] !== "") {
+          fd.append(key, editForm[key]);
+        }
+      }
+
+      // Append removed images
+      if (removedImages.length > 0) {
+        fd.append("removedImages", JSON.stringify(removedImages));
+      }
+
+      // Append new image files
+      for (const file of newImages) {
+        fd.append("images", file);
+      }
+
+      await adminUpdateMedicine(id, fd);
       cancelEdit();
       loadMedicines();
     } catch {
@@ -99,123 +152,215 @@ function Medicines() {
     : medicines;
 
   return (
-    <main className="admin-medicines" aria-label="Admin medicine management">
-      <div className="admin-header">
-        <h1>Medicine Management</h1>
-        <p className="text-muted">
-          View and edit existing medicines. To add new stock, use Purchase Entry.
-        </p>
-      </div>
+    <>
+      <main className="admin-medicines" aria-label="Admin medicine management">
+        <div className="admin-header">
+          <h1>Medicine Management</h1>
+          <p className="text-muted">
+            View and edit existing medicines. To add new stock, use Purchase Entry.
+          </p>
+        </div>
 
-      {/* ================= INVENTORY ================= */}
+        {error && (
+          <p className="text-sm" style={{ color: "#dc2626" }} role="alert">
+            {error}
+          </p>
+        )}
 
-      <div className="card">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-          <h3 className="card-title m-0">Inventory</h3>
+        {/* ================= INVENTORY ================= */}
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <input
-              className="input input-sm w-full sm:w-64"
-              type="text"
-              placeholder="Search by name, brand, category..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              aria-label="Search medicines"
-            />
+        <div className="card">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+            <h3 className="card-title m-0">Inventory</h3>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <input
+                className="input input-sm w-full sm:w-64"
+                type="text"
+                placeholder="Search by name, brand, category..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                aria-label="Search medicines"
+              />
+            </div>
+          </div>
+
+          <div className="table-wrapper">
+            <table
+              className="table admin-orders-table"
+              aria-label="Medicines inventory table"
+            >
+              <thead>
+                <tr>
+                  <th className="img-cell">Image</th>
+                  <th>Name</th>
+                  <th>Brand</th>
+                  <th>MRP</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Expiry</th>
+                  <th>Category</th>
+                  <th className="text-right">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredMedicines.map((m) => (
+                  <tr key={m._id}>
+                    {editingId === m._id ? (
+                      <>
+                        {/* IMAGE UPLOAD CELL */}
+                        <td className="img-cell">
+                          <div className="img-upload-zone">
+                            {/* Existing images */}
+                            {editForm.existingImages?.map((url, i) => (
+                              <div className="img-upload-item" key={`ex-${i}`}>
+                                <img
+                                  src={url}
+                                  alt={`medicine ${i + 1}`}
+                                  onClick={() => setPreviewImage(url)}
+                                />
+                                <button
+                                  type="button"
+                                  className="img-remove-btn"
+                                  title="Remove image"
+                                  onClick={() => handleRemoveExisting(url)}
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+
+                            {/* New images (preview) */}
+                            {newImages.map((file, i) => (
+                              <div className="img-upload-item" key={`new-${i}`}>
+                                <img
+                                  src={URL.createObjectURL(file)}
+                                  alt={`new ${i + 1}`}
+                                />
+                                <button
+                                  type="button"
+                                  className="img-remove-btn"
+                                  title="Remove image"
+                                  onClick={() => handleRemoveNew(i)}
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+
+                            {/* Add button */}
+                            <button
+                              type="button"
+                              className="img-add-btn"
+                              title="Add images"
+                              onClick={() => fileInputRef.current?.click()}
+                            >
+                              +
+                            </button>
+                            <input
+                              ref={fileInputRef}
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              hidden
+                              onChange={handleAddImages}
+                            />
+                          </div>
+                        </td>
+                        <td><input className="input" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} /></td>
+                        <td><input className="input" value={editForm.brand} onChange={(e) => setEditForm({ ...editForm, brand: e.target.value })} /></td>
+                        <td><input className="input" type="number" value={editForm.mrp} onChange={(e) => setEditForm({ ...editForm, mrp: e.target.value })} /></td>
+                        <td><input className="input" type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} /></td>
+                        <td><input className="input" type="number" value={editForm.stock} onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })} /></td>
+                        <td><input className="input" type="date" value={editForm.expiryDate} onChange={(e) => setEditForm({ ...editForm, expiryDate: e.target.value })} /></td>
+                        <td>
+                          <select className="input" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}>
+                            <option value="TAB">TAB</option>
+                            <option value="CAP">CAP</option>
+                            <option value="SYP">SYP</option>
+                            <option value="EE">EE</option>
+                            <option value="INJ">INJ</option>
+                            <option value="INSTR">INSTR</option>
+                          </select>
+                        </td>
+                        <td className="actions">
+                          <button
+                            type="button"
+                            className="button button-primary"
+                            disabled={loadingId === m._id}
+                            onClick={() => saveEdit(m._id)}
+                          >
+                            {loadingId === m._id ? "Saving…" : "Save"}
+                          </button>
+                          <button
+                            type="button"
+                            className="button button-outline"
+                            onClick={cancelEdit}
+                          >
+                            Cancel
+                          </button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        {/* IMAGE THUMBNAIL */}
+                        <td className="img-cell">
+                          {m.images?.length > 0 ? (
+                            <img
+                              className="img-thumb"
+                              src={m.images[0]}
+                              alt={m.name}
+                              onClick={() => setPreviewImage(m.images[0])}
+                            />
+                          ) : (
+                            <div className="img-placeholder" title="No image">
+                              📷
+                            </div>
+                          )}
+                        </td>
+                        <td>{m.name}</td>
+                        <td>{m.brand || "-"}</td>
+                        <td>₹{m.mrp}</td>
+                        <td>₹{m.price}</td>
+                        <td>{m.stock}</td>
+                        <td>{m.expiryDate ? new Date(m.expiryDate).toLocaleDateString() : "-"}</td>
+                        <td>{m.category}</td>
+                        <td className="actions">
+                          <button
+                            type="button"
+                            className="button button-outline"
+                            onClick={() => startEdit(m)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            className="button button-danger"
+                            disabled={loadingId === m._id}
+                            onClick={() => handleDelete(m._id)}
+                          >
+                            {loadingId === m._id ? "Deleting…" : "Delete"}
+                          </button>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
+      </main>
 
-        <div className="table-wrapper">
-          <table
-            className="table admin-orders-table"
-            aria-label="Medicines inventory table"
-          >
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Brand</th>
-                <th>MRP</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Expiry</th>
-                <th>Category</th>
-                <th className="text-right">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredMedicines.map((m) => (
-                <tr key={m._id}>
-                  {editingId === m._id ? (
-                    <>
-                      <td><input className="input" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} /></td>
-                      <td><input className="input" value={editForm.brand} onChange={(e) => setEditForm({ ...editForm, brand: e.target.value })} /></td>
-                      <td><input className="input" type="number" value={editForm.mrp} onChange={(e) => setEditForm({ ...editForm, mrp: e.target.value })} /></td>
-                      <td><input className="input" type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} /></td>
-                      <td><input className="input" type="number" value={editForm.stock} onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })} /></td>
-                      <td><input className="input" type="date" value={editForm.expiryDate} onChange={(e) => setEditForm({ ...editForm, expiryDate: e.target.value })} /></td>
-                      <td>
-                        <select className="input" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}>
-                          <option value="TAB">TAB</option>
-                          <option value="CAP">CAP</option>
-                          <option value="SYP">SYP</option>
-                          <option value="EE">EE</option>
-                          <option value="INJ">INJ</option>
-                          <option value="INSTR">INSTR</option>
-                        </select>
-                      </td>
-                      <td className="actions">
-                        <button
-                          type="button"
-                          className="button button-primary"
-                          onClick={() => saveEdit(m._id)}
-                        >
-                          Save
-                        </button>
-                        <button
-                          type="button"
-                          className="button button-outline"
-                          onClick={cancelEdit}
-                        >
-                          Cancel
-                        </button>
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td>{m.name}</td>
-                      <td>{m.brand || "-"}</td>
-                      <td>₹{m.mrp}</td>
-                      <td>₹{m.price}</td>
-                      <td>{m.stock}</td>
-                      <td>{m.expiryDate ? new Date(m.expiryDate).toLocaleDateString() : "-"}</td>
-                      <td>{m.category}</td>
-                      <td className="actions">
-                        <button
-                          type="button"
-                          className="button button-outline"
-                          onClick={() => startEdit(m)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          className="button button-danger"
-                          disabled={loadingId === m._id}
-                          onClick={() => handleDelete(m._id)}
-                        >
-                          {loadingId === m._id ? "Deleting…" : "Delete"}
-                        </button>
-                      </td>
-                    </>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </main>
+      {/* IMAGE PREVIEW MODAL */}
+      {previewImage && (
+        <ImageViewer
+          src={previewImage}
+          onClose={() => setPreviewImage(null)}
+        />
+      )}
+    </>
   );
 }
 

@@ -12,6 +12,7 @@ import adminAuthRoutes from "./routes/adminAuthRoutes.js";
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 import adminMedicineRoutes from "./routes/adminMedicineRoutes.js";
 import adminPaymentRoutes from "./routes/adminPaymentRoutes.js";
+import adminPurchaseRoutes from "./routes/adminPurchaseRoutes.js";
 import doctorAuthRoutes from "./routes/doctorAuthRoutes.js";
 import medicineRoutes from "./routes/medicineRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
@@ -54,6 +55,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/admin/medicines", adminMedicineRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/payments", adminPaymentRoutes); // ✅ NEW ROUTE
+app.use("/api/admin/purchases", adminPurchaseRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/payment", paymentRoutes);
 
