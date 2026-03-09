@@ -4,11 +4,6 @@ import { v2 as cloudinary } from "cloudinary";
 // FORCE load env here (important for ES modules)
 dotenv.config();
 
-console.log("Cloudinary ENV check:", {
-  cloud: process.env.CLOUDINARY_CLOUD_NAME,
-  key: process.env.CLOUDINARY_API_KEY,
-  secret: process.env.CLOUDINARY_API_SECRET ? "LOADED" : "MISSING",
-});
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

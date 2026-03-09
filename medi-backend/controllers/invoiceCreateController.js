@@ -37,12 +37,12 @@ export const createInvoice = async (orderId) => {
       amount: item.price * item.quantity,
     })),
 
-    taxableAmount: order.taxableAmount,
-    sgstAmount: order.sgstAmount,
-    cgstAmount: order.cgstAmount,
-    igstAmount: order.igstAmount || 0,
+    taxableAmount: order.billing.taxableAmount,
+    sgstAmount: order.billing.sgstAmount,
+    cgstAmount: order.billing.cgstAmount,
+    igstAmount: 0,
 
-    totalAmount: order.totalAmount,
+    totalAmount: order.billing.finalAmount,
   });
 
   return invoice;

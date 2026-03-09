@@ -6,6 +6,3 @@ const router = express.Router();
 router.get("/", getMedicines);
 
 export default router;
-
-
-

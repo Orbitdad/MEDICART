@@ -83,8 +83,6 @@ export function AuthProvider({ children }) {
 
     setToken(null);
     setRole(null);
-    setToken(null);
-    setRole(null);
     setUser(null);
   };
 

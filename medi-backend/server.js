@@ -42,8 +42,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
-app.use("/api/invoice", invoiceRoutes);
-
 
 /* ROUTES */
 app.use("/api/auth/admin", adminAuthRoutes);

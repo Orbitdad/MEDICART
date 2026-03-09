@@ -143,12 +143,39 @@ export const createPurchase = async (req, res, next) => {
             createdBy: req.user?._id,
         });
 
-        /* ── Update Medicine stock for matching items ── */
+        /* ── Update / create Medicine stock for each item ── */
+        const validCategories = ["SYP", "TAB", "CAP", "EE", "INJ", "INSTR"];
+
         for (const item of itemDocs) {
             if (item.itemName) {
+                const stockDelta = item.qty + (item.free || 0);
+                const inferredCategory = validCategories.includes(
+                    (item.pkg || "").toUpperCase()
+                )
+                    ? (item.pkg || "").toUpperCase()
+                    : "TAB";
+
                 await Medicine.findOneAndUpdate(
                     { name: { $regex: `^${item.itemName.trim()}$`, $options: "i" } },
-                    { $inc: { stock: item.qty + (item.free || 0) } }
+                    {
+                        $inc: { stock: stockDelta },
+                        $setOnInsert: {
+                            name: item.itemName.trim(),
+                            brand: item.mfr || "Unknown",
+                            mrp: item.mrp || 0,
+                            price: item.salePrice || item.billRate || item.mrp || 0,
+                            gstPercent: item.gstPercent || 5,
+                            expiryDate: item.exp
+                                ? new Date(item.exp)
+                                : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+                            category: inferredCategory,
+                            images: item.imageUrl ? [item.imageUrl] : [],
+                            description: "",
+                            packaging: item.pkg || "",
+                            isActive: true,
+                        },
+                    },
+                    { upsert: true, new: true }
                 );
             }
         }

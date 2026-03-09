@@ -98,10 +98,6 @@ export const placeOrder = async (req, res) => {
         finalAmount,
       },
 
-      subTotal,
-      gstAmount: gstTotal,
-      totalAmount: finalAmount,
-
       paymentMode,
       paymentStatus: paymentMode === "online" ? "paid" : "pending",
 

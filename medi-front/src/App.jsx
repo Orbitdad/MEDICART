@@ -98,7 +98,6 @@ function App() {
             <Route path="/admin/orders" element={<Orders />} />
             <Route path="/admin/medicines" element={<Medicines />} />
             <Route path="/admin/inventory" element={<Inventory />} />
-            <Route path="/admin/inventory" element={<Inventory />} />
             <Route path="/admin/purchase" element={<PurchaseEntry />} />
             <Route path="/admin/payments" element={<PaymentEntry />} />
           </Route>
