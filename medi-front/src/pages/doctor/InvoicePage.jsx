@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./Invoice.css";
-import axios from "axios";
+import client from "../../api/client.js";
 
 export default function InvoicePage() {
   const { id } = useParams();
@@ -20,19 +20,12 @@ export default function InvoicePage() {
 
   async function fetchInvoice() {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/invoice/by-order/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("medicart_token")}`,
-          },
-        }
-      );
-      setInvoice(res.data);
+      const data = await client.get(`/invoices/by-order/${id}`);
+      setInvoice(data);
     } catch (err) {
       console.error("Invoice fetch error:", err);
       setError(
-        err?.response?.data?.message || "Failed to load invoice."
+        err?.message || "Failed to load invoice."
       );
     }
   }
