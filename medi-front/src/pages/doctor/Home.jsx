@@ -37,7 +37,7 @@ export default function DoctorHome() {
             id: o._id,
             payStatus: o.paymentStatus,
             payMode: o.paymentMode,
-            total: o.totalAmount,
+            total: o.billing?.finalAmount,
             billingFinal: o.billing?.finalAmount
           })));
           setRecentOrders(res);
@@ -164,7 +164,7 @@ export default function DoctorHome() {
                 ₹
                 {recentOrders
                   .filter((o) => o?.paymentStatus === "pending")
-                  .reduce((sum, o) => sum + (o.totalAmount || o.billing?.finalAmount || 0), 0)
+                  .reduce((sum, o) => sum + (o.billing?.finalAmount || 0), 0)
                   .toFixed(2)}
               </p>
             </div>

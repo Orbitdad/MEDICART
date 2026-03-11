@@ -25,16 +25,11 @@ export default function Footer() {
             <li>
               <Link to="/doctor/orders">My Orders</Link>
             </li>
-            {/* Placeholder links – pages not yet implemented */}
             <li>
-              <button className="footer-link-button" type="button" disabled>
-                Contact Support
-              </button>
+              <Link to="/contact">Contact Support</Link>
             </li>
             <li>
-              <button className="footer-link-button" type="button" disabled>
-                About MediCart
-              </button>
+              <Link to="/about">About MediCart</Link>
             </li>
           </ul>
         </div>
@@ -43,9 +38,9 @@ export default function Footer() {
         <div className="footer-col">
           <h4>Legal</h4>
           <ul>
-            <li><a href="/privacy-policy">Privacy Policy</a></li>
-            <li><a href="/terms">Terms & Conditions</a></li>
-            <li><a href="/refund-policy">Refund Policy</a></li>
+            <li><Link to="/privacy-policy">Privacy Policy</Link></li>
+            <li><Link to="/terms">Terms &amp; Conditions</Link></li>
+            <li><Link to="/refund-policy">Refund Policy</Link></li>
           </ul>
         </div>
 
@@ -54,8 +49,8 @@ export default function Footer() {
           <h4>Support</h4>
           <p>
             Email:{" "}
-            <a href="mailto:support@medicart.com">
-              support@medicart.com
+            <a href="mailto:shreesaisurgical16@yahoo.in">
+              shreesaisurgical16@yahoo.in
             </a>
           </p>
           <p>Mon – Sat: 9:00 AM – 7:00 PM</p>

@@ -72,7 +72,7 @@ export default function PaymentEntry() {
 
             setMessage({
                 type: "success",
-                text: `Payment applied! ${res.paidOrders.length} orders marked as paid. Remaining excess: ₹${res.remainingExcess}`
+                text: `Payment of ₹${paymentAmount} applied! ${res.paidOrders.length} order(s) fully paid${res.partiallyPaidOrders?.length ? `, ${res.partiallyPaidOrders.length} partially paid` : ''}. Remaining excess: ₹${res.remainingExcess}`
             });
 
             // Refresh due details

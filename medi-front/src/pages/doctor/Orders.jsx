@@ -57,7 +57,6 @@ export default function DoctorOrders() {
             <strong>Total</strong>
             <p>
               ₹{(
-                order.totalAmount ??
                 order.billing?.finalAmount ??
                 0
               ).toFixed(2)}

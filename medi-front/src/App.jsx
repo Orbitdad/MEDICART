@@ -33,6 +33,15 @@ import Inventory from "./pages/admin/Inventory.jsx";
 import PurchaseEntry from "./pages/admin/PurchaseEntry.jsx";
 import PaymentEntry from "./pages/admin/PaymentEntry.jsx";
 
+/* =========================
+   PUBLIC PAGES
+========================= */
+import ContactSupport from "./pages/public/ContactSupport.jsx";
+import AboutMediCart from "./pages/public/AboutMediCart.jsx";
+import PrivacyPolicy from "./pages/public/PrivacyPolicy.jsx";
+import TermsAndConditions from "./pages/public/TermsAndConditions.jsx";
+import RefundPolicy from "./pages/public/RefundPolicy.jsx";
+
 function App() {
   return (
     <div className="app-root">
@@ -101,6 +110,13 @@ function App() {
             <Route path="/admin/purchase" element={<PurchaseEntry />} />
             <Route path="/admin/payments" element={<PaymentEntry />} />
           </Route>
+
+          {/* PUBLIC PAGES */}
+          <Route path="/contact" element={<ContactSupport />} />
+          <Route path="/about" element={<AboutMediCart />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
 
           {/* 404 */}
           <Route

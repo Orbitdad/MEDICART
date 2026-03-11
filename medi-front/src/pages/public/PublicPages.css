@@ -1,0 +1,362 @@
+/* ===========================
+   PUBLIC / LEGAL PAGES
+=========================== */
+
+.public-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+}
+
+/* Hero Header */
+.public-hero {
+  text-align: center;
+  padding: 2.5rem 1rem 2rem;
+}
+
+.public-hero-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(124,58,237,0.12) 100%);
+  color: var(--primary);
+}
+
+.public-hero h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.4rem;
+}
+
+.public-hero p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Content Area */
+.public-content {
+  animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===========================
+   LEGAL PAGES
+=========================== */
+.legal-content {
+  padding: 2rem 2.5rem;
+  line-height: 1.75;
+  color: #334155;
+}
+
+.legal-content section {
+  margin-bottom: 2rem;
+}
+
+.legal-content section:last-child {
+  margin-bottom: 0;
+}
+
+.legal-content h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid rgba(37,99,235,0.1);
+}
+
+.legal-content h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 1rem 0 0.4rem;
+}
+
+.legal-content p {
+  margin: 0 0 0.6rem;
+}
+
+.legal-content ul, .legal-content ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.legal-content li {
+  margin-bottom: 0.35rem;
+}
+
+.legal-content a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.legal-content a:hover {
+  text-decoration: underline;
+}
+
+/* ===========================
+   CONTACT PAGE
+=========================== */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.contact-info-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.info-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.info-card h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0 0 0.15rem;
+}
+
+.info-card p,
+.info-card a {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+  text-decoration: none;
+}
+
+.info-card a:hover {
+  color: var(--primary);
+}
+
+/* Contact Form */
+.contact-form-card {
+  padding: 2rem;
+}
+
+.form-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.form-group label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.form-success {
+  text-align: center;
+  padding: 2rem;
+}
+
+.success-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(22,163,74,0.12);
+  color: #16a34a;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.form-success h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.4rem;
+}
+
+.form-success p {
+  color: var(--text-muted);
+}
+
+/* ===========================
+   ABOUT PAGE
+=========================== */
+.about-section {
+  margin-bottom: 2.5rem;
+}
+
+.about-section h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
+
+.about-lead {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #475569;
+  max-width: 720px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.feature-card {
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.1) 0%, rgba(124,58,237,0.1) 100%);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.feature-card h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.feature-card p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Stats */
+.about-stats-section {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(99,102,241,0.12);
+}
+
+.about-stat {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-caption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 768px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .about-stats-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .legal-content {
+    padding: 1.5rem;
+  }
+
+  .public-hero h1 {
+    font-size: 1.5rem;
+  }
+}

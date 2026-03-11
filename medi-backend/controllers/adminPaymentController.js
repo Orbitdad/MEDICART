@@ -42,7 +42,11 @@ export const getDoctorDue = async (req, res) => {
             paymentStatus: "pending"
         });
 
-        const totalDue = orders.reduce((sum, o) => sum + (o.totalAmount || o.billing?.finalAmount || 0), 0);
+        const totalDue = orders.reduce((sum, o) => {
+            const orderTotal = o.billing?.finalAmount || 0;
+            const alreadyPaid = o.paidAmount || 0;
+            return sum + (orderTotal - alreadyPaid);
+        }, 0);
 
         res.json({
             doctorId: id,
@@ -66,8 +70,7 @@ export const deductPayment = async (req, res) => {
             return res.status(400).json({ message: "Invalid data" });
         }
 
-        // 1. Fetch pending orders sorted by Date (Oldest first)
-        // We want to clear strict debts first.
+        // Fetch pending orders sorted oldest-first (FIFO)
         const orders = await Order.find({
             doctor: doctorId,
             paymentStatus: "pending"
@@ -75,29 +78,40 @@ export const deductPayment = async (req, res) => {
 
         let remaining = Number(amount);
         let paidOrderIds = [];
+        let partiallyPaidOrderIds = [];
 
         for (let order of orders) {
-            const orderTotal = order.totalAmount || order.billing?.finalAmount || 0;
+            if (remaining <= 0) break;
 
-            if (remaining >= orderTotal) {
-                // Pay this order fully
+            const orderTotal = order.billing?.finalAmount || 0;
+            const alreadyPaid = order.paidAmount || 0;
+            const orderRemaining = orderTotal - alreadyPaid;
+
+            if (orderRemaining <= 0) continue; // already covered
+
+            if (remaining >= orderRemaining) {
+                // Payment covers the full remaining balance of this order
                 order.paymentStatus = "paid";
+                order.paidAmount = orderTotal;
                 await order.save();
 
-                remaining -= orderTotal;
+                remaining -= orderRemaining;
                 paidOrderIds.push(order._id);
             } else {
-                // Cannot pay full order, stop here
-                // (Unless we support partial, but User requested "deduct from total", 
-                // implies clearing orders. Standard practice: clear whole orders first)
-                break;
+                // Partial payment — apply what we can
+                order.paidAmount = alreadyPaid + remaining;
+                await order.save();
+
+                remaining = 0;
+                partiallyPaidOrderIds.push(order._id);
             }
         }
 
         res.json({
             message: "Payment applied",
             paidOrders: paidOrderIds,
-            remainingExcess: remaining, // Amount that couldn't cover a full order
+            partiallyPaidOrders: partiallyPaidOrderIds,
+            remainingExcess: remaining,
             totalProcessed: Number(amount) - remaining
         });
 
