@@ -203,3 +203,20 @@ export const adminDeleteMedicine = async (req, res, next) => {
     next(err);
   }
 };
+
+/* ----------------------------------
+   ADMIN: DELETE ALL OUT-OF-STOCK
+----------------------------------- */
+export const adminDeleteOutOfStock = async (req, res, next) => {
+  try {
+    const result = await Medicine.deleteMany({ stock: 0 });
+
+    res.json({
+      success: true,
+      deletedCount: result.deletedCount,
+      message: `${result.deletedCount} out-of-stock medicine(s) deleted`,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

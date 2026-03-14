@@ -4,6 +4,7 @@ import {
   adminCreateMedicine,
   adminUpdateMedicine,
   adminDeleteMedicine,
+  adminDeleteOutOfStock,
 } from "../controllers/medicineController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -23,6 +24,8 @@ router.post(
   upload.array("images"),
   adminCreateMedicine
 );
+
+router.delete("/out-of-stock", protect(["admin"]), adminDeleteOutOfStock);
 
 router.put("/:id", protect(["admin"]), upload.array("images"), adminUpdateMedicine);
 
