@@ -47,9 +47,9 @@ function Medicines() {
     setEditingId(m._id);
     setEditForm({
       name: m.name || "",
-      brand: m.brand || "",
+      company: m.company || m.brand || "",
       description: m.description || "",
-      packaging: m.packaging || "",
+      packing: m.packing || m.packaging || "",
       mrp: m.mrp || "",
       price: m.price || "",
       gstPercent: m.gstPercent ?? 5,
@@ -94,7 +94,7 @@ function Medicines() {
 
       // Append text fields
       const textFields = [
-        "name", "brand", "description", "packaging",
+        "name", "company", "description", "packing",
         "mrp", "price", "gstPercent", "stock", "expiryDate", "category",
       ];
       for (const key of textFields) {
@@ -170,12 +170,14 @@ function Medicines() {
   const filteredMedicines = normalizedSearch
     ? medicines.filter((m) => {
       const name = (m.name || "").toLowerCase();
-      const brand = (m.brand || "").toLowerCase();
+      const company = (m.company || m.brand || "").toLowerCase();
       const category = (m.category || "").toLowerCase();
+      const packing = (m.packing || m.packaging || "").toLowerCase();
       return (
         name.includes(normalizedSearch) ||
-        brand.includes(normalizedSearch) ||
-        category.includes(normalizedSearch)
+        company.includes(normalizedSearch) ||
+        category.includes(normalizedSearch) ||
+        packing.includes(normalizedSearch)
       );
     })
     : medicines;
@@ -232,7 +234,8 @@ function Medicines() {
                 <tr>
                   <th className="img-cell">Image</th>
                   <th>Name</th>
-                  <th>Brand</th>
+                  <th>Company</th>
+                  <th>Packing</th>
                   <th>MRP</th>
                   <th>Price</th>
                   <th>Stock</th>
@@ -307,7 +310,8 @@ function Medicines() {
                           </div>
                         </td>
                         <td><input className="input" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} /></td>
-                        <td><input className="input" value={editForm.brand} onChange={(e) => setEditForm({ ...editForm, brand: e.target.value })} /></td>
+                        <td><input className="input" value={editForm.company} onChange={(e) => setEditForm({ ...editForm, company: e.target.value })} /></td>
+                        <td><input className="input" value={editForm.packing} onChange={(e) => setEditForm({ ...editForm, packing: e.target.value })} /></td>
                         <td><input className="input" type="number" value={editForm.mrp} onChange={(e) => setEditForm({ ...editForm, mrp: e.target.value })} /></td>
                         <td><input className="input" type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} /></td>
                         <td><input className="input" type="number" value={editForm.stock} onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })} /></td>
@@ -358,7 +362,8 @@ function Medicines() {
                           )}
                         </td>
                         <td>{m.name}</td>
-                        <td>{m.brand || "-"}</td>
+                        <td>{m.company || m.brand || "-"}</td>
+                        <td>{m.packing || m.packaging || "-"}</td>
                         <td>₹{m.mrp}</td>
                         <td>₹{m.price}</td>
                         <td>{m.stock}</td>

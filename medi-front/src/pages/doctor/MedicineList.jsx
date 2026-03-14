@@ -64,9 +64,9 @@ useEffect(() => {
     filtered = filtered.filter((m) => {
       const searchableText = `
         ${m.name || ""}
-        ${m.brand || ""}
+        ${m.company || ""} ${m.brand || ""}
         ${m.description || ""}
-        ${m.packaging || ""}
+        ${m.packing || ""} ${m.packaging || ""}
       `.toLowerCase();
 
       return searchableText.includes(keyword);

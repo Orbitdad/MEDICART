@@ -67,8 +67,8 @@ export const placeOrder = async (req, res) => {
 
         // 👇 required for invoice
         name: medicine.name,
-        brand: medicine.brand,
-        packaging: medicine.packaging,
+        company: medicine.company || medicine.brand || "",
+        packaging: medicine.packing || medicine.packaging || "",
         mrp: medicine.mrp,
         expiryDate: medicine.expiryDate,
 
@@ -125,7 +125,7 @@ export const placeOrder = async (req, res) => {
 
       items: orderItems.map((it) => ({
         name: it.name || "",
-        company: it.brand || "",
+        company: it.company || "",
         packaging: it.packaging || "",
         expiry: "",
         qty: it.quantity,

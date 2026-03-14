@@ -47,18 +47,18 @@ export default function MedicineCard({ med }) {
             {med?.name || "Unnamed medicine"}
           </p>
 
-          {/* BRAND */}
+          {/* COMPANY */}
           <p className="medicine-brand">
-                               <span className="label">co:   </span>
+                               <span className="label">Co:   </span>
 
-            {med?.brand || "—"}
+            {med?.company || med?.brand || "—"}
           </p>
 
-          {/* PACKAGING */}
-          {med?.packaging && (
+          {/* PACKING */}
+          {(med?.packing || med?.packaging) && (
             <p className="medicine-packaging">
                     <span className="label">Pack of:   </span>
-{med.packaging}
+{med.packing || med.packaging}
             </p>
           )}
 

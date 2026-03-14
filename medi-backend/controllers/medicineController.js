@@ -6,15 +6,18 @@ import cloudinary from "../config/cloudinary.js";
 ----------------------------------- */
 export const getMedicines = async (req, res, next) => {
   try {
-    const q = req.query.search
-      ? { name: { $regex: req.query.search, $options: "i" } }
-      : {};
+    const filter = { stock: { $gt: 0 } };
 
-    const medicines = await Medicine.find({
-      ...q,
-      isActive: { $ne: false },
-      stock: { $gt: 0 },
-    }).sort({ name: 1 });
+    if (req.query.search) {
+      const regex = { $regex: req.query.search, $options: "i" };
+      filter.$or = [
+        { name: regex },
+        { company: regex },
+        { brand: regex },
+      ];
+    }
+
+    const medicines = await Medicine.find(filter).sort({ name: 1 });
 
     res.json(medicines);
   } catch (err) {
@@ -42,10 +45,15 @@ export const adminCreateMedicine = async (req, res, next) => {
     const {
       name,
       brand,
+      company,
+      companyCode,
+      itemCode,
       description,
       packaging,
+      packing,
       mrp,
       price,
+      cost,
       gstPercent,
       stock,
       expiryDate,
@@ -85,14 +93,19 @@ export const adminCreateMedicine = async (req, res, next) => {
 
     const medicine = await Medicine.create({
       name: name.trim(),
-      brand: brand?.trim(),
-      description: description?.trim(),
-      packaging: packaging?.trim(),
+      brand: brand?.trim() || "",
+      company: company?.trim() || "",
+      companyCode: companyCode?.trim() || "",
+      itemCode: itemCode?.trim() || "",
+      description: description?.trim() || "",
+      packaging: packaging?.trim() || "",
+      packing: packing?.trim() || "",
       mrp: Number(mrp),
       price: Number(price),
+      cost: cost ? Number(cost) : 0,
       gstPercent: gstPercent ? Number(gstPercent) : 5,
       stock: Number(stock),
-      expiryDate: new Date(expiryDate),
+      expiryDate: expiryDate ? new Date(expiryDate) : undefined,
       category,
       images: imageUrls,
     });
@@ -112,10 +125,15 @@ export const adminUpdateMedicine = async (req, res, next) => {
     const allowedFields = [
       "name",
       "brand",
+      "company",
+      "companyCode",
+      "itemCode",
       "description",
       "packaging",
+      "packing",
       "mrp",
       "price",
+      "cost",
       "gstPercent",
       "stock",
       "expiryDate",

@@ -11,9 +11,26 @@ const medicineSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // Old field (manually-created via GPT)
     brand: {
       type: String,
-      required: true,
+      default: "",
+    },
+
+    // New field (imported backup JSON) — equivalent of brand
+    company: {
+      type: String,
+      default: "",
+    },
+
+    companyCode: {
+      type: String,
+      default: "",
+    },
+
+    itemCode: {
+      type: String,
+      default: "",
     },
 
     description: {
@@ -21,7 +38,14 @@ const medicineSchema = new mongoose.Schema(
       default: "",
     },
 
+    // Old field (manually-created via GPT)
     packaging: {
+      type: String,
+      default: "",
+    },
+
+    // New field (imported backup JSON) — equivalent of packaging
+    packing: {
       type: String,
       default: "",
     },
@@ -42,6 +66,13 @@ const medicineSchema = new mongoose.Schema(
       default: 0, // 🔥 SAFETY: prevents NaN
     },
 
+    // Purchase cost (from imported backup)
+    cost: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
     gstPercent: {
       type: Number,
       default: 5, // 🔥 SAFETY: always defined
@@ -60,7 +91,6 @@ const medicineSchema = new mongoose.Schema(
 
     expiryDate: {
       type: Date,
-      required: true,
     },
 
     /* --------------------
