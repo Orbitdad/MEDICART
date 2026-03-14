@@ -5,6 +5,7 @@ import {
   adminGetMedicines,
   adminUpdateMedicine,
   adminDeleteMedicine,
+  adminDeleteOutOfStock,
 } from "../../api/medicines.js";
 import "../../components/MedicineImageUpload.css";
 
@@ -16,6 +17,7 @@ function Medicines() {
   const [newImages, setNewImages] = useState([]);         // File objects to upload
   const [removedImages, setRemovedImages] = useState([]); // URLs to remove
   const [loadingId, setLoadingId] = useState(null);
+  const [deletingOOS, setDeletingOOS] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
@@ -137,6 +139,33 @@ function Medicines() {
     }
   };
 
+  /* ================= DELETE OUT-OF-STOCK ================= */
+
+  const handleDeleteOutOfStock = async () => {
+    const oosCount = medicines.filter((m) => m.stock === 0).length;
+    if (oosCount === 0) {
+      alert("No out-of-stock medicines found.");
+      return;
+    }
+    if (
+      !window.confirm(
+        `Delete ${oosCount} out-of-stock medicine(s) permanently? This cannot be undone.`
+      )
+    )
+      return;
+
+    setDeletingOOS(true);
+    try {
+      const result = await adminDeleteOutOfStock();
+      alert(result.message || "Out-of-stock medicines deleted.");
+      loadMedicines();
+    } catch {
+      alert("Failed to delete out-of-stock medicines.");
+    } finally {
+      setDeletingOOS(false);
+    }
+  };
+
   const normalizedSearch = search.trim().toLowerCase();
   const filteredMedicines = normalizedSearch
     ? medicines.filter((m) => {
@@ -182,6 +211,15 @@ function Medicines() {
                 onChange={(e) => setSearch(e.target.value)}
                 aria-label="Search medicines"
               />
+              <button
+                type="button"
+                className="button button-sm button-danger"
+                disabled={deletingOOS}
+                onClick={handleDeleteOutOfStock}
+                title="Delete all medicines with 0 stock"
+              >
+                {deletingOOS ? "Deleting…" : "Delete Out-of-Stock"}
+              </button>
             </div>
           </div>
 

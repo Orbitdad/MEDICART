@@ -78,3 +78,17 @@ export const adminDeleteMedicine = async (id) => {
 
   return res.json();
 };
+
+/* DELETE OUT-OF-STOCK */
+export const adminDeleteOutOfStock = async () => {
+  const res = await fetch(`${BASE}/admin/medicines/out-of-stock`, {
+    method: "DELETE",
+    headers: authHeader(),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete out-of-stock medicines");
+  }
+
+  return res.json();
+};
