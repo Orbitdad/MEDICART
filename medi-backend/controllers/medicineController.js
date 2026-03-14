@@ -12,7 +12,7 @@ export const getMedicines = async (req, res, next) => {
 
     const medicines = await Medicine.find({
       ...q,
-      isActive: true,
+      isActive: { $ne: false },
     }).sort({ name: 1 });
 
     res.json(medicines);
