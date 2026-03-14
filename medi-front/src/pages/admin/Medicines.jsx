@@ -235,6 +235,7 @@ function Medicines() {
                   <th className="img-cell">Image</th>
                   <th>Name</th>
                   <th>Company</th>
+                  <th>Info</th>
                   <th>Packing</th>
                   <th>MRP</th>
                   <th>Price</th>
@@ -311,6 +312,7 @@ function Medicines() {
                         </td>
                         <td><input className="input" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} /></td>
                         <td><input className="input" value={editForm.company} onChange={(e) => setEditForm({ ...editForm, company: e.target.value })} /></td>
+                        <td><input className="input" value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} placeholder="Product info" /></td>
                         <td><input className="input" value={editForm.packing} onChange={(e) => setEditForm({ ...editForm, packing: e.target.value })} /></td>
                         <td><input className="input" type="number" value={editForm.mrp} onChange={(e) => setEditForm({ ...editForm, mrp: e.target.value })} /></td>
                         <td><input className="input" type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} /></td>
@@ -363,6 +365,7 @@ function Medicines() {
                         </td>
                         <td>{m.name}</td>
                         <td>{m.company || m.brand || "-"}</td>
+                        <td>{m.description || "-"}</td>
                         <td>{m.packing || m.packaging || "-"}</td>
                         <td>₹{m.mrp}</td>
                         <td>₹{m.price}</td>

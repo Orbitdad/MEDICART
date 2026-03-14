@@ -62,14 +62,11 @@ export default function MedicineCard({ med }) {
             </p>
           )}
 
-          {/* DESCRIPTION */}
-          {med?.description && (
-            <p className="medicine-desc">
+          {/* DESCRIPTION / INFO */}
+          <p className="medicine-desc">
                    <span className="label">Info:   </span>
-                   {med.description}
-
-            </p>
-          )}
+                   {med?.description || "—"}
+          </p>
 
 {/* PRICE */}
 <div className="medicine-price-box">
