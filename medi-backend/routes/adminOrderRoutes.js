@@ -12,6 +12,14 @@ import { protect } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 /* ADMIN ONLY */
+
+/* ⚠️ Specific literal paths MUST come before parameterised /:id routes */
+router.get(
+  "/inventory",
+  protect(["admin"]),
+  inventorySummary
+);
+
 router.get(
   "/",
   protect(["admin"]),
@@ -35,12 +43,6 @@ router.put(
   "/:id/complete",
   protect(["admin"]),
   adminMarkOrderCompleted
-);
-
-router.get(
-  "/inventory",
-  protect(["admin"]),
-  inventorySummary
 );
 
 export default router;

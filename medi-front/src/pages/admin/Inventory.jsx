@@ -10,17 +10,21 @@ function Inventory() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("overview"); // "overview" | "medicines" | "purchase"
 
+  const loadSummary = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await fetchInventorySummary();
+      setSummary(data);
+    } catch (err) {
+      setError(err.message || "Failed to load inventory summary");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await fetchInventorySummary();
-        setSummary(data);
-      } catch (err) {
-        setError(err.message || "Failed to load inventory summary");
-      } finally {
-        setLoading(false);
-      }
-    })();
+    loadSummary();
   }, []);
 
   if (loading) return <LoadingScreen />;
@@ -89,14 +93,22 @@ function Inventory() {
           aria-label="Inventory overview metrics"
         >
           {error && (
-            <p
-              className="text-sm"
+            <div
+              className="text-sm flex gap-2 align-items-center"
               style={{ color: "#dc2626" }}
               role="alert"
               aria-live="assertive"
             >
-              {error}
-            </p>
+              <span>{error}</span>
+              <button
+                type="button"
+                className="button button-sm button-outline"
+                onClick={loadSummary}
+                style={{ marginLeft: "0.5rem" }}
+              >
+                Retry
+              </button>
+            </div>
           )}
 
           {summary ? (

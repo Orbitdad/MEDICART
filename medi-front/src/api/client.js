@@ -15,11 +15,11 @@ function buildHeaders() {
 }
 
 /* =========================
-   SAFE FETCH (MOBILE FIX)
+   SAFE FETCH (MOBILE FIX + RENDER COLD START)
 ========================= */
-async function safeFetch(url, options = {}) {
+async function safeFetch(url, options = {}, retries = 1) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000); // ⏱️ 15s
+  const timeout = setTimeout(() => controller.abort(), 30000); // ⏱️ 30s for Render cold starts
 
   try {
     const res = await fetch(url, {
@@ -30,7 +30,18 @@ async function safeFetch(url, options = {}) {
     return res;
   } catch (err) {
     if (err.name === "AbortError") {
+      // Retry once: Render free-tier cold start can take ~20-30s
+      if (retries > 0) {
+        clearTimeout(timeout);
+        return safeFetch(url, options, retries - 1);
+      }
       throw new Error("Server timeout. Please try again.");
+    }
+
+    // Network error — also retry once
+    if (retries > 0) {
+      clearTimeout(timeout);
+      return safeFetch(url, options, retries - 1);
     }
 
     throw new Error(
