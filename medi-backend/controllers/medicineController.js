@@ -199,6 +199,7 @@ export const adminUpdateMedicine = async (req, res, next) => {
 
     res.json(updated);
   } catch (err) {
+    console.error("❌ adminUpdateMedicine error:", err);
     next(err);
   }
 };
