@@ -1,0 +1,76 @@
+Line 147: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 148 START DIAGRAM: flowchart LR
+    Doctor["🩺 Doctor"]
+    Admin["🔧 Admin"]
+    RZP["💳 Razorpay"]
+    CLD["☁️ Cloudinar
+Line 150: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 151 START DIAGRAM: flowchart TB
+    Doctor["🩺 Doctor"]
+    Admin["🔧 Admin"]
+    RZP["💳 Razorpay"]
+    CLD["☁️ Cloudinar
+Line 153: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 154 START DIAGRAM: flowchart TB
+    Doctor["🩺 Doctor"]
+    Admin["🔧 Admin"]
+
+    subgraph "3.0 Order Processing"
+      
+Line 156: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 157 START DIAGRAM: gantt
+    title MediCart Development Timeline
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b %d
+
+    
+Line 159: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 160 START DIAGRAM: flowchart LR
+    A["A: Requirements\nAnalysis\n7 days"] --> B["B: System\nDesign\n11 days"]
+    B --
+Line 224: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 225 START DIAGRAM: erDiagram
+    USER {
+        ObjectId _id PK
+        String name
+        String email UK
+        Str
+Line 229: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 230 START DIAGRAM: flowchart TB
+    subgraph Actors
+        Doctor["🩺 Doctor"]
+        Admin["🔧 Admin"]
+        Razorpa
+Line 232: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 233 START DIAGRAM: flowchart TD
+    START(["▶ Start"])
+    LOGIN["Doctor Logs In"]
+    AUTH{"Credentials\nValid?"}
+    
+Line 235: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 236 START DIAGRAM: sequenceDiagram
+    actor Doctor
+    participant Frontend as React Frontend
+    participant API as E
+Line 238: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 241: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 242 START DIAGRAM: classDiagram
+    class User {
+        +ObjectId _id
+        +String name
+        +String email
+     
+Line 244: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 245 START DIAGRAM: flowchart TD
+    A["Receive POST /api/orders"] --> B{"User authenticated?"}
+    B -- No --> C["Retur
+Line 247: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 248 START DIAGRAM: flowchart LR
+    subgraph "Frontend (React)"
+        AUTH_CTX["AuthContext"]
+        CART_CTX["CartC
+Line 266: [Note: This section contains a MERMAID diagram. Please refer to the original Markdown file to render
+Line 267 START DIAGRAM: flowchart TB
+    subgraph "Client Layer"
+        Browser["🌐 Browser"]
+        Mobile["📱 Mobile Brows
