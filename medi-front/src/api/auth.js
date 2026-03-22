@@ -20,11 +20,12 @@ export const doctorLogin = async (email, password) => {
   };
 };
 
-export const doctorSignup = async (name, email, password) => {
+export const doctorSignup = async (name, email, password, phone) => {
   const res = await client.post("/auth/doctor/register", {
     name,
     email,
     password,
+    phone,
   });
 
   if (!res || !res.token) {
@@ -41,6 +42,14 @@ export const doctorSignup = async (name, email, password) => {
 export const updateProfile = async (data) => {
   const res = await client.put("/auth/doctor/profile", data);
   return res.user;
+};
+
+export const doctorForgotPassword = async (email, phone) => {
+  return await client.post("/auth/doctor/forgot-password", { email, phone });
+};
+
+export const doctorResetPassword = async (email, phone, newPassword) => {
+  return await client.post("/auth/doctor/reset-password", { email, phone, newPassword });
 };
 
 /* =========================
@@ -61,4 +70,12 @@ export const adminLogin = async (email, password) => {
     role: res.role,
     user: res.user,
   };
+};
+
+export const adminForgotPassword = async (email, phone) => {
+  return await client.post("/auth/admin/forgot-password", { email, phone });
+};
+
+export const adminResetPassword = async (email, phone, newPassword) => {
+  return await client.post("/auth/admin/reset-password", { email, phone, newPassword });
 };

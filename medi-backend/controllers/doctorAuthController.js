@@ -6,12 +6,12 @@ import { generateToken } from "../utils/generateToken.js";
 ========================= */
 export const registerDoctor = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !phone) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: "All fields are required (Name, Email, Password, Phone)",
       });
     }
 
@@ -28,6 +28,7 @@ export const registerDoctor = async (req, res) => {
       name,
       email,
       password,
+      phone,
       role: "doctor",
     });
 
@@ -157,5 +158,61 @@ export const updateDoctorProfile = async (req, res) => {
   } catch (error) {
     console.error("Update profile error:", error);
     res.status(500).json({ message: "Update failed" });
+  }
+};
+
+/* =========================
+   FORGOT PASSWORD (VERIFY)
+   ========================= */
+export const forgotPasswordDoctor = async (req, res) => {
+  try {
+    const { email, phone } = req.body;
+
+    if (!email || !phone) {
+      return res.status(400).json({ success: false, message: "Email and Phone are required" });
+    }
+
+    const doctor = await User.findOne({ email, role: "doctor" });
+
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: "Doctor not found" });
+    }
+
+    // Check if phone matches
+    if (doctor.phone !== phone) {
+      return res.status(400).json({ success: false, message: "Verification failed. Phone number does not match." });
+    }
+
+    return res.status(200).json({ success: true, message: "Identity verified. You can now reset your password." });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/* =========================
+   RESET PASSWORD
+   ========================= */
+export const resetPasswordDoctor = async (req, res) => {
+  try {
+    const { email, phone, newPassword } = req.body;
+
+    if (!email || !phone || !newPassword) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    const doctor = await User.findOne({ email, role: "doctor" });
+
+    if (!doctor || doctor.phone !== phone) {
+      return res.status(401).json({ success: false, message: "Unauthorized reset attempt" });
+    }
+
+    doctor.password = newPassword;
+    await doctor.save();
+
+    return res.status(200).json({ success: true, message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };

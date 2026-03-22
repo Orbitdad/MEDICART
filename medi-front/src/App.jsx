@@ -41,6 +41,8 @@ import AboutMediCart from "./pages/public/AboutMediCart.jsx";
 import PrivacyPolicy from "./pages/public/PrivacyPolicy.jsx";
 import TermsAndConditions from "./pages/public/TermsAndConditions.jsx";
 import RefundPolicy from "./pages/public/RefundPolicy.jsx";
+import ForgotPassword from "./pages/public/ForgotPassword.jsx";
+import ResetPassword from "./pages/public/ResetPassword.jsx";
 
 function App() {
   return (
@@ -117,6 +119,8 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsAndConditions />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* 404 */}
           <Route
