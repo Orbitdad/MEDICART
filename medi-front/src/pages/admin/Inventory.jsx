@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { fetchInventorySummary } from "../../api/orders.js";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 import Medicines from "./Medicines.jsx";
@@ -8,7 +9,14 @@ function Inventory() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("overview"); // "overview" | "medicines" | "purchase"
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlSearch = searchParams.get("search") || "";
+  const [activeTab, setActiveTab] = useState(urlSearch ? "medicines" : "overview");
+
+  // Auto-switch to medicines tab when navbar search is used
+  useEffect(() => {
+    if (urlSearch) setActiveTab("medicines");
+  }, [urlSearch]);
 
   const loadSummary = async () => {
     setLoading(true);
@@ -138,7 +146,7 @@ function Inventory() {
 
       {activeTab === "medicines" && (
         <section role="tabpanel" aria-label="Medicine master and stock">
-          <Medicines />
+          <Medicines initialSearch={urlSearch} />
         </section>
       )}
 

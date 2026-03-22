@@ -9,7 +9,7 @@ import {
 } from "../../api/medicines.js";
 import "../../components/MedicineImageUpload.css";
 
-function Medicines() {
+function Medicines({ initialSearch = "" }) {
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
@@ -19,7 +19,12 @@ function Medicines() {
   const [loadingId, setLoadingId] = useState(null);
   const [deletingOOS, setDeletingOOS] = useState(false);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
+
+  // Sync search when navbar triggers a new search
+  useEffect(() => {
+    if (initialSearch) setSearch(initialSearch);
+  }, [initialSearch]);
   const [previewImage, setPreviewImage] = useState(null);
   const fileInputRef = useRef(null);
 

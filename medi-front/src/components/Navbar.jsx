@@ -36,10 +36,10 @@ function Navbar() {
   const handleSearch = (e) => {
     e.preventDefault();
     const q = searchQuery.trim();
-    if (isAuthenticated && role === "doctor") {
+    if (isAuthenticated && role === "admin") {
+      navigate(q ? `/admin/inventory?search=${encodeURIComponent(q)}` : "/admin/inventory");
+    } else if (isAuthenticated && role === "doctor") {
       navigate(q ? `/doctor/medicines?search=${encodeURIComponent(q)}` : "/doctor/medicines");
-    } else {
-      navigate(q ? `/doctor/medicines?search=${encodeURIComponent(q)}` : "/");
     }
     setMobileMenuOpen(false);
   };
@@ -54,17 +54,19 @@ function Navbar() {
           </span>
         </button>
 
-        <form onSubmit={handleSearch} className="navbar-search-wrap">
-          <Search size={18} className="navbar-search-icon" aria-hidden />
-          <input
-            type="text"
-            placeholder="Search medicines, salts, brands..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="navbar-search-input"
-            aria-label="Search medicines"
-          />
-        </form>
+        {isAuthenticated && (
+          <form onSubmit={handleSearch} className="navbar-search-wrap">
+            <Search size={18} className="navbar-search-icon" aria-hidden />
+            <input
+              type="text"
+              placeholder="Search medicines, salts, brands..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="navbar-search-input"
+              aria-label="Search medicines"
+            />
+          </form>
+        )}
 
 
         <div className="navbar-actions">
@@ -123,16 +125,18 @@ function Navbar() {
 
       {mobileMenuOpen && (
         <div className="navbar-mobile-menu">
-          <form onSubmit={handleSearch} className="navbar-mobile-search">
-            <Search size={18} />
-            <input
-              type="text"
-              placeholder="Search medicines..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="navbar-mobile-search-input"
-            />
-          </form>
+          {isAuthenticated && (
+            <form onSubmit={handleSearch} className="navbar-mobile-search">
+              <Search size={18} />
+              <input
+                type="text"
+                placeholder="Search medicines..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="navbar-mobile-search-input"
+              />
+            </form>
+          )}
           <div className="navbar-mobile-location">
             <MapPin size={16} />
             <span>{locationText}</span>
