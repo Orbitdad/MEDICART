@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, MapPin, ShoppingCart, Menu, X, Download } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -14,6 +14,9 @@ function Navbar() {
   const [locationText, setLocationText] = useState("Deliver to");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [locationDropdownOpen, setLocationDropdownOpen] = useState(false);
+  
+  // Ref for secret admin tap login
+  const adminTapRef = useRef({ count: 0, lastTap: 0 });
 
   const cartCount = items.length;
   const isLanding = pathname === "/";
@@ -26,6 +29,24 @@ function Navbar() {
   };
 
   const goHome = () => {
+    const now = Date.now();
+    const { count, lastTap } = adminTapRef.current;
+
+    // Secret 5-tap logic
+    if (now - lastTap < 800) {
+      adminTapRef.current.count = count + 1;
+      // 4 means 5 total taps including the first one (0, 1, 2, 3, 4)
+      if (adminTapRef.current.count >= 4) {
+        adminTapRef.current.count = 0;
+        navigate("/admin/login");
+        setMobileMenuOpen(false);
+        return; // Don't fall through to normal goHome logic
+      }
+    } else {
+      adminTapRef.current.count = 0; // Reset if too slow
+    }
+    adminTapRef.current.lastTap = now;
+
     if (role === "admin") navigate("/admin/dashboard");
     else if (role === "doctor") navigate("/doctor/home");
     else navigate("/");
