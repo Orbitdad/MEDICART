@@ -1,6 +1,6 @@
 {
   "appId": "org.medicart.app",
-  "appName": "medi-front",
+  "appName": "SHREE SAI SURGICAL",
   "webDir": "dist",
   "server": {
     "cleartext": true

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">medi-front</string>
-    <string name="title_activity_main">medi-front</string>
+    <string name="app_name">MediCart</string>
+    <string name="title_activity_main">MediCart</string>
     <string name="package_name">org.medicart.app</string>
     <string name="custom_url_scheme">org.medicart.app</string>
 </resources>
