@@ -216,6 +216,17 @@
   color: #fff;
 }
 
+.navbar-btn-apk {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.navbar-btn-apk:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
 /* Nav links (when logged in) */
 .navbar-nav-links {
   display: flex;

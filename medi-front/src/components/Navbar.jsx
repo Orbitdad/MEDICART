@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Search, MapPin, ShoppingCart, Menu, X } from "lucide-react";
+import { Search, MapPin, ShoppingCart, Menu, X, Download } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import "./Navbar.css";
@@ -70,6 +70,10 @@ function Navbar() {
 
 
         <div className="navbar-actions">
+          <a href="/medicart.apk" download className="navbar-btn navbar-btn-apk" aria-label="Download App APK">
+            <Download size={16} strokeWidth={2.5} style={{ marginRight: "6px" }} /> App
+          </a>
+
           {!isAuthenticated && (
             <>
               <Link to="/doctor/login" className="navbar-link navbar-link-login">Login</Link>
@@ -142,6 +146,9 @@ function Navbar() {
             <span>{locationText}</span>
           </div>
           <nav className="navbar-mobile-links">
+            <a href="/medicart.apk" download onClick={() => setMobileMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Download size={18} /> Download App
+            </a>
             {!isAuthenticated && (
               <>
                 <Link to="/doctor/login" onClick={() => setMobileMenuOpen(false)}>Login</Link>

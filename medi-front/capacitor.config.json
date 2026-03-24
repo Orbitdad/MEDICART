@@ -1,0 +1,8 @@
+{
+  "appId": "org.medicart.app",
+  "appName": "medi-front",
+  "webDir": "dist",
+  "server": {
+    "cleartext": true
+  }
+}
