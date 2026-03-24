@@ -27,17 +27,24 @@ const app = express();
 /* CORS — ONCE ONLY */
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost",
-      "capacitor://localhost",
-      "ionic://localhost",
-      "http://192.168.0.103:5173/MEDICART/",
-      "https://orbitdad.github.io",
-    ],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost",
+        "capacitor://localhost",
+        "ionic://localhost",
+        "http://192.168.0.103:5173/MEDICART/",
+        "https://orbitdad.github.io",
+      ];
+      if (!origin || allowedOrigins.includes(origin) || origin.startsWith("http://10.0.2.2") || origin.startsWith("http://192.168.")) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
   })
 );
 

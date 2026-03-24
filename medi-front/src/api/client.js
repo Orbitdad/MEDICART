@@ -1,5 +1,5 @@
 const base =
-  (import.meta.env.VITE_API_URL || "https://medicart-backend.onrender.com/api")
+  (import.meta.env.VITE_API_URL || "https://medicart-d2ju.onrender.com/api")
     .replace(/\/$/, "");
 
 /* =========================
