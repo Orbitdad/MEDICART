@@ -30,6 +30,9 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
+      "http://localhost",
+      "capacitor://localhost",
+      "ionic://localhost",
       "http://192.168.0.103:5173/MEDICART/",
       "https://orbitdad.github.io",
     ],
