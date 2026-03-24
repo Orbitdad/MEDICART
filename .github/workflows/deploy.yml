@@ -27,20 +27,20 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: SHREE SAI SURGICAL/package-lock.json
+          cache-dependency-path: medi-front/package-lock.json
 
       - name: Install dependencies
-        working-directory: SHREE SAI SURGICAL
+        working-directory: medi-front
         run: npm ci
 
       - name: Build project
-        working-directory: SHREE SAI SURGICAL
+        working-directory: medi-front
         run: npm run build
 
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: SHREE SAI SURGICAL/dist
+          path: medi-front/dist
 
   deploy:
     needs: build
