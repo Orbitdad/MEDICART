@@ -53,8 +53,8 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-top: 64px;
-  /* navbar height */
+  padding-top: calc(64px + env(safe-area-inset-top, 0px));
+  /* navbar height + safe area */
 }
 
 /* Main content wrapper */

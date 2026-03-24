@@ -8,7 +8,8 @@
   top: 0;
   left: 0;
   width: 100%;
-  min-height: 64px;
+  padding-top: env(safe-area-inset-top, 0px);
+  min-height: calc(64px + env(safe-area-inset-top, 0px));
   z-index: 1000;
   background: #ffffff;
   border-bottom: 1px solid var(--border-soft);

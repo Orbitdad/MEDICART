@@ -10,7 +10,8 @@
     left: 0;
     right: 0;
 
-    height: 56px;
+    height: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     background: #ffffff;
     border-top: 1px solid rgba(15, 23, 42, 0.12);
     z-index: 1000;
@@ -33,6 +34,6 @@
 
   /* Prevent content from hiding */
   .app-root {
-    padding-bottom: 56px;
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
   }
 }
