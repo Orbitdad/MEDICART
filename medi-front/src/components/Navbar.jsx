@@ -70,7 +70,7 @@ function Navbar() {
 
 
         <div className="navbar-actions">
-          <a href="/medicart.apk" download className="navbar-btn navbar-btn-apk" aria-label="Download App APK">
+          <a href={`${import.meta.env.BASE_URL}medicart.apk`} download className="navbar-btn navbar-btn-apk" aria-label="Download App APK">
             <Download size={16} strokeWidth={2.5} style={{ marginRight: "6px" }} /> App
           </a>
 
@@ -146,7 +146,7 @@ function Navbar() {
             <span>{locationText}</span>
           </div>
           <nav className="navbar-mobile-links">
-            <a href="/medicart.apk" download onClick={() => setMobileMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <a href={`${import.meta.env.BASE_URL}medicart.apk`} download onClick={() => setMobileMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Download size={18} /> Download App
             </a>
             {!isAuthenticated && (
