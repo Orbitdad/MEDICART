@@ -67,7 +67,7 @@ export default function InvoicePage() {
           <h2>SHREE SAI SURGICAL</h2>
           <p>Pharmaceutical & Surgical Distributor</p>
           <p>GSTIN: 27AKVPM197Q1Z4</p>
-          <p>Andheri (E), Mumbai – 400069</p>
+          <p>Ghatkopar (W), Mumbai – 400086</p>
         </div>
 
         {/* META */}
