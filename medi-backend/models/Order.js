@@ -42,6 +42,13 @@ const orderSchema = new mongoose.Schema(
       default: null
     },
 
+    orderNo: {
+      type: String,
+      unique: true,
+      index: true,
+      default: null,
+    },
+
 
 
     notes: {

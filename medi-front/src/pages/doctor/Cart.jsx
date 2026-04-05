@@ -92,7 +92,9 @@ export default function Cart() {
             });
 
             clearCart();
-            navigate(`/doctor/order-success/${res.order._id}`);
+            navigate(`/doctor/order-success/${res.orderNo || res.order._id}`, {
+              state: { orderId: res.order._id }
+            });
           } catch (err) {
             setError("Payment verification failed.");
             setLoading(false);
@@ -139,7 +141,9 @@ export default function Cart() {
       });
 
       clearCart();
-      navigate(`/doctor/order-success/${res.order._id}`);
+      navigate(`/doctor/order-success/${res.orderNo || res.order._id}`, {
+        state: { orderId: res.order._id }
+      });
     } catch (err) {
       setError(err.message || "Order failed.");
     } finally {

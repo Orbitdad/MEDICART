@@ -14,6 +14,24 @@ function generateInvoiceNo() {
   return `INV-${yyyy}${mm}${dd}-${rand}`;
 }
 
+async function generateOrderNo() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const datePrefix = `${yyyy}${mm}${dd}`;
+
+  // Count orders already created today to get the sequence number
+  const startOfDay = new Date(`${yyyy}-${mm}-${dd}T00:00:00.000Z`);
+  const endOfDay   = new Date(`${yyyy}-${mm}-${dd}T23:59:59.999Z`);
+  const count = await Order.countDocuments({
+    createdAt: { $gte: startOfDay, $lte: endOfDay },
+  });
+
+  const seq = String(count + 1).padStart(4, "0");
+  return `ORD-${datePrefix}-${seq}`;
+}
+
 
 
 /* ----------------------------------
@@ -105,7 +123,8 @@ export const placeOrder = async (req, res) => {
 
       orderStatus: "placed",
       adminStatus: "pending",
-      invoiceNo: generateInvoiceNo()
+      invoiceNo: generateInvoiceNo(),
+      orderNo: await generateOrderNo(),
     });
 
     /* -----------------------------
@@ -146,6 +165,7 @@ export const placeOrder = async (req, res) => {
     return res.status(201).json({
       message: "Order placed successfully",
       order,
+      orderNo: order.orderNo,
     });
   } catch (err) {
     console.error("ORDER ERROR:", err);
