@@ -16,7 +16,7 @@ router.post("/create-order", async (req, res) => {
     }
 
     const order = await razorpay.orders.create({
-      amount: amount * 100,
+      amount: amount, // already in paise (frontend sends finalAmount * 100)
       currency: "INR",
       receipt: "medicart_" + Date.now(),
     });
