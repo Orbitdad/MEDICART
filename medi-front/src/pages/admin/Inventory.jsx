@@ -4,6 +4,8 @@ import { fetchInventorySummary } from "../../api/orders.js";
 import LoadingScreen from "../../components/LoadingScreen.jsx";
 import Medicines from "./Medicines.jsx";
 import PurchaseEntry from "./PurchaseEntry.jsx";
+import InvoiceScan from "./InvoiceScan.jsx";
+import SmartRestock from "./SmartRestock.jsx";
 
 function Inventory() {
   const [summary, setSummary] = useState(null);
@@ -88,7 +90,31 @@ function Inventory() {
             aria-selected={activeTab === "purchase"}
             onClick={() => setActiveTab("purchase")}
           >
-            Purchase Entry
+            Manual Entry
+          </button>
+          <button
+            type="button"
+            role="tab"
+            className={`button button-sm ${activeTab === "scan"
+                ? "button-primary"
+                : "button-outline"
+              }`}
+            aria-selected={activeTab === "scan"}
+            onClick={() => setActiveTab("scan")}
+          >
+            Invoice Scan
+          </button>
+          <button
+            type="button"
+            role="tab"
+            className={`button button-sm ${activeTab === "restock"
+                ? "button-primary"
+                : "button-outline"
+              }`}
+            aria-selected={activeTab === "restock"}
+            onClick={() => setActiveTab("restock")}
+          >
+            Smart Restock
           </button>
         </div>
       </div>
@@ -151,8 +177,20 @@ function Inventory() {
       )}
 
       {activeTab === "purchase" && (
-        <section role="tabpanel" aria-label="Purchase entry form">
+        <section role="tabpanel" aria-label="Manual purchase entry form">
           <PurchaseEntry />
+        </section>
+      )}
+
+      {activeTab === "scan" && (
+        <section role="tabpanel" aria-label="Invoice scan and review">
+          <InvoiceScan />
+        </section>
+      )}
+
+      {activeTab === "restock" && (
+        <section role="tabpanel" aria-label="Smart restock form">
+          <SmartRestock />
         </section>
       )}
     </main>

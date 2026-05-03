@@ -18,6 +18,8 @@ import medicineRoutes from "./routes/medicineRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import invoiceRoutes from "./routes/invoiceRoutes.js";
+import ocrRoutes from "./routes/ocrRoutes.js";
+import stockRoutes from "./routes/stockRoutes.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 
 connectDB();
@@ -64,6 +66,8 @@ app.use("/api/admin/medicines", adminMedicineRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/payments", adminPaymentRoutes); // ✅ NEW ROUTE
 app.use("/api/admin/purchases", adminPurchaseRoutes);
+app.use("/api/admin/stock", stockRoutes);
+app.use("/api/admin/ocr", ocrRoutes);
 app.use("/api/invoices", invoiceRoutes);
 app.use("/api/payment", paymentRoutes);
 

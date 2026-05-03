@@ -2,124 +2,68 @@ import mongoose from "mongoose";
 
 const medicineSchema = new mongoose.Schema(
   {
-    /* --------------------
-       BASIC INFO
-    -------------------- */
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    /* ── Identity ── */
+    name:        { type: String, required: true, trim: true },
+    brand:       { type: String, trim: true, default: "" },
+    company:     { type: String, trim: true, default: "" },
+    companyCode: { type: String, trim: true, default: "" },
+    itemCode:    { type: String, trim: true, default: "" },
 
-    // Old field (manually-created via GPT)
-    brand: {
-      type: String,
-      default: "",
-    },
-
-    // New field (imported backup JSON) — equivalent of brand
-    company: {
-      type: String,
-      default: "",
-    },
-
-    companyCode: {
-      type: String,
-      default: "",
-    },
-
-    itemCode: {
-      type: String,
-      default: "",
-    },
-
-    description: {
-      type: String,
-      default: "",
-    },
-
-    // Old field (manually-created via GPT)
-    packaging: {
-      type: String,
-      default: "",
-    },
-
-    // New field (imported backup JSON) — equivalent of packaging
-    packing: {
-      type: String,
-      default: "",
-    },
-
-    /* --------------------
-       PRICING
-    -------------------- */
-    mrp: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-
-    price: {
-      type: Number,
-      required: true,
-      min: 0,
-      default: 0, // 🔥 SAFETY: prevents NaN
-    },
-
-    // Purchase cost (from imported backup)
-    cost: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
-
-    gstPercent: {
-      type: Number,
-      default: 5, // 🔥 SAFETY: always defined
-      min: 0,
-    },
-
-    /* --------------------
-       STOCK
-    -------------------- */
-    stock: {
-      type: Number,
-      required: true,
-      default: 0,
-      min: 0,
-    },
-
-    expiryDate: {
-      type: Date,
-    },
-
-    /* --------------------
-       CATEGORY
-    -------------------- */
+    /* ── Classification ── */
     category: {
       type: String,
-      enum: ["SYP", "TAB", "CAP", "EE", "INJ", "INSTR"],
+      enum: ["SYP", "TAB", "CAP", "EE", "INJ", "INSTR", "OTH"],
       default: "TAB",
     },
+    packaging:   { type: String, trim: true, default: "" }, // e.g. "10TAB", "100ML"
+    packing:     { type: String, trim: true, default: "" },
+    salt:        { type: String, trim: true, default: "" }, // composition / generic name
+    description: { type: String, trim: true, default: "" },
 
-    /* --------------------
-       IMAGES
-    -------------------- */
-    images: [
-      {
-        type: String,
-      },
-    ],
+    /* ── Tax / GST ── */
+    hsnCode:    { type: String, trim: true, default: "" },
+    gstPercent: { type: Number, default: 5 },
 
-    /* --------------------
-       STATUS
-    -------------------- */
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
+    /* ── Pricing (master defaults — overridden per batch) ── */
+    salePrice: { type: Number, default: 0 }, // selling price to doctor
+
+    /* ── Images (AutoImage lives here) ── */
+    images: [{ type: String }],
+
+    /* ── Search helpers ── */
+    // Aliases let fuzzy OCR match "Crocin 500" → "Crocin Tab 500mg"
+    searchAliases: [{ type: String, trim: true }],
+
+    /* ── Alerts ── */
+    minStockAlert: { type: Number, default: 10 }, // trigger low-stock warning
+
+    /* ── Flags ── */
+    isActive:  { type: Boolean, default: true },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON:   { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
-export default mongoose.model("Medicine", medicineSchema);
+/* ─────────────────────────────────────────
+   VIRTUALS — computed from PurchaseItem
+   These replace the old flat stock / mrp / expiryDate fields.
+   Call Medicine.findById(id).populate('batches') to use them,
+   OR use the aggregation helpers in medicineController.
+───────────────────────────────────────── */
+
+// currentStock: sum of (qty + free) across all non-expired active batches
+// → computed in controller via aggregation (can't do cross-collection in virtual)
+
+/* ─────────────────────────────────────────
+   INDEXES
+───────────────────────────────────────── */
+medicineSchema.index({ name: 1 });
+medicineSchema.index({ itemCode: 1 });
+medicineSchema.index({ name: "text", brand: "text", searchAliases: "text" });
+
+const Medicine = mongoose.model("Medicine", medicineSchema);
+export default Medicine;

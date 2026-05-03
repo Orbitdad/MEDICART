@@ -5,6 +5,7 @@ import {
   adminUpdateMedicine,
   adminDeleteMedicine,
   adminDeleteOutOfStock,
+  adminLowStock,
 } from "../controllers/medicineController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -17,6 +18,8 @@ const router = express.Router();
 ========================= */
 
 router.get("/", protect(["admin"]), adminGetMedicines);
+
+router.get("/low-stock", protect(["admin"]), adminLowStock);
 
 router.post(
   "/",
