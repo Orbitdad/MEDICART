@@ -13,7 +13,12 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
 import { getRecentOrders } from "../../api/orders";
 import doctorHeroImg from "../../public/illustrations/shreelogo.png";
+import ParallaxHero from "../../components/ParallaxHero.jsx";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./DoctorHome.css";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function DoctorHome() {
   const navigate = useNavigate();
@@ -60,23 +65,79 @@ export default function DoctorHome() {
     );
   };
 
+  useEffect(() => {
+    const triggers = [];
+
+    // We select sections that should fade in
+    const sections = gsap.utils.toArray([
+      ".welcome-section", 
+      ".stats-section",
+      ".empty-state-section"
+    ].join(","));
+
+    sections.forEach(section => {
+      if(!section) return;
+      const sectionAnim = gsap.fromTo(section, 
+        { opacity: 0, y: 60, scale: 0.98 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 1.2,
+          ease: "expo.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 85%",
+          }
+        }
+      );
+      triggers.push(sectionAnim.scrollTrigger);
+
+      // Stagger child elements
+      const children = section.querySelectorAll(".welcome-content > *, .stats-grid > *");
+      if(children.length > 0) {
+        const childrenAnim = gsap.fromTo(children,
+          { opacity: 0, y: 30, scale: 0.96 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1,
+            stagger: 0.1,
+            ease: "expo.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 85%",
+            }
+          }
+        );
+        triggers.push(childrenAnim.scrollTrigger);
+      }
+    });
+
+    return () => {
+      triggers.forEach(t => { if(t) t.kill(); });
+    };
+  }, [hasCartItems]);
+
   return (
     <>
       <section className="landing-hero">
+        <ParallaxHero />
         <div className="landing-hero-inner">
           {/* Flow: image above, then Shree Sai text, subtitle, search, chips */}
-          <div className="landing-hero-visual">
+          <div className="landing-hero-visual anti-gravity-2">
             <div className="landing-hero-image-wrap">
               <img
                 src={doctorHeroImg}
                 alt="Healthcare professional and medicines"
-                className="landing-hero-image"
+                className="landing-hero-image anti-gravity-3"
                 width={400}
                 height={320}
               />
             </div>
           </div>
-          <div className="landing-hero-content">
+          <div className="landing-hero-content anti-gravity-1">
             <h1 className="landing-hero-title">
               Shree Sai Surgical <br />
               <span className="landing-hero-title-accent">Pharmaceutical & Surgical Distributor</span>
