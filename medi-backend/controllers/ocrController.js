@@ -1,4 +1,5 @@
 import Medicine from "../models/Medicine.js";
+import { createWorker } from 'tesseract.js';
 
 /* ─────────────────────────────────────────
    HELPER: fuzzy match OCR name → Medicine
@@ -64,111 +65,67 @@ export const scanInvoice = async (req, res, next) => {
       return res.status(400).json({ message: "Invoice image is required" });
     }
 
-    const base64Image = file.buffer.toString("base64");
-    const mimeType = file.mimetype; // image/jpeg or image/png
+    /* ── Call Tesseract.js locally ── */
+    const worker = await createWorker('eng');
+    const { data: { text } } = await worker.recognize(file.buffer);
+    await worker.terminate();
 
-    /* ── Call Claude API to extract invoice rows ── */
-    const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "anthropic-version": "2023-06-01",
-        "x-api-key": process.env.ANTHROPIC_API_KEY,
-      },
-      body: JSON.stringify({
-        model: "claude-3-opus-20240229",
-        max_tokens: 4096,
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "image",
-                source: {
-                  type: "base64",
-                  media_type: mimeType,
-                  data: base64Image,
-                },
-              },
-              {
-                type: "text",
-                text: `This is a pharmaceutical supplier invoice (GST Tax Invoice) from India.
-Extract ALL medicine/product line items from this invoice into a JSON array.
+    const rawText = text;
+    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 5);
 
-For each row return EXACTLY this structure (no extra fields):
-{
-  "itemName": "exact product name as printed",
-  "qty": number,
-  "free": number or 0,
-  "pkg": "packaging e.g. 10TAB 100ML 1BOX",
-  "hsn": "HSN code",
-  "mfr": "manufacturer/company code or name",
-  "batch": "batch number",
-  "exp": "expiry MM/YY or MM/YYYY",
-  "mrp": number,
-  "billRate": number,
-  "amount": number,
-  "discountPercent": number or 0,
-  "gstPercent": number
-}
+    const header = { partyName: "Unknown", billNo: `INV-${Date.now()}` };
+    const parsedItems = [];
 
-Also extract the invoice header into this structure:
-{
-  "partyName": "supplier name",
-  "billNo": "invoice number",
-  "billDate": "date as printed",
-  "dueDate": "due date if present"
-}
-
-Return ONLY valid JSON in this exact shape, no explanation:
-{
-  "header": { ...header fields },
-  "items": [ ...all rows ]
-}
-
-Rules:
-- itemName: preserve exact spelling including strength e.g. "ELBIOCID 170ML SYR"
-- If a column is missing or illegible, use null
-- Numbers must be numeric (not strings)
-- Do not skip any row even if partially legible`,
-              },
-            ],
-          },
-        ],
-      }),
-    });
-
-    if (!claudeResponse.ok) {
-      const err = await claudeResponse.text();
-      console.error("Claude OCR API error:", err);
-      return res.status(502).json({ message: "OCR service error", detail: err });
+    // Header extraction guess
+    for (let i = 0; i < Math.min(10, lines.length); i++) {
+      const l = lines[i].toUpperCase();
+      if (l.includes("GSTIN") || l.includes("PHARMA") || l.includes("MEDICAL") || l.includes("DISTRIBUTOR") || l.includes("SURGICAL") || l.includes("AGENCY")) {
+        header.partyName = lines[i];
+        break;
+      }
     }
 
-    const claudeData = await claudeResponse.json();
-    const rawText = claudeData.content
-      .filter((b) => b.type === "text")
-      .map((b) => b.text)
-      .join("");
+    // Row extraction guess
+    for (const line of lines) {
+      const expMatch = line.match(/\b(0?[1-9]|1[0-2])[\/\-](20\d{2}|\d{2})\b/);
+      const amounts = [...line.matchAll(/\b\d+\.\d{2}\b/g)].map(m => Number(m[0]));
+      const ints = [...line.matchAll(/\b\d{1,4}\b/g)].map(m => m[0]);
 
-    /* ── Parse JSON from Claude response ── */
-    let parsed;
-    try {
-      // Strip markdown code fences if present
-      const cleaned = rawText.replace(/```json|```/g, "").trim();
-      parsed = JSON.parse(cleaned);
-    } catch (e) {
-      console.error("OCR JSON parse error:", e, "\nRaw:", rawText);
+      if (expMatch && amounts.length >= 2) {
+        const exp = expMatch[0];
+        const amount = amounts[amounts.length - 1] || 0;
+        const billRate = amounts[amounts.length - 2] || amount;
+        const mrp = amounts[amounts.length - 3] || billRate;
+
+        let nameText = line.replace(exp, '').replace(/\b\d+\.\d{2}\b/g, '').trim();
+        let qty = 1;
+        if (ints.length > 0) {
+           qty = Number(ints[0]);
+           nameText = nameText.replace(new RegExp(`\\b${ints[0]}\\b`), '');
+        }
+
+        const words = nameText.split(/\s+/).filter(w => w.length > 2 && !/^\d+$/.test(w));
+        const itemName = words.slice(0, 4).join(' ');
+
+        if (itemName) {
+          parsedItems.push({
+            itemName, qty, free: 0, pkg: "", hsn: "", mfr: "",
+            batch: "", exp, mrp, billRate, amount, discountPercent: 0, gstPercent: 5
+          });
+        }
+      }
+    }
+
+    if (parsedItems.length === 0) {
       return res.status(422).json({
-        message: "Could not parse invoice. Try a clearer photo.",
+        message: "No medicine items found. Tesseract could not read the table correctly.",
         raw: rawText,
       });
     }
 
-    const { header = {}, items = [] } = parsed;
-
     /* ── Fuzzy match each item to Medicine master ── */
     const matchedItems = await Promise.all(
-      items.map(async (item) => {
+      parsedItems.map(async (item) => {
         const { medicine, confidence } = await fuzzyMatch(item.itemName);
 
         return {

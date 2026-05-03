@@ -23,7 +23,8 @@
         "morgan": "^1.10.0",
         "multer": "^2.0.2",
         "pdfkit": "^0.17.2",
-        "razorpay": "^2.9.6"
+        "razorpay": "^2.9.6",
+        "tesseract.js": "^7.0.0"
     },
     "devDependencies": {
         "nodemon": "^3.1.0"
