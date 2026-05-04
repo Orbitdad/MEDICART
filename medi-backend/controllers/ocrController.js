@@ -1,5 +1,6 @@
 import Medicine from "../models/Medicine.js";
-import vision from "@google-cloud/vision";
+import { createWorker } from "tesseract.js";
+import sharp from "sharp";
 
 /* ─────────────────────────────────────────
    HELPER: fuzzy match OCR name → Medicine
@@ -65,29 +66,24 @@ export const scanInvoice = async (req, res, next) => {
       return res.status(400).json({ message: "Invoice image is required" });
     }
 
-    /* ── Call Google Cloud Vision API ── */
-    let credentials;
-    if (process.env.GOOGLE_CREDENTIALS_JSON) {
-      try {
-        credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
-      } catch (e) {
-        console.error("Failed to parse GOOGLE_CREDENTIALS_JSON", e);
-      }
-    }
-    
-    // Initialize client. If credentials provided, use them; otherwise defaults to ADC.
-    const client = new vision.ImageAnnotatorClient(credentials ? { credentials } : undefined);
+    /* ── Preprocess image and Call Tesseract OCR ── */
+    const processedBuffer = await sharp(file.buffer)
+      .greyscale()
+      .normalize()
+      .sharpen()
+      .png()
+      .toBuffer();
 
-    const [result] = await client.textDetection(file.buffer);
-    const detections = result.textAnnotations;
-    if (!detections || detections.length === 0) {
+    const worker = await createWorker("eng");
+    const { data: { text: rawText } } = await worker.recognize(processedBuffer);
+    await worker.terminate();
+
+    if (!rawText || rawText.trim() === "") {
       return res.status(422).json({
         message: "No text found in the invoice image.",
         raw: "",
       });
     }
-
-    const rawText = detections[0].description;
     const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 5);
 
     const header = { partyName: "Unknown", billNo: `INV-${Date.now()}` };
