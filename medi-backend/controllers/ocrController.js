@@ -145,7 +145,7 @@ export const scanInvoice = async (req, res, next) => {
         let remainingBefore = beforeExp;
         
         // Extract Qty and Free from the beginning
-        const firstNums = remainingBefore.match(/^(\d+)\s+(\d+)?/);
+        const firstNums = remainingBefore.match(/^\s*(\d+)\s+(\d+)?/);
         if (firstNums) {
             qty = Number(firstNums[1]);
             if (firstNums[2]) {
@@ -153,7 +153,7 @@ export const scanInvoice = async (req, res, next) => {
             }
             remainingBefore = remainingBefore.substring(firstNums[0].length).trim();
         } else {
-            const oneNum = remainingBefore.match(/^(\d+)\s+/);
+            const oneNum = remainingBefore.match(/^\s*(\d+)/);
             if (oneNum) {
                 qty = Number(oneNum[1]);
                 remainingBefore = remainingBefore.substring(oneNum[0].length).trim();
@@ -169,8 +169,20 @@ export const scanInvoice = async (req, res, next) => {
         
         // Extract Item Name (usually the first 2-4 tokens of what's left)
         const words = partsBefore.filter(w => w.length >= 2 && !/^\d+$/.test(w));
-        const itemName = words.slice(0, Math.min(4, words.length)).join(' ');
+        let itemName = words.slice(0, Math.min(4, words.length)).join(' ');
         
+        // Clean up itemName
+        if (itemName) {
+            itemName = itemName
+                .replace(/\|/g, '') // remove pipe characters
+                .trim()
+                .replace(/^\d+[\),]\s*/, '') // remove leading numbers with brackets or commas
+                .replace(/\b\d{5,8}\b/g, '') // remove HSN codes (5-8 digit standalone numbers)
+                .replace(/\b(PENTA|HELIC|ELDER|ANGLO|LEEF|WOCK|NUBEN)\b/g, '') // remove company codes
+                .replace(/\s{2,}/g, ' ') // remove extra spaces
+                .trim();
+        }
+
         // Pkg, HSN, Mfr/Co can be extrapolated from what remains, but not strictly needed for fuzzy match
         
         if (itemName) {
