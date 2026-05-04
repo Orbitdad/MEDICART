@@ -1,5 +1,5 @@
 import Medicine from "../models/Medicine.js";
-import { createWorker } from 'tesseract.js';
+import vision from "@google-cloud/vision";
 
 /* ─────────────────────────────────────────
    HELPER: fuzzy match OCR name → Medicine
@@ -65,12 +65,29 @@ export const scanInvoice = async (req, res, next) => {
       return res.status(400).json({ message: "Invoice image is required" });
     }
 
-    /* ── Call Tesseract.js locally ── */
-    const worker = await createWorker('eng');
-    const { data: { text } } = await worker.recognize(file.buffer);
-    await worker.terminate();
+    /* ── Call Google Cloud Vision API ── */
+    let credentials;
+    if (process.env.GOOGLE_CREDENTIALS_JSON) {
+      try {
+        credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+      } catch (e) {
+        console.error("Failed to parse GOOGLE_CREDENTIALS_JSON", e);
+      }
+    }
+    
+    // Initialize client. If credentials provided, use them; otherwise defaults to ADC.
+    const client = new vision.ImageAnnotatorClient(credentials ? { credentials } : undefined);
 
-    const rawText = text;
+    const [result] = await client.textDetection(file.buffer);
+    const detections = result.textAnnotations;
+    if (!detections || detections.length === 0) {
+      return res.status(422).json({
+        message: "No text found in the invoice image.",
+        raw: "",
+      });
+    }
+
+    const rawText = detections[0].description;
     const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 5);
 
     const header = { partyName: "Unknown", billNo: `INV-${Date.now()}` };
@@ -85,32 +102,79 @@ export const scanInvoice = async (req, res, next) => {
       }
     }
 
-    // Row extraction guess
+    // Row extraction using MM/YY or MM/YYYY as anchor
     for (const line of lines) {
+      // Find the expiry date which serves as our anchor point
       const expMatch = line.match(/\b(0?[1-9]|1[0-2])[\/\-](20\d{2}|\d{2})\b/);
-      const amounts = [...line.matchAll(/\b\d+\.\d{2}\b/g)].map(m => Number(m[0]));
-      const ints = [...line.matchAll(/\b\d{1,4}\b/g)].map(m => m[0]);
-
-      if (expMatch && amounts.length >= 2) {
+      
+      if (expMatch) {
         const exp = expMatch[0];
-        const amount = amounts[amounts.length - 1] || 0;
-        const billRate = amounts[amounts.length - 2] || amount;
-        const mrp = amounts[amounts.length - 3] || billRate;
-
-        let nameText = line.replace(exp, '').replace(/\b\d+\.\d{2}\b/g, '').trim();
-        let qty = 1;
-        if (ints.length > 0) {
-           qty = Number(ints[0]);
-           nameText = nameText.replace(new RegExp(`\\b${ints[0]}\\b`), '');
+        const expIndex = line.indexOf(exp);
+        
+        // Split line into before exp and after exp
+        const beforeExp = line.substring(0, expIndex).trim();
+        const afterExp = line.substring(expIndex + exp.length).trim();
+        
+        // After exp: MRP, Price/Rate, Amount, Disc%, GST%
+        // Extract all numbers after the expiry
+        const afterNumbers = [...afterExp.matchAll(/\b\d+(\.\d{1,2})?\b/g)].map(m => Number(m[0]));
+        
+        let mrp = 0, billRate = 0, amount = 0, discountPercent = 0, gstPercent = 5;
+        
+        if (afterNumbers.length >= 3) {
+           mrp = afterNumbers[0];
+           billRate = afterNumbers[1];
+           amount = afterNumbers[2];
+           if (afterNumbers.length > 3) discountPercent = afterNumbers[3];
+           if (afterNumbers.length > 4) gstPercent = afterNumbers[4];
+        } else {
+           // Fallback: look at all numbers in the line if the right side is incomplete
+           const allAmounts = [...line.matchAll(/\b\d+\.\d{2}\b/g)].map(m => Number(m[0]));
+           if (allAmounts.length >= 2) {
+             amount = allAmounts[allAmounts.length - 1] || 0;
+             billRate = allAmounts[allAmounts.length - 2] || amount;
+             mrp = allAmounts[allAmounts.length - 3] || billRate;
+           }
         }
 
-        const words = nameText.split(/\s+/).filter(w => w.length > 2 && !/^\d+$/.test(w));
-        const itemName = words.slice(0, 4).join(' ');
-
+        // Before exp: Qty, Free, Item Name, Pkg, HSN, Mfr/Co, Batch No
+        let qty = 1;
+        let free = 0;
+        let remainingBefore = beforeExp;
+        
+        // Extract Qty and Free from the beginning
+        const firstNums = remainingBefore.match(/^(\d+)\s+(\d+)?/);
+        if (firstNums) {
+            qty = Number(firstNums[1]);
+            if (firstNums[2]) {
+                free = Number(firstNums[2]);
+            }
+            remainingBefore = remainingBefore.substring(firstNums[0].length).trim();
+        } else {
+            const oneNum = remainingBefore.match(/^(\d+)\s+/);
+            if (oneNum) {
+                qty = Number(oneNum[1]);
+                remainingBefore = remainingBefore.substring(oneNum[0].length).trim();
+            }
+        }
+        
+        // Extract Batch No (usually the last token before Exp)
+        let batch = "";
+        const partsBefore = remainingBefore.split(/\s+/);
+        if (partsBefore.length > 1) {
+            batch = partsBefore.pop(); // The last word is often the batch
+        }
+        
+        // Extract Item Name (usually the first 2-4 tokens of what's left)
+        const words = partsBefore.filter(w => w.length >= 2 && !/^\d+$/.test(w));
+        const itemName = words.slice(0, Math.min(4, words.length)).join(' ');
+        
+        // Pkg, HSN, Mfr/Co can be extrapolated from what remains, but not strictly needed for fuzzy match
+        
         if (itemName) {
           parsedItems.push({
-            itemName, qty, free: 0, pkg: "", hsn: "", mfr: "",
-            batch: "", exp, mrp, billRate, amount, discountPercent: 0, gstPercent: 5
+            itemName, qty, free, pkg: "", hsn: "", mfr: "",
+            batch, exp, mrp, billRate, amount, discountPercent, gstPercent
           });
         }
       }
@@ -118,7 +182,7 @@ export const scanInvoice = async (req, res, next) => {
 
     if (parsedItems.length === 0) {
       return res.status(422).json({
-        message: "No medicine items found. Tesseract could not read the table correctly.",
+        message: "No medicine items found. Could not read the table correctly.",
         raw: rawText,
       });
     }

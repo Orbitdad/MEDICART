@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { savePurchase } from "../../api/purchase";
+import { savePurchase, searchMedicineAPI } from "../../api/purchase";
 import {
   Package,
   Save,
@@ -17,6 +17,8 @@ import "../../components/MedicineImageUpload.css";
 
 /* ─────────────── helpers ─────────────── */
 const EMPTY_ROW = () => ({
+  medicineId: null,
+  isNewMedicine: true,
   code: "",
   itemName: "",
   mfr: "",
@@ -79,9 +81,12 @@ function PurchaseEntry() {
   const [activeTab, setActiveTab] = useState(0);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState(null);
+  const [dropdownRowIndex, setDropdownRowIndex] = useState(null);
+  const [searchResults, setSearchResults] = useState([]);
 
   /* ── refs ── */
   const fileInputRefs = useRef([]);
+  const searchTimeout = useRef(null);
 
   /* ─────── handlers ─────── */
   const handleHeaderChange = (e) => {
@@ -130,6 +135,53 @@ function PurchaseEntry() {
       if (prev.length <= 1) return prev; // keep at least 1
       return prev.filter((_, i) => i !== index);
     });
+  };
+
+  /* ── autocomplete ── */
+  const handleItemNameChange = (index, value) => {
+    setRows((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], itemName: value, medicineId: null, isNewMedicine: true };
+      return next;
+    });
+
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+
+    if (value.length >= 2) {
+      searchTimeout.current = setTimeout(async () => {
+        try {
+          const results = await searchMedicineAPI(value);
+          setSearchResults(results || []);
+          setDropdownRowIndex(index);
+        } catch (err) {
+          console.error("Search error:", err);
+        }
+      }, 300);
+    } else {
+      setDropdownRowIndex(null);
+      setSearchResults([]);
+    }
+  };
+
+  const handleSelectMedicine = (index, medicine) => {
+    setRows((prev) => {
+      const next = [...prev];
+      next[index] = {
+        ...next[index],
+        itemName: medicine.name,
+        medicineId: medicine._id,
+        isNewMedicine: false,
+        mfr: medicine.brand || next[index].mfr,
+        pkg: medicine.packaging || next[index].pkg,
+        hsnCode: medicine.hsnCode || next[index].hsnCode,
+        gstPercent: medicine.gstPercent || next[index].gstPercent,
+        salePrice: medicine.salePrice || next[index].salePrice,
+      };
+      next[index] = recalcRow(next[index]);
+      return next;
+    });
+    setDropdownRowIndex(null);
+    setSearchResults([]);
   };
 
   /* ── image ── */
@@ -438,7 +490,49 @@ function PurchaseEntry() {
                     )}
                   </td>
                   <td><input className="input" value={row.code} onChange={(e) => handleRowChange(idx, "code", e.target.value)} style={{ minWidth: 55 }} /></td>
-                  <td><input className="input" value={row.itemName} onChange={(e) => handleRowChange(idx, "itemName", e.target.value)} style={{ minWidth: 120, textAlign: "left" }} /></td>
+                  <td>
+                    <div style={{ position: "relative" }}>
+                      <input 
+                        className="input" 
+                        value={row.itemName} 
+                        onChange={(e) => handleItemNameChange(idx, e.target.value)} 
+                        style={{ minWidth: 120, textAlign: "left" }} 
+                      />
+                      {dropdownRowIndex === idx && searchResults.length > 0 && (
+                        <ul style={{
+                          position: "absolute",
+                          top: "100%",
+                          left: 0,
+                          minWidth: 200,
+                          background: "#fff",
+                          border: "1px solid var(--border-soft)",
+                          borderRadius: 4,
+                          boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+                          zIndex: 50,
+                          maxHeight: 200,
+                          overflowY: "auto",
+                          padding: 0,
+                          margin: 0,
+                          listStyle: "none",
+                          fontSize: "0.85rem",
+                          color: "var(--text-main)"
+                        }}>
+                          {searchResults.map((med) => (
+                            <li 
+                              key={med._id} 
+                              style={{ padding: "6px 8px", cursor: "pointer", borderBottom: "1px solid #f1f5f9" }}
+                              onMouseDown={(e) => { e.preventDefault(); handleSelectMedicine(idx, med); }}
+                            >
+                              <div style={{ fontWeight: 500 }}>{med.name}</div>
+                              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                                {med.brand} • {med.packaging}
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </td>
                   <td><input className="input" value={row.mfr} onChange={(e) => handleRowChange(idx, "mfr", e.target.value)} style={{ minWidth: 60, textAlign: "left" }} /></td>
                   <td><input className="input" value={row.pkg} onChange={(e) => handleRowChange(idx, "pkg", e.target.value)} style={{ minWidth: 45 }} /></td>
                   <td><input className="input" value={row.batch} onChange={(e) => handleRowChange(idx, "batch", e.target.value)} style={{ minWidth: 65 }} /></td>

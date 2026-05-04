@@ -81,3 +81,15 @@ export const deletePurchase = async (id) => {
     if (!res.ok) throw new Error("Failed to delete purchase");
     return res.json();
 };
+
+/* =========================
+   SEARCH MEDICINE API
+========================= */
+export const searchMedicineAPI = async (q) => {
+    const res = await fetch(`${BASE}/admin/ocr/search-medicine?q=${encodeURIComponent(q)}`, {
+        headers: authHeader(),
+    });
+
+    if (!res.ok) throw new Error("Search failed");
+    return res.json();
+};
