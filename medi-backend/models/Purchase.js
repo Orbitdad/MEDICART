@@ -101,7 +101,7 @@ const purchaseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-purchaseSchema.index({ purchaseNo: 1 });
+
 purchaseSchema.index({ partyName: 1 });
 purchaseSchema.index({ billDate: -1 });
 purchaseSchema.index({ "items.medicineId": 1 }); // fast stock lookup per medicine
