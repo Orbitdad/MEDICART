@@ -2,6 +2,10 @@ import Medicine from "../models/Medicine.js";
 import { createWorker } from "tesseract.js";
 import sharp from "sharp";
 
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
 /* ─────────────────────────────────────────
    HELPER: fuzzy match OCR name → Medicine
    Uses MongoDB text search + fallback regex.
@@ -11,17 +15,18 @@ async function fuzzyMatch(rawName) {
   if (!rawName?.trim()) return { medicine: null, confidence: 0 };
 
   const clean = rawName.trim().toUpperCase();
+  const escapedClean = escapeRegex(clean);
 
   // 1. Exact match (case-insensitive)
   let medicine = await Medicine.findOne({
-    name: { $regex: `^${clean}$`, $options: "i" },
+    name: { $regex: `^${escapedClean}$`, $options: "i" },
     isActive: true,
   });
   if (medicine) return { medicine, confidence: 1.0 };
 
   // 2. Alias exact match
   medicine = await Medicine.findOne({
-    searchAliases: { $regex: `^${clean}$`, $options: "i" },
+    searchAliases: { $regex: `^${escapedClean}$`, $options: "i" },
     isActive: true,
   });
   if (medicine) return { medicine, confidence: 0.97 };
@@ -43,9 +48,10 @@ async function fuzzyMatch(rawName) {
   // 4. Partial name contains match (last resort)
   // Strip common suffixes to get the root word
   const root = clean.replace(/\s+(TAB|SYP|CAP|INJ|GEL|CREAM|DROPS?|SYRUP|TABLET|CAPSULE|MG|ML)\b.*/i, "").trim();
+  const escapedRoot = escapeRegex(root);
   if (root.length >= 3) {
     medicine = await Medicine.findOne({
-      name: { $regex: root, $options: "i" },
+      name: { $regex: escapedRoot, $options: "i" },
       isActive: true,
     }).limit(1);
     if (medicine) return { medicine, confidence: 0.6 };
@@ -240,15 +246,17 @@ export const searchMedicine = async (req, res, next) => {
   try {
     const q = (req.query.q || "").trim();
     if (!q || q.length < 2) return res.json([]);
+    
+    const escapedQ = escapeRegex(q);
 
     const results = await Medicine.find(
       {
         isActive: true,
         $or: [
-          { name:          { $regex: q, $options: "i" } },
-          { brand:         { $regex: q, $options: "i" } },
-          { itemCode:      { $regex: q, $options: "i" } },
-          { searchAliases: { $regex: q, $options: "i" } },
+          { name:          { $regex: escapedQ, $options: "i" } },
+          { brand:         { $regex: escapedQ, $options: "i" } },
+          { itemCode:      { $regex: escapedQ, $options: "i" } },
+          { searchAliases: { $regex: escapedQ, $options: "i" } },
         ],
       },
       {
