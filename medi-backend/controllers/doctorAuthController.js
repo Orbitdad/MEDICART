@@ -103,7 +103,16 @@ export const loginDoctor = async (req, res) => {
       });
     }
 
-    const token = generateToken(doctor._id, "doctor");
+    let token;
+    try {
+      token = generateToken(doctor._id, "doctor");
+    } catch (tokenErr) {
+      console.error("generateToken failed:", tokenErr.message, "| JWT_SECRET set:", !!process.env.JWT_SECRET, "| JWT_EXPIRES_IN:", process.env.JWT_EXPIRES_IN);
+      return res.status(500).json({
+        success: false,
+        message: "Token generation failed",
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -116,7 +125,7 @@ export const loginDoctor = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Doctor login error:", error);
+    console.error("Doctor login error:", error.name, error.message, error.stack?.split('\n')[1]);
 
     return res.status(500).json({
       success: false,
