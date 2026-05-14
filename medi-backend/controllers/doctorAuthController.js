@@ -136,7 +136,7 @@ export const loginDoctor = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Doctor login failed",
+      message: "Doctor login failed [v3]",
     });
   }
 };
