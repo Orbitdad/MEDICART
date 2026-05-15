@@ -68,9 +68,7 @@ export const loginDoctor = async (req, res) => {
       });
     }
 
-    console.log("[LOGIN] step 1: finding user");
     const doctor = await User.findOne({ email });
-    console.log("[LOGIN] step 2: user found:", !!doctor);
 
     if (!doctor) {
       return res.status(401).json({
@@ -79,7 +77,6 @@ export const loginDoctor = async (req, res) => {
       });
     }
 
-    console.log("[LOGIN] step 3: role check:", doctor.role);
     if (doctor.role !== "doctor") {
       return res.status(403).json({
         success: false,
@@ -88,10 +85,8 @@ export const loginDoctor = async (req, res) => {
     }
 
     let isMatch = false;
-    console.log("[LOGIN] step 4: comparing password");
     try {
       isMatch = await doctor.matchPassword(password);
-      console.log("[LOGIN] step 5: isMatch =", isMatch);
     } catch (err) {
       console.error("Password compare failed:", err.message);
       return res.status(401).json({
@@ -108,19 +103,16 @@ export const loginDoctor = async (req, res) => {
     }
 
     let token;
-    console.log("[LOGIN] step 6: generating token");
     try {
       token = generateToken(doctor._id, "doctor");
-      console.log("[LOGIN] step 7: token generated");
     } catch (tokenErr) {
-      console.error("generateToken failed:", tokenErr.message, "| JWT_SECRET set:", !!process.env.JWT_SECRET, "| JWT_EXPIRES_IN:", process.env.JWT_EXPIRES_IN);
+      console.error("Token generation failed:", tokenErr.message);
       return res.status(500).json({
         success: false,
         message: "Token generation failed",
       });
     }
 
-    console.log("[LOGIN] step 8: sending success response");
     return res.status(200).json({
       success: true,
       token,
@@ -132,11 +124,11 @@ export const loginDoctor = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("[LOGIN] OUTER CATCH:", error.name, "|", error.message, "|", error.stack?.split('\n').slice(0,3).join(' | '));
+    console.error("Doctor login error:", error.message);
 
     return res.status(500).json({
       success: false,
-      message: "Doctor login failed [v3]",
+      message: "Doctor login failed",
     });
   }
 };
